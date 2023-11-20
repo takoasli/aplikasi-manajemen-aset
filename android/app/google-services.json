@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "344098018213",
+    "project_id": "manajemen-aset-a1129",
+    "storage_bucket": "manajemen-aset-a1129.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344098018213:android:76aebe99134ba7a4ef0e4c",
+        "android_client_info": {
+          "package_name": "com.example.projek_skripsi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzrffwFrYR5Ngvik6I27VezoOHZrB2zqc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
