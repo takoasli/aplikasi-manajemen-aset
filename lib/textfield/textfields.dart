@@ -34,7 +34,7 @@ class MyTextField extends StatelessWidget {
           suffixIcon: hasSuffix ? IconButton(
             onPressed: onPress, icon: Icon(
             isObscure ? Icons.visibility : Icons.visibility_off,
-                color: Warna.white,
+                color: Warna.grey,
           ),
           )
               :null,

@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
+import 'package:projek_skripsi/manajemenUser.dart';
 import 'package:projek_skripsi/profile.dart';
+import 'package:projek_skripsi/tesTombol.dart';
 import 'aset_info.dart';
 
 
@@ -88,8 +90,30 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ],
             ),
+
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 45.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                Box(
+                text: 'Manajemen\nUser',
+                gambar: 'gambar/users.png',
+                halaman: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ManageAcc()),
+                  );
+                },
+              ),
+              ],
+              ),
+            )
           ],
         ),
+
+
         backgroundColor: Colors.white,
 
         //bottom navbar
@@ -98,7 +122,10 @@ class _DashboardState extends State<Dashboard> {
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => tesTombol()));
+            },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
@@ -131,13 +158,23 @@ class _DashboardState extends State<Dashboard> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(right: 5.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "gambar/home.png",
-                      ),
-                    ],
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Dashboard()),
+                      );
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "gambar/home.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

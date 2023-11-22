@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:projek_skripsi/dashboard.dart';
+import 'package:projek_skripsi/profile.dart';
 import 'komponen/box.dart';
 import 'komponen/style.dart';
 
@@ -17,7 +19,7 @@ class _AsetState extends State<Aset> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF61BF9D),
           title: const Text(
-            'Asset Info',
+            'Aset Info',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -100,18 +102,121 @@ class _AsetState extends State<Aset> {
                 ),
               ),
             ),
-
           ],
         ),
         backgroundColor: Colors.white,
-        bottomNavigationBar: Container(
-          color: const Color(0xFF61BF9D),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: Container(
+          width: 75,
           height: 75,
-          child: const Center(
-            child: Text(
-              'Your Footer Content Goes Here',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+          child: FloatingActionButton(
+            onPressed: () {},
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+              side: const BorderSide(
+                color: Colors.green,
+                width: 6.0,
+                style: BorderStyle.solid,
+              ),
             ),
+            child: Image.asset(
+              "gambar/qr_code.png",
+              height: 50,
+              width: 50,
+            ),
+          ),
+        ),
+        bottomNavigationBar: Container(
+          height: 65,
+          decoration: const BoxDecoration(
+            color: Color(0xFF61BF9D),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Dashboard()),
+                      );
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "gambar/home.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 45.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "gambar/notifications.png",
+                        height: 40,
+                        width: 40,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 45.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "gambar/settings.png",
+                        height: 40,
+                        width: 40,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Profiles()),
+                      );
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "gambar/profiles.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),

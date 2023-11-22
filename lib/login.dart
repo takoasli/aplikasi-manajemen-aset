@@ -16,34 +16,61 @@ class _LoginState extends State<Login> {
   final IdController = TextEditingController();
   bool isObscure = true;
 
-
-  void login() async{
-
-    //loading
+  void showErrorDialog(BuildContext context, String errorMessage) {
+    print('Dialog error call with message $errorMessage');
     showDialog(
-        context: context,
-        builder: (context){
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
-    await Future.delayed(const Duration(seconds: 1));
-    try{
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: IdController.text,
-          password: passwordController.text
-      );
-    } on FirebaseAuthException catch (e) {
-      print('pesan error: ${e.message}');
-      if (e.message == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.message == 'wrong-password') {
-        print('password salah');
-      }
-    }
-    Navigator.pop(context);
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: Text(errorMessage),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
+  Future<void>login(BuildContext context) async {
+    /*showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );*/
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: IdController.text,
+        password: passwordController.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-credential') {
+        showErrorDialog(context, 'The password or email is incorrect.');
+      } else {
+        showErrorDialog(context,'make sure you input email and password');
+      }
+     /* if (e.code == 'user-not-found') {
+        showErrorDialog('The email is not found.');
+      } else if (e.code == 'invalid-credential') {
+        showErrorDialog('The password is incorrect.');
+      } else {
+        showErrorDialog('An error occurred: ${e.message}');
+      }*/
+    }
+
+    Navigator.pop(context);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +143,9 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: login,
+                  onPressed: (){
+                    login(context);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Warna.green,
                     minimumSize: const Size(300, 50),
@@ -131,7 +160,6 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-
               ],
             ),
           ),
