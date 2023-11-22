@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/resetPassword.dart';
@@ -16,36 +17,32 @@ class _LoginState extends State<Login> {
   final IdController = TextEditingController();
   bool isObscure = true;
 
-  void showErrorDialog(BuildContext context, String errorMessage) {
-    print('Dialog error call with message $errorMessage');
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Error"),
-          content: Text(errorMessage),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      },
+  void errorDialog(String message) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: "Terjadi error",
+        message: message,
+        contentType: ContentType.failure,
+      ),
     );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
-  Future<void>login(BuildContext context) async {
-    /*showDialog(
+  void login() async {
+    showDialog(
       context: context,
       builder: (context) {
         return const Center(
           child: CircularProgressIndicator(),
         );
       },
-    );*/
+    );
 
     await Future.delayed(const Duration(seconds: 1));
 
@@ -56,17 +53,10 @@ class _LoginState extends State<Login> {
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
-        showErrorDialog(context, 'The password or email is incorrect.');
+        errorDialog('The password or email is incorrect.');
       } else {
-        showErrorDialog(context,'make sure you input email and password');
+       errorDialog('make sure you input email and password');
       }
-     /* if (e.code == 'user-not-found') {
-        showErrorDialog('The email is not found.');
-      } else if (e.code == 'invalid-credential') {
-        showErrorDialog('The password is incorrect.');
-      } else {
-        showErrorDialog('An error occurred: ${e.message}');
-      }*/
     }
 
     Navigator.pop(context);
@@ -143,9 +133,7 @@ class _LoginState extends State<Login> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: (){
-                    login(context);
-                  },
+                  onPressed: login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Warna.green,
                     minimumSize: const Size(300, 50),
