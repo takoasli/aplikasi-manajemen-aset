@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:projek_skripsi/catatanAset.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
@@ -73,7 +74,7 @@ class _DashboardState extends State<Dashboard> {
                   halaman: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Aset()),
+                      MaterialPageRoute(builder: (context) => Catatan()),
                     );
                   },
                 ),

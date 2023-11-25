@@ -9,33 +9,58 @@ class BacaUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    CollectionReference User = FirebaseFirestore.instance.collection('User');
+    CollectionReference user = FirebaseFirestore.instance.collection('User');
 
     return FutureBuilder<DocumentSnapshot>(
-      future: User.doc(dokumenUser).get(),
+      future: user.doc(dokumenUser).get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+
           Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          String urlGambar = data['Foto Profil'] ?? ''; // Ubah 'UrlGambar' sesuai dengan field di Firestore Anda
+
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                '${data['Nama']}',
-                style: TextStyles.title.copyWith(
-                    fontSize: 17,
-                    color: Warna.darkgrey,
-                letterSpacing: 0.5),
+              CircleAvatar(
+                backgroundImage: urlGambar.isNotEmpty
+                    ? NetworkImage(urlGambar) as ImageProvider<Object>
+                    : AssetImage('path_to_placeholder_image') as ImageProvider<Object>, // Ganti dengan path placeholder jika URL kosong
+                radius: 25,
+                backgroundColor: Warna.green,
               ),
-              SizedBox(height: 8),
-              Text(
-                '${data['ID']}',
-                style: TextStyles.body.copyWith(fontSize: 15, color: Warna.darkgrey),
+              SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${data['Nama']}',
+                    style: TextStyles.title.copyWith(
+                      fontSize: 17,
+                      color: Warna.darkgrey,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    '${data['ID']}',
+                    style: TextStyles.body.copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ],
               ),
             ],
           );
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        } else {
+          return Text('loading bang');
         }
-        return Text('loading bang');
       },
     );
   }
 }
+
+

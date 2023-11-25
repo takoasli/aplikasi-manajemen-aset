@@ -1,7 +1,13 @@
+
+import 'dart:io';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:projek_skripsi/textfield/imageField.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 import 'komponen/style.dart';
 import 'manajemenUser.dart';
@@ -20,11 +26,14 @@ class _AddUserState extends State<AddUser> {
   final alamatController = TextEditingController();
   final namaController = TextEditingController();
   final IdController = TextEditingController();
+  final ImgController = TextEditingController();
+  final ImagePicker _img= ImagePicker();
   final passwordController = TextEditingController();
 
   final confirmPasswordController = TextEditingController();
   bool isPassword = true;
   bool confirmisPassword = true;
+
 
   final Sukses = SnackBar(
     elevation: 0,
@@ -33,10 +42,42 @@ class _AddUserState extends State<AddUser> {
     content: AwesomeSnackbarContent(
       title: 'SUCCESS',
       message:
-      'Data user berhasil Ditambahkan',
+      'Data user berhasil Ditambahkan!',
       contentType: ContentType.success,
     ),
   );
+
+
+  Future PilihGambar() async {
+    final pilihGambar = await _img.pickImage(source: ImageSource.gallery);
+    if (pilihGambar != null) {
+      setState(() {
+        ImgController.text = pilihGambar.path;
+      });
+    }
+  }
+
+  Future<String> unggahGambar(File profil) async {
+    try {
+      if (!profil.existsSync()) {
+        print('File tidak ditemukan.');
+        return '';
+      }
+
+      Reference penyimpanan = FirebaseStorage.instance
+          .ref()
+          .child('gambar')
+          .child(ImgController.text.split('/').last);
+
+      UploadTask uploadGambar = penyimpanan.putFile(profil);
+      await uploadGambar;
+      String foto = await penyimpanan.getDownloadURL();
+      return foto;
+    } catch (e) {
+      print('$e');
+      return '';
+    }
+  }
 
   Future SimpanAkun() async {
     if (PasswordConfirmed()) {
@@ -45,16 +86,27 @@ class _AddUserState extends State<AddUser> {
           email: emailController.text,
           password: passwordController.text,
         );
+
+        String lokasiGambar = ImgController.text;
+        String foto = '';
+
+        if (lokasiGambar.isNotEmpty) {
+          File profil = File(lokasiGambar);
+          foto = await unggahGambar(profil);
+        }
+
         await tambahUserInfo(
           namaController.text.trim(),
           IdController.text.trim(),
           int.parse(nomorController.text.trim()),
           emailController.text.trim(),
           alamatController.text.trim(),
+          foto,
         );
 
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder:(context) => ManageAcc())
+          context,
+          MaterialPageRoute(builder: (context) => ManageAcc()),
         );
 
         ScaffoldMessenger.of(context).showSnackBar(Sukses);
@@ -71,14 +123,14 @@ class _AddUserState extends State<AddUser> {
     }
   }
 
-  Future tambahUserInfo(
-      String Nama, String ID, int Nomor, String Email, String Alamat) async {
+  Future tambahUserInfo(String Nama, String ID, int Nomor, String Email, String Alamat, String urlGambar) async {
     await FirebaseFirestore.instance.collection('User').add({
       'Nama': Nama,
       'ID': ID,
       'Nomor HP': Nomor,
       'Email': Email,
       'Alamat Rumah': Alamat,
+      'Foto Profil': urlGambar,
     });
   }
 
@@ -257,23 +309,15 @@ class _AddUserState extends State<AddUser> {
                           fontSize: 15, color: Warna.darkgrey),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Warna.green,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      child: Text(
-                        'Choose...',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
+                  FieldImage(
+                    controller: ImgController,
+                    selectedImageName: ImgController.text.isNotEmpty
+                        ? ImgController.text.split('/').last // Display only the image name
+                        : '',
+                    onPressed: PilihGambar, // Pass the pickImage method to FieldImage
                   ),
+
+
                   const SizedBox(height: 30),
 
 
