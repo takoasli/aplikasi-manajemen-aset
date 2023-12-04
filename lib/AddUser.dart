@@ -11,7 +11,6 @@ import 'package:projek_skripsi/textfield/imageField.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
 import 'komponen/style.dart';
-import 'manajemenUser.dart';
 
 class AddUser extends StatefulWidget {
   const AddUser({super.key});
@@ -118,10 +117,7 @@ class _AddUserState extends State<AddUser> {
           foto,
         );
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ManageAcc()),
-        );
+        Navigator.pop(context, true);
 
         ScaffoldMessenger.of(context).showSnackBar(Sukses);
         namaController.clear();
@@ -318,11 +314,11 @@ class _AddUserState extends State<AddUser> {
                   controller: ImgController,
                   selectedImageName: ImgController.text.isNotEmpty
                       ? ImgController.text
-                      .split('/')
-                      .last // Display only the image name
+                          .split('/')
+                          .last // Display only the image name
                       : '',
                   onPressed:
-                  PilihGambar, // Pass the pickImage method to FieldImage
+                      PilihGambar, // Pass the pickImage method to FieldImage
                 ),
                 const SizedBox(height: 30),
                 Align(

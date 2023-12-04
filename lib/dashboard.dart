@@ -6,9 +6,8 @@ import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
 import 'package:projek_skripsi/profile.dart';
-import 'package:projek_skripsi/tesTombol.dart';
-import 'pilihInfoAset.dart';
 
+import 'pilihInfoAset.dart';
 
 void main() {
   runApp(Dashboard());
@@ -25,11 +24,14 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   late List<String> docPenggunas = [];
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: const Color(0xFF61BF9D),
           title: const Text(
             'Asset Management',
@@ -49,16 +51,17 @@ class _DashboardState extends State<Dashboard> {
             Padding(
               padding: const EdgeInsets.only(left: 17.0),
               child: Text(
-                'Selamat Datang, '+ widget.pengguna.email!.split('@')[0],
-                style: TextStyles.title.copyWith(color: Warna.darkgrey, fontSize: 17, fontWeight: FontWeight.bold),
+                'Selamat Datang, ' + widget.pengguna.email!.split('@')[0],
+                style: TextStyles.title.copyWith(
+                    color: Warna.darkgrey,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 20),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-
                 Box(
                   text: 'Aset \nInfo',
                   gambar: 'gambar/aset_info.png',
@@ -70,7 +73,6 @@ class _DashboardState extends State<Dashboard> {
                     );
                   },
                 ),
-
                 Box(
                   text: 'Catatan \nAset',
                   gambar: 'gambar/catatan.png',
@@ -82,41 +84,36 @@ class _DashboardState extends State<Dashboard> {
                     );
                   },
                 ),
-
                 Box(
                   text: 'Manajemen \nAset',
                   gambar: 'gambar/manajemen.png',
                   warna: Warna.green,
-                  halaman: () {
-
-                  },
+                  halaman: () {},
                 ),
               ],
             ),
-
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 45.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                Box(
-                text: 'Manajemen\nUser',
-                gambar: 'gambar/users.png',
-                warna: Warna.green,
-                halaman: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ManageAcc()),
-                  );
-                },
-              ),
-              ],
+                  Box(
+                    text: 'Manajemen\nUser',
+                    gambar: 'gambar/users.png',
+                    warna: Warna.green,
+                    halaman: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ManageAcc()),
+                      );
+                    },
+                  ),
+                ],
               ),
             )
           ],
         ),
-
 
         backgroundColor: Colors.white,
 
@@ -127,8 +124,8 @@ class _DashboardState extends State<Dashboard> {
           height: 75,
           child: FloatingActionButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => TimeBar()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => TimeBar()));
             },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -212,33 +209,32 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
               ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 5.0),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Profiles()),
-                    );
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "gambar/profiles.png",
-                        height: 40,
-                        width: 40,
-                      ),
-                    ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Profiles()),
+                      );
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "gambar/profiles.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
             ],
           ),
         ),
-
       ),
     );
   }

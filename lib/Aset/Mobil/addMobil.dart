@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/Mobil/manajemenMobil.dart';
 
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
@@ -19,13 +18,12 @@ class AddMobil extends StatefulWidget {
 }
 
 class _AddMobilState extends State<AddMobil> {
-
-  final merekMobilController =TextEditingController();
+  final merekMobilController = TextEditingController();
   final idMobilCOntroller = TextEditingController();
   final tipemesinController = TextEditingController();
   final tipeBahanBakarController = TextEditingController();
   final pendinginController = TextEditingController();
-  final transmisController =TextEditingController();
+  final transmisController = TextEditingController();
   final kapasitasBBController = TextEditingController();
   final ukuranBanController = TextEditingController();
   final akiController = TextEditingController();
@@ -43,10 +41,10 @@ class _AddMobilState extends State<AddMobil> {
     ),
   );
 
-
-  void PilihGambarMobil() async{
-    final pilihMobil = await _gambarMobil.pickImage(source: ImageSource.gallery);
-    if(pilihMobil != null) {
+  void PilihGambarMobil() async {
+    final pilihMobil =
+        await _gambarMobil.pickImage(source: ImageSource.gallery);
+    if (pilihMobil != null) {
       setState(() {
         imgMobilController.text = pilihMobil.path;
       });
@@ -54,8 +52,8 @@ class _AddMobilState extends State<AddMobil> {
   }
 
   Future<String> unggahGambarMobil(File gambarMobil) async {
-    try{
-      if(!gambarMobil.existsSync()){
+    try {
+      if (!gambarMobil.existsSync()) {
         print('File tidak ditemukan!');
         return '';
       }
@@ -68,19 +66,18 @@ class _AddMobilState extends State<AddMobil> {
       await uploadMobil;
       String fotoMobil = await penyimpanan.getDownloadURL();
       return fotoMobil;
-    }catch (e){
+    } catch (e) {
       print('$e');
       return '';
     }
   }
 
-
-  void SimpanMobil() async{
-    try{
+  void SimpanMobil() async {
+    try {
       String lokasiGambarMobil = imgMobilController.text;
       String fotoMobil = '';
 
-      if(lokasiGambarMobil.isNotEmpty) {
+      if (lokasiGambarMobil.isNotEmpty) {
         File imgMobil = File(lokasiGambarMobil);
         fotoMobil = await unggahGambarMobil(imgMobil);
       }
@@ -97,33 +94,43 @@ class _AddMobilState extends State<AddMobil> {
         akiController.text.trim(),
         int.parse(MasaServisMobilController.text.trim()),
         fotoMobil,
-
       );
-      Navigator.pushReplacement(
+      /*Navigator.pushReplacement(
           context, MaterialPageRoute(
           builder: (context)=> ManajemenMobil())
-      );
+      );*/
+      Navigator.pop(context, true);
 
       ScaffoldMessenger.of(context).showSnackBar(Sukses);
-    }catch(e){
+    } catch (e) {
       print("Error : $e");
     }
   }
 
-  Future tambahMobil (String merek, String ID, String tipemesin,
-      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, String Aki, int masaServis, String GambarMobil) async{
+  Future tambahMobil(
+      String merek,
+      String ID,
+      String tipemesin,
+      String tipeBB,
+      String pendingin,
+      String transmisi,
+      int kapasitasBB,
+      String ban,
+      String Aki,
+      int masaServis,
+      String GambarMobil) async {
     await FirebaseFirestore.instance.collection('Mobil').add({
-      'Merek Mobil' : merek,
-      'ID Mobil' : ID,
-      'Tipe Mesin' : tipemesin,
-      'Jenis Bahan Bakar' : tipeBB,
-      'Sistem Pendingin Mesin' : pendingin,
-      'Tipe Transmisi' : transmisi,
-      'Kapasitas Bahan Bakar' : kapasitasBB,
-      'Ukuran Ban' : ban,
-      'Aki' : Aki,
-      'Masa Servis' : masaServis,
-      'Gambar Mobil' : GambarMobil
+      'Merek Mobil': merek,
+      'ID Mobil': ID,
+      'Tipe Mesin': tipemesin,
+      'Jenis Bahan Bakar': tipeBB,
+      'Sistem Pendingin Mesin': pendingin,
+      'Tipe Transmisi': transmisi,
+      'Kapasitas Bahan Bakar': kapasitasBB,
+      'Ukuran Ban': ban,
+      'Aki': Aki,
+      'Masa Servis': masaServis,
+      'Gambar Mobil': GambarMobil
     });
   }
 
@@ -144,7 +151,6 @@ class _AddMobilState extends State<AddMobil> {
         elevation: 0,
         centerTitle: false,
       ),
-
       body: Center(
         child: Container(
           width: 370,
@@ -168,14 +174,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: merekMobilController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -185,14 +189,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: idMobilCOntroller),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -202,14 +204,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipemesinController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -219,14 +219,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipeBahanBakarController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -236,14 +234,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: pendinginController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -253,14 +249,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: transmisController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -270,14 +264,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: kapasitasBBController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -287,14 +279,12 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: ukuranBanController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -304,23 +294,21 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: akiController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                   textInputType: TextInputType.number,
                   hint: '',
@@ -328,7 +316,6 @@ class _AddMobilState extends State<AddMobil> {
                   controller: MasaServisMobilController,
                 ),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -338,7 +325,6 @@ class _AddMobilState extends State<AddMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 FieldImage(
                     controller: imgMobilController,
                     selectedImageName: imgMobilController.text.isNotEmpty
@@ -346,7 +332,6 @@ class _AddMobilState extends State<AddMobil> {
                         : '',
                     onPressed: PilihGambarMobil),
                 const SizedBox(height: 30),
-
                 Align(
                   alignment: Alignment.center,
                   child: ElevatedButton(
@@ -355,8 +340,7 @@ class _AddMobilState extends State<AddMobil> {
                         backgroundColor: Warna.green,
                         minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25))
-                    ),
+                            borderRadius: BorderRadius.circular(25))),
                     child: Container(
                       width: 200,
                       child: Center(

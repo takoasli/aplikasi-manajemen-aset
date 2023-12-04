@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/Laptop/manajemenLaptop.dart';
 
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
@@ -41,9 +40,10 @@ class _AddLaptopState extends State<AddLaptop> {
     ),
   );
 
-  void PilihGambarLaptop() async{
-    final pilihLaptop = await _gambarLaptop.pickImage(source: ImageSource.gallery);
-    if(pilihLaptop != null) {
+  void PilihGambarLaptop() async {
+    final pilihLaptop =
+        await _gambarLaptop.pickImage(source: ImageSource.gallery);
+    if (pilihLaptop != null) {
       setState(() {
         ImglaptopController.text = pilihLaptop.path;
       });
@@ -51,8 +51,8 @@ class _AddLaptopState extends State<AddLaptop> {
   }
 
   Future<String> unggahGambarLaptop(File gambarLaptop) async {
-    try{
-      if(!gambarLaptop.existsSync()){
+    try {
+      if (!gambarLaptop.existsSync()) {
         print('File tidak ditemukan!');
         return '';
       }
@@ -65,18 +65,18 @@ class _AddLaptopState extends State<AddLaptop> {
       await uploadLaptop;
       String fotoLaptop = await penyimpanan.getDownloadURL();
       return fotoLaptop;
-    }catch (e){
+    } catch (e) {
       print('$e');
       return '';
     }
   }
 
-  void SimpanLaptop() async{
-    try{
+  void SimpanLaptop() async {
+    try {
       String lokasiGambarPC = ImglaptopController.text;
       String fotoLaptop = '';
 
-      if(lokasiGambarPC.isNotEmpty) {
+      if (lokasiGambarPC.isNotEmpty) {
         File imgLaptop = File(lokasiGambarPC);
         fotoLaptop = await unggahGambarLaptop(imgLaptop);
       }
@@ -92,35 +92,43 @@ class _AddLaptopState extends State<AddLaptop> {
         MonitorController.text.trim(),
         int.parse(MasaServisLaptopController.text.trim()),
         fotoLaptop,
-
       );
-      Navigator.pushReplacement(
+      /*Navigator.pushReplacement(
           context, MaterialPageRoute(
           builder: (context)=> ManajemenLaptop())
-      );
+      );*/
+      Navigator.pop(context, true);
 
       ScaffoldMessenger.of(context).showSnackBar(Sukses);
-    }catch(e){
+    } catch (e) {
       print("Error : $e");
     }
   }
 
-  Future tambahLaptop (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, String monitor,int masaServis, String gambarLaptop) async{
+  Future tambahLaptop(
+      String merek,
+      String ID,
+      String ruangan,
+      String CPU,
+      int ram,
+      int storage,
+      String vga,
+      String monitor,
+      int masaServis,
+      String gambarLaptop) async {
     await FirebaseFirestore.instance.collection('Laptop').add({
-      'Merek Laptop' : merek,
-      'ID Laptop' : ID,
-      'Lokasi Ruangan' : ruangan,
-      'CPU' : CPU,
-      'RAM' : ram,
-      'Kapasitas Penyimpanan' : storage,
-      'VGA' : vga,
-      'Ukuran Monitor' : monitor,
-      'Masa Servis' : masaServis,
-      'Gambar Laptop' : gambarLaptop
+      'Merek Laptop': merek,
+      'ID Laptop': ID,
+      'Lokasi Ruangan': ruangan,
+      'CPU': CPU,
+      'RAM': ram,
+      'Kapasitas Penyimpanan': storage,
+      'VGA': vga,
+      'Ukuran Monitor': monitor,
+      'Masa Servis': masaServis,
+      'Gambar Laptop': gambarLaptop
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +147,6 @@ class _AddLaptopState extends State<AddLaptop> {
         elevation: 0,
         centerTitle: false,
       ),
-
       body: Center(
         child: Container(
           width: 370,
@@ -163,14 +170,12 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: merekLaptopController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -179,14 +184,12 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: IdLaptopController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -196,14 +199,12 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: lokasiRuanganController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -213,14 +214,12 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: CPUController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -230,14 +229,12 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: RamController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -247,14 +244,12 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: StorageController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -264,14 +259,12 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: VGAController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -281,23 +274,21 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: MonitorController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                   textInputType: TextInputType.number,
                   hint: '',
@@ -305,7 +296,6 @@ class _AddLaptopState extends State<AddLaptop> {
                   controller: MasaServisLaptopController,
                 ),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -315,7 +305,6 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 FieldImage(
                     controller: ImglaptopController,
                     selectedImageName: ImglaptopController.text.isNotEmpty
@@ -323,7 +312,6 @@ class _AddLaptopState extends State<AddLaptop> {
                         : '',
                     onPressed: PilihGambarLaptop),
                 const SizedBox(height: 30),
-
                 Align(
                   alignment: Alignment.center,
                   child: ElevatedButton(
@@ -332,8 +320,7 @@ class _AddLaptopState extends State<AddLaptop> {
                         backgroundColor: Warna.green,
                         minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25))
-                    ),
+                            borderRadius: BorderRadius.circular(25))),
                     child: Container(
                       width: 200,
                       child: Center(

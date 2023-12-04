@@ -45,11 +45,11 @@ class _ProfilesState extends State<Profiles> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('Tidak Ada Data'));
+            return const Center(child: Text('Tidak Ada Data'));
           } else {
             // Pasti index ke 0
             var doc = snapshot.data!.docs[0];
@@ -80,7 +80,7 @@ class _ProfilesState extends State<Profiles> {
             backgroundColor: Warna.green,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-            minimumSize: Size(200, 50),
+            minimumSize: const Size(200, 50),
           ),
           child: Container(
             width: 200,
