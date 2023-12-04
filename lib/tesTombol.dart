@@ -31,7 +31,6 @@ class tesTombol extends StatelessWidget {
               child: const Text('Show Awesome SnackBar'),
               onPressed: () {
                 final snackBar = SnackBar(
-                  /// need to set following properties for best effect of awesome_snackbar_content
                   elevation: 0,
                   behavior: SnackBarBehavior.floating,
                   backgroundColor: Colors.transparent,
@@ -40,7 +39,6 @@ class tesTombol extends StatelessWidget {
                     message:
                     'testing',
 
-                    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                     contentType: ContentType.success,
                   ),
                 );

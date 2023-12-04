@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/catatanAset.dart';
+import 'package:projek_skripsi/komponen/TimeBar.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
 import 'package:projek_skripsi/profile.dart';
 import 'package:projek_skripsi/tesTombol.dart';
-import 'aset_info.dart';
+import 'pilihInfoAset.dart';
 
 
 void main() {
@@ -23,6 +24,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  late List<String> docPenggunas = [];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,7 +49,7 @@ class _DashboardState extends State<Dashboard> {
             Padding(
               padding: const EdgeInsets.only(left: 17.0),
               child: Text(
-                'Selamat Datang, '+ widget.pengguna.email!,
+                'Selamat Datang, '+ widget.pengguna.email!.split('@')[0],
                 style: TextStyles.title.copyWith(color: Warna.darkgrey, fontSize: 17, fontWeight: FontWeight.bold),
               ),
             ),
@@ -60,10 +62,11 @@ class _DashboardState extends State<Dashboard> {
                 Box(
                   text: 'Aset \nInfo',
                   gambar: 'gambar/aset_info.png',
+                  warna: Warna.green,
                   halaman: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Aset()),
+                      MaterialPageRoute(builder: (context) => PilihInfoAset()),
                     );
                   },
                 ),
@@ -71,6 +74,7 @@ class _DashboardState extends State<Dashboard> {
                 Box(
                   text: 'Catatan \nAset',
                   gambar: 'gambar/catatan.png',
+                  warna: Warna.green,
                   halaman: () {
                     Navigator.push(
                       context,
@@ -82,11 +86,9 @@ class _DashboardState extends State<Dashboard> {
                 Box(
                   text: 'Manajemen \nAset',
                   gambar: 'gambar/manajemen.png',
+                  warna: Warna.green,
                   halaman: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Aset()),
-                    );
+
                   },
                 ),
               ],
@@ -101,6 +103,7 @@ class _DashboardState extends State<Dashboard> {
                 Box(
                 text: 'Manajemen\nUser',
                 gambar: 'gambar/users.png',
+                warna: Warna.green,
                 halaman: () {
                   Navigator.push(
                     context,
@@ -125,7 +128,7 @@ class _DashboardState extends State<Dashboard> {
           child: FloatingActionButton(
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => tesTombol()));
+                  MaterialPageRoute(builder: (context) => TimeBar()));
             },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -216,7 +219,7 @@ class _DashboardState extends State<Dashboard> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const Profiles()),
+                      MaterialPageRoute(builder: (context) => Profiles()),
                     );
                   },
                   child: Column(

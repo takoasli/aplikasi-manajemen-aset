@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:projek_skripsi/Aset/AC/AC.dart';
+import 'package:projek_skripsi/Aset/Laptop/Laptop.dart';
+import 'package:projek_skripsi/Aset/Mobil/Mobil.dart';
+import 'package:projek_skripsi/Aset/Motor/Motor.dart';
 import 'package:projek_skripsi/dashboard.dart';
 import 'package:projek_skripsi/profile.dart';
+import 'Aset/PC/PC.dart';
 import 'komponen/box.dart';
 import 'komponen/style.dart';
 
-class Aset extends StatefulWidget {
-  const Aset({Key? key}) : super(key: key);
+class PilihInfoAset extends StatefulWidget {
+  const PilihInfoAset({Key? key}) : super(key: key);
 
   @override
-  State<Aset> createState() => _AsetState();
+  State<PilihInfoAset> createState() => _PilihInfoAset();
 }
 
-class _AsetState extends State<Aset> {
+class _PilihInfoAset extends State<PilihInfoAset> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -26,6 +31,7 @@ class _AsetState extends State<Aset> {
               letterSpacing: -0.5,
             ),
           ),
+          elevation: 0,
           centerTitle: false,
         ),
         body: Column(
@@ -35,7 +41,7 @@ class _AsetState extends State<Aset> {
             Padding(
               padding: const EdgeInsets.all(17.0),
               child: Text(
-                'Pilih Kategori Aset',
+                'Silahkan Pilih Aset',
                 style: TextStyles.title.copyWith(
                   color: Warna.black,
                   fontSize: 17,
@@ -50,31 +56,34 @@ class _AsetState extends State<Aset> {
               children: [
                 Box(
                   text: 'AC',
+                  warna: Warna.green,
                   gambar: 'gambar/ac.png',
                   halaman: () {
-                    Navigator.push(
+                      Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Aset()),
-                    );
+                      MaterialPageRoute(builder: (context) => AC()),
+                      );
                   },
                 ),
                 Box(
-                  text: 'PC / Laptop',
+                  text: 'PC',
+                  warna: Warna.green,
                   gambar: 'gambar/pc.png',
                   halaman: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Aset()),
+                      MaterialPageRoute(builder: (context) => PC()),
                     );
                   },
                 ),
                 Box(
                   text: 'Motor',
+                  warna: Warna.green,
                   gambar: 'gambar/motor.png',
                   halaman: () {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Aset()),
+                        context,
+                        MaterialPageRoute(builder: (context) => Motor()),
                     );
                   },
                 ),
@@ -86,18 +95,30 @@ class _AsetState extends State<Aset> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 45.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Box(
                       text: 'Mobil',
+                      warna: Warna.green,
                       gambar: 'gambar/mobil.png',
                       halaman: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Aset()),
+                          MaterialPageRoute(builder: (context) => Mobil()),
                         );
                       },
                     ),
+
+                    Box(
+                        text: 'Laptop',
+                        gambar: 'gambar/laptop.png',
+                        halaman: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Laptop()),
+                          );
+                        },
+                        warna: Warna.green)
                   ],
                 ),
               ),
@@ -200,7 +221,7 @@ class _AsetState extends State<Aset> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Profiles()),
+                        MaterialPageRoute(builder: (context) => Profiles()),
                       );
                     },
                     child: Column(

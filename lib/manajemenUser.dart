@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:projek_skripsi/AddUser.dart';
 import 'package:projek_skripsi/baca%20data/baca_user.dart';
 import 'package:projek_skripsi/komponen/style.dart';
@@ -22,8 +24,7 @@ class _ManageAccState extends State<ManageAcc> {
     backgroundColor: Colors.transparent,
     content: AwesomeSnackbarContent(
       title: 'SUCCESS',
-      message:
-      'Data user berhasil Dihapus!',
+      message: 'Data user berhasil Dihapus!',
       contentType: ContentType.success,
     ),
   );
@@ -36,12 +37,34 @@ class _ManageAccState extends State<ManageAcc> {
     });
   }
 
-  Future<void> hapusUser(String docID) async{
-    try{
-    await FirebaseFirestore.instance.collection('User').doc(docID).delete();
-    getDokumen();
-    ScaffoldMessenger.of(context).showSnackBar(berhasil);
-  }catch (e) {
+  Future<void> removeRegisterUser(token) async {
+    const apiUrl =
+        "https://identitytoolkit.googleapis.com/v1/accounts:delete?key=AIzaSyDzrffwFrYR5Ngvik6I27VezoOHZrB2zqc";
+    var response = await http.post(Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "idToken": token,
+        }));
+    if (response.statusCode == 200) {
+      print("User berhasil dihapus dengan token $token");
+    }
+  }
+
+  Future<void> hapusUser(String docID) async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('User').doc(docID).get();
+      final data = snapshot.data();
+
+      var token = data?['Token'];
+
+      await removeRegisterUser(token);
+
+      await FirebaseFirestore.instance.collection('User').doc(docID).delete();
+
+      getDokumen();
+      ScaffoldMessenger.of(context).showSnackBar(berhasil);
+    } catch (e) {
       print(e);
     }
   }
@@ -104,12 +127,14 @@ class _ManageAccState extends State<ManageAcc> {
                           IconButton(
                             onPressed: () {
                               Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => UpdateUser(dokumenUser: docIDs[index]
-                                ,)
-                                ,),
-                            );
-                              },
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UpdateUser(
+                                    dokumenUser: docIDs[index],
+                                  ),
+                                ),
+                              );
+                            },
                             icon: const Icon(
                               Icons.edit,
                               color: Colors.lightBlue,

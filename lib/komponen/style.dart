@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class Warna {
   static const green = Color(0XFF61BF9D);
+  static const mediumgreen = Color(0XFF67DBB1);
   static const grey = Color(0XFFC6C6C6);
   static const lightgreen = Color(0XFF73E17E);
   static const yellow = Color(0XFFF9CF3B);

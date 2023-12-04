@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'komponen/style.dart';
 
 class Profiles extends StatefulWidget {
-  const Profiles({Key? key}) : super(key: key);
+  Profiles({Key? key}) : super(key: key);
+
+  final pengguna = FirebaseAuth.instance.currentUser!;
 
   @override
   State<Profiles> createState() => _ProfilesState();
@@ -25,7 +28,7 @@ class _ProfilesState extends State<Profiles> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF61BF9D),
         title: const Text(
-          'Profiles',
+          'Profile',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -34,20 +37,37 @@ class _ProfilesState extends State<Profiles> {
         ),
         centerTitle: false,
       ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-          children: <Widget>[
-            buildTop(),
-            SizedBox(height: 65),
-            buildNama(),
-            buildKonten(),
-            SizedBox(height: 40),
-            buildLogout(),
-            SizedBox(height: 40),
-          ],
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('User')
+            .doc(widget.pengguna.email)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.data() == null) {
+            return Center(child: Text('Tidak Ada Data'));
+          } else {
+            final dataUser = snapshot.data!.data() as Map<String, dynamic>;
+            return ListView(
+              children: <Widget>[
+                buildTop(dataUser),
+                SizedBox(height: 65),
+                buildNama(dataUser),
+                buildKonten(),
+                SizedBox(height: 40),
+                buildLogout(),
+                SizedBox(height: 40),
+              ],
+            );
+          }
+        },
       ),
     );
   }
+
 
   Widget buildLogout() {
     return Column(
@@ -57,7 +77,7 @@ class _ProfilesState extends State<Profiles> {
           style: ElevatedButton.styleFrom(
             backgroundColor: Warna.green,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30)
+                borderRadius: BorderRadius.circular(30)
             ),
             minimumSize: Size(200, 50),
           ),
@@ -76,18 +96,18 @@ class _ProfilesState extends State<Profiles> {
   }
 
 
-  Widget buildNama(){
+  Widget buildNama(Map<String, dynamic> dataUser) {
     return Positioned(
       top: tiggiBackground - (tinggiProfile / 2),
       child: Column(
         children: [
           Text(
-            'Tako',
-              style: TextStyles.title.copyWith(fontSize: 30, color: Warna.black),
+            dataUser['Nama'] ?? 'No Name',
+            style: TextStyles.title.copyWith(fontSize: 30, color: Warna.black),
           ),
           SizedBox(height: 6),
           Text(
-            'ID: 31200060',
+            dataUser['ID'] ?? 'No ID',
             style: TextStyles.body.copyWith(fontSize: 15, color: Colors.black38),
           ),
         ],
@@ -103,7 +123,7 @@ class _ProfilesState extends State<Profiles> {
         children: [
           buildInfoText('HP', '087958473824'),
           SizedBox(height: 20),
-          buildInfoText('email', 's31200060@gmail.com'),
+          buildInfoText('email', widget.pengguna.email!),
           SizedBox(height: 20),
           buildInfoText('alamat', 'rumah makan satpam'),
         ],
@@ -116,20 +136,20 @@ class _ProfilesState extends State<Profiles> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title.toUpperCase(),
-          style: TextStyles.body.copyWith(color: Warna.black, fontSize: 17)
+            title.toUpperCase(),
+            style: TextStyles.body.copyWith(color: Warna.black, fontSize: 17)
         ),
         SizedBox(height: 6),
         Text(
-          content,
-          style: TextStyles.body.copyWith(color: Colors.black38, fontSize: 15)
+            content,
+            style: TextStyles.body.copyWith(color: Colors.black38, fontSize: 15)
         ),
       ],
     );
   }
 
 
-  Widget buildTop() {
+  Widget buildTop(Map<String, dynamic> dataUser) {
     final atas = tiggiBackground - tinggiProfile;
 
     return Stack(
@@ -189,7 +209,7 @@ class _ProfilesState extends State<Profiles> {
 
   Widget gambarProfile() => CircleAvatar(
     radius: tinggiProfile,
-    backgroundColor: Colors.white, // Mengganti Warna.white dengan Colors.white
+    backgroundColor: Colors.white,
     child: Image.asset('gambar/profil.png'),
   );
 }

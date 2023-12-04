@@ -7,10 +7,12 @@ class Box extends StatelessWidget {
     required this.text,
     required this.gambar,
     required this.halaman,
+    required this.warna,
   }) : super(key: key);
 
   final String text;
   final String gambar;
+  final Color warna;
   final VoidCallback halaman;
 
   @override
@@ -23,7 +25,7 @@ class Box extends StatelessWidget {
             width: 78,
             height: 78,
             decoration: BoxDecoration(
-              color: Warna.green,
+              color: warna,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Image.asset(
@@ -36,7 +38,7 @@ class Box extends StatelessWidget {
           Text(
             text,
             textAlign: TextAlign.center,
-            style: TextStyles.title.copyWith(fontSize: 11, color: Warna.black),
+            style: TextStyles.title.copyWith(fontSize: 14, color: Warna.black),
           ),
         ],
       ),

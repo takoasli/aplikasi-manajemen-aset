@@ -28,6 +28,7 @@ class _UpdateUserState extends State<UpdateUser> {
   final alamatController = TextEditingController();
   final namaController = TextEditingController();
   final IdController = TextEditingController();
+  String oldphoto = '';
   Map<String, dynamic> databaru = {};
 
   final Sukses = SnackBar(
@@ -94,8 +95,7 @@ class _UpdateUserState extends State<UpdateUser> {
         File profil = File(ImgController.text);
         foto = await unggahGambar(profil);
       } else {
-        // Jika tidak ada gambar yang dipilih, gunakan kembali URL gambar yang ada di Firestore
-        foto = newData['Foto Profil'];
+        foto = oldphoto;
       }
 
       Map<String, dynamic> databaru = {
@@ -104,7 +104,8 @@ class _UpdateUserState extends State<UpdateUser> {
         'Alamat Rumah': alamatController.text,
         'Nama': namaController.text,
         'ID': IdController.text,
-        'Foto Profil': foto,
+        'Foto Profil' : foto,
+
       };
 
       await FirebaseFirestore.instance.collection('User').doc(docID).update(databaru);
@@ -138,8 +139,8 @@ class _UpdateUserState extends State<UpdateUser> {
       namaController.text = data?['Nama'] ?? '';
       IdController.text = data?['ID'] ?? '';
       final imageUrl = data?['Foto Profil'] ?? '';
-      final decodedImageUrl = Uri.decodeComponent(imageUrl.split('/').last);
-      ImgController.text = decodedImageUrl;
+      oldphoto = imageUrl;
+
     });
   }
 

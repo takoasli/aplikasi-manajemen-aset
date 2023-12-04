@@ -20,7 +20,7 @@ class BacaUser extends StatelessWidget {
           }
 
           Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-          String urlGambar = data['Foto Profil'] ?? ''; // Ubah 'UrlGambar' sesuai dengan field di Firestore Anda
+          String urlGambar = data['Foto Profil'] ?? '';
 
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -28,7 +28,7 @@ class BacaUser extends StatelessWidget {
               CircleAvatar(
                 backgroundImage: urlGambar.isNotEmpty
                     ? NetworkImage(urlGambar) as ImageProvider<Object>
-                    : AssetImage('path_to_placeholder_image') as ImageProvider<Object>, // Ganti dengan path placeholder jika URL kosong
+                    : AssetImage('gambar/user.png') as ImageProvider<Object>,
                 radius: 25,
                 backgroundColor: Warna.green,
               ),
