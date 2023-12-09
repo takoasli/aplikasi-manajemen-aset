@@ -5,10 +5,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:projek_skripsi/Aset/helper.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
+import 'ManajemenAC.dart';
 
 class AddAC extends StatefulWidget {
   const AddAC({super.key});
@@ -129,12 +131,11 @@ class _AddACState extends State<AddAC> {
         fotoIndoor,
         fotoOutdoor,
       );
-      /*Navigator.pushReplacement(
+
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => ManajemenAC()),
-      );*/
-
-      Navigator.pop(context, true);
+      );
 
       ScaffoldMessenger.of(context).showSnackBar(Sukses);
       MerekACController.clear();
@@ -149,6 +150,7 @@ class _AddACState extends State<AddAC> {
 
   Future tambahAC(String merek, String ID, int watt, int pk, String ruangan,
       int masaServis, String UrlIndoor, String UrlOutdoor) async {
+    var timeService = contTimeService(masaServis);
     await FirebaseFirestore.instance.collection('Aset').add({
       'Merek AC': merek,
       'ID AC': ID,
@@ -157,7 +159,9 @@ class _AddACState extends State<AddAC> {
       'Lokasi Ruangan': ruangan,
       'Masa Servis': masaServis,
       'Foto AC Indoor': UrlIndoor,
-      'Foto AC Outdoor': UrlOutdoor
+      'Foto AC Outdoor': UrlOutdoor,
+      'waktu_service': timeService.millisecondsSinceEpoch,
+      'hari_service': daysBetween(DateTime.now(), timeService)
     });
   }
 
