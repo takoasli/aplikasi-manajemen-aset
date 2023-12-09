@@ -15,8 +15,8 @@ class _CatatanState extends State<Catatan> {
   final isiDialog = TextEditingController();
 
   List ToDo = [
-    ["hello nigga", false],
-    ["konnichiwa nigga", false],
+    ["Tes", false],
+    ["Tes 2", false],
   ];
 
   void checkBoxberubah(bool? value, int index){

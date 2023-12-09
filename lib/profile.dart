@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import 'komponen/style.dart';
 
 class Profiles extends StatefulWidget {
@@ -37,26 +38,28 @@ class _ProfilesState extends State<Profiles> {
         ),
         centerTitle: false,
       ),
-      body: StreamBuilder<DocumentSnapshot>(
+      body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('User')
-            .doc(widget.pengguna.email)
+            .where("Email", isEqualTo: widget.pengguna.email)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.data() == null) {
-            return Center(child: Text('Tidak Ada Data'));
+          } else if (snapshot.hasData && snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('Tidak Ada Data'));
           } else {
-            final dataUser = snapshot.data!.data() as Map<String, dynamic>;
+
+            var doc = snapshot.data!.docs[0];
+            var dataUser = doc.data() as Map;
             return ListView(
               children: <Widget>[
                 buildTop(dataUser),
                 SizedBox(height: 65),
                 buildNama(dataUser),
-                buildKonten(),
+                buildKonten(dataUser),
                 SizedBox(height: 40),
                 buildLogout(),
                 SizedBox(height: 40),
@@ -68,7 +71,6 @@ class _ProfilesState extends State<Profiles> {
     );
   }
 
-
   Widget buildLogout() {
     return Column(
       children: [
@@ -76,17 +78,17 @@ class _ProfilesState extends State<Profiles> {
           onPressed: logout,
           style: ElevatedButton.styleFrom(
             backgroundColor: Warna.green,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30)
-            ),
-            minimumSize: Size(200, 50),
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            minimumSize: const Size(200, 50),
           ),
           child: Container(
             width: 200,
             child: Center(
               child: Text(
                 'Logout',
-                style: TextStyles.title.copyWith(fontSize: 20, color: Colors.white),
+                style: TextStyles.title
+                    .copyWith(fontSize: 20, color: Colors.white),
               ),
             ),
           ),
@@ -95,8 +97,7 @@ class _ProfilesState extends State<Profiles> {
     );
   }
 
-
-  Widget buildNama(Map<String, dynamic> dataUser) {
+  Widget buildNama(Map<dynamic, dynamic> dataUser) {
     return Positioned(
       top: tiggiBackground - (tinggiProfile / 2),
       child: Column(
@@ -108,24 +109,25 @@ class _ProfilesState extends State<Profiles> {
           SizedBox(height: 6),
           Text(
             dataUser['ID'] ?? 'No ID',
-            style: TextStyles.body.copyWith(fontSize: 15, color: Colors.black38),
+            style:
+            TextStyles.body.copyWith(fontSize: 15, color: Colors.black38),
           ),
         ],
       ),
     );
   }
 
-  Widget buildKonten() {
+  Widget buildKonten(Map<dynamic, dynamic> dataUser) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          buildInfoText('HP', '087958473824'),
-          SizedBox(height: 20),
-          buildInfoText('email', widget.pengguna.email!),
-          SizedBox(height: 20),
-          buildInfoText('alamat', 'rumah makan satpam'),
+          buildInfoText('HP', '${dataUser['Nomor HP']}'),
+          const SizedBox(height: 20),
+          buildInfoText('Email', dataUser['Email'] ?? '-'),
+          const SizedBox(height: 20),
+          buildInfoText('Alamat', dataUser['Alamat Rumah'] ?? '-'),
         ],
       ),
     );
@@ -135,21 +137,17 @@ class _ProfilesState extends State<Profiles> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title.toUpperCase(),
-            style: TextStyles.body.copyWith(color: Warna.black, fontSize: 17)
-        ),
+        Text(title.toUpperCase(),
+            style: TextStyles.body.copyWith(color: Warna.black, fontSize: 17)),
         SizedBox(height: 6),
-        Text(
-            content,
-            style: TextStyles.body.copyWith(color: Colors.black38, fontSize: 15)
-        ),
+        Text(content,
+            style:
+            TextStyles.body.copyWith(color: Colors.black38, fontSize: 15)),
       ],
     );
   }
 
-
-  Widget buildTop(Map<String, dynamic> dataUser) {
+  Widget buildTop(Map<dynamic, dynamic> dataUser) {
     final atas = tiggiBackground - tinggiProfile;
 
     return Stack(
@@ -166,28 +164,7 @@ class _ProfilesState extends State<Profiles> {
                 clipBehavior: Clip.none,
                 alignment: Alignment.center,
                 children: [
-                  gambarProfile(),
-                  Positioned(
-                    bottom: 5,
-                    right: -120,
-                    child: ElevatedButton(
-                      onPressed: () {
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Warna.green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                        child: Text(
-                          'Edit',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ),
+                  gambarProfile(dataUser['Foto Profil']),
                 ],
               ),
             ],
@@ -198,7 +175,7 @@ class _ProfilesState extends State<Profiles> {
   }
 
   Widget gambarBackground() => Container(
-    color: Colors.green, // Mengganti Warna.green dengan Colors.green
+    color: Colors.green,
     child: Image.asset(
       'gambar/background_profile.jpg',
       width: double.infinity,
@@ -207,9 +184,9 @@ class _ProfilesState extends State<Profiles> {
     ),
   );
 
-  Widget gambarProfile() => CircleAvatar(
+  Widget gambarProfile(url) => CircleAvatar(
     radius: tinggiProfile,
+    backgroundImage: NetworkImage(url),
     backgroundColor: Colors.white,
-    child: Image.asset('gambar/profil.png'),
   );
 }

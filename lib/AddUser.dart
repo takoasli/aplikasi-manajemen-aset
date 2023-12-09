@@ -109,12 +109,12 @@ class _AddUserState extends State<AddUser> {
         }
 
         await tambahUserInfo(
-          Token,
           namaController.text.trim(),
           IdController.text.trim(),
           int.parse(nomorController.text.trim()),
           emailController.text.trim(),
           alamatController.text.trim(),
+          Token,
           foto,
         );
 
@@ -138,15 +138,15 @@ class _AddUserState extends State<AddUser> {
     }
   }
 
-  Future tambahUserInfo(String Token, String Nama, String ID, int Nomor,
-      String Email, String Alamat, String urlGambar) async {
+  Future tambahUserInfo(String Nama, String ID, int Nomor,
+      String Email, String Alamat,String Token, String urlGambar) async {
     await FirebaseFirestore.instance.collection('User').add({
-      'Token': Token,
       'Nama': Nama,
       'ID': ID,
       'Nomor HP': Nomor,
       'Email': Email,
       'Alamat Rumah': Alamat,
+      'Token': Token,
       'Foto Profil': urlGambar,
     });
   }

@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/PC/ManajemenPC.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
+import '../Durability.dart';
 
 class EditPC extends StatefulWidget {
   const EditPC({super.key,
@@ -29,6 +31,7 @@ class _EditPCState extends State<EditPC> {
   final VGAController = TextEditingController();
   final ImgPCController = TextEditingController();
   final StorageController = TextEditingController();
+  final isiKebutuhan = TextEditingController();
   final PSUController = TextEditingController();
   final MasaServisController = TextEditingController();
   String oldphotoPC = '';
@@ -57,6 +60,9 @@ class _EditPCState extends State<EditPC> {
     ),
   );
 
+  List Kebutuhan = [
+  ];
+
   void PilihGambarPC() async{
     final pilihPC = await _gambarPC.pickImage(source: ImageSource.gallery);
     if(pilihPC != null) {
@@ -64,6 +70,31 @@ class _EditPCState extends State<EditPC> {
         ImgPCController.text = pilihPC.path;
       });
     }
+  }
+
+  void SimpanKebutuhan(){
+    setState(() {
+      Kebutuhan.add({'Kebutuhan PC': isiKebutuhan.text});
+      isiKebutuhan.clear();
+    });
+    Navigator.of(context).pop();
+  }
+  void tambahKebutuhan(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhan,
+            onAdd: SimpanKebutuhan,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan(int index) {
+    setState(() {
+      Kebutuhan.removeAt(index);
+    });
   }
 
   Future<String> unggahGambarPC(File gambarPC) async {
@@ -90,6 +121,11 @@ class _EditPCState extends State<EditPC> {
   Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async{
     try{
       String GambarPC;
+      List <Map<String, dynamic>> ListKebutuhan = [];
+      var timeService = contTimeService(int.parse(MasaServisController.text));
+      for(var i = 0; i < Kebutuhan.length; i++){
+        ListKebutuhan.add({'Kebutuhan PC': Kebutuhan[i]['Kebutuhan PC']});
+      }
 
       if(ImgPCController.text.isNotEmpty){
         File gambarPCBaru = File(ImgPCController.text);
@@ -108,13 +144,16 @@ class _EditPCState extends State<EditPC> {
         'VGA' : VGAController.text,
         'Kapasitas Power Supply' : PSUController.text,
         'Masa Servis' : MasaServisController.text,
-        'Gambar PC' : GambarPC
+        'kebutuhan' : ListKebutuhan,
+        'Gambar PC' : GambarPC,
+        'Waktu Service PC': timeService.millisecondsSinceEpoch,
+        'Hari Service PC': daysBetween(DateTime.now(), timeService)
       };
 
       await FirebaseFirestore.instance.collection('PC').doc(dokPC).update(DataPCBaru);
 
       Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ManajemenPC()),
+        context, MaterialPageRoute(builder: (context) => const ManajemenPC()),
       );
     }catch (e){
       print(e);
@@ -127,23 +166,33 @@ class _EditPCState extends State<EditPC> {
   }
 
   Future<void> getData() async{
-    final DocumentSnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('PC').doc(widget.dokumenPC).get();
-    final data = snapshot.data();
+    try{
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('PC').doc(widget.dokumenPC).get();
+      final data = snapshot.data();
 
-    setState(() {
-      merekPCController.text = data?['Merek PC'] ?? '';
-      IdPCController.text = data?['ID PC'] ?? '';
-      lokasiRuanganController.text = data?['Lokasi Ruangan'] ?? '';
-      CPUController.text = data?['CPU'] ?? '';
-      RamController.text = (data?['RAM'] ?? '').toString();
-      StorageController.text = (data?['Kapasitas Penyimpanan'] ?? '').toString();
-      VGAController.text = data?['VGA'] ?? '';
-      PSUController.text = (data?['Kapasitas Power Supply'] ?? '').toString();
-      MasaServisController.text = (data?['Masa Servis'] ?? '').toString();
-      final UrlPC = data?['Gambar PC'] ?? '';
-      oldphotoPC = UrlPC;
-    });
+      setState(() {
+        merekPCController.text = data?['Merek PC'] ?? '';
+        IdPCController.text = data?['ID PC'] ?? '';
+        lokasiRuanganController.text = data?['Lokasi Ruangan'] ?? '';
+        CPUController.text = data?['CPU'] ?? '';
+        RamController.text = (data?['RAM'] ?? '').toString();
+        StorageController.text = (data?['Kapasitas Penyimpanan'] ?? '').toString();
+        VGAController.text = data?['VGA'] ?? '';
+        PSUController.text = (data?['Kapasitas Power Supply'] ?? '').toString();
+        MasaServisController.text = (data?['Masa Servis'] ?? '').toString();
+        final UrlPC = data?['Gambar PC'] ?? '';
+        oldphotoPC = UrlPC;
+        final List<dynamic> KebutuhanData = data?['kebutuhan'] ?? [];
+        KebutuhanData.forEach((item) {
+          Kebutuhan.add({'Kebutuhan PC' : item['Kebutuhan PC']});
+        });
+
+      });
+    }catch(e){
+      print('Terjadi kesalahan: $e');
+    }
+
   }
 
   @override
@@ -186,14 +235,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: merekPCController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -209,7 +258,7 @@ class _EditPCState extends State<EditPC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: IdPCController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -219,14 +268,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: lokasiRuanganController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -236,14 +285,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: CPUController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -253,14 +302,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: RamController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -270,14 +319,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: StorageController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -287,14 +336,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: VGAController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -304,14 +353,14 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: PSUController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -320,7 +369,7 @@ class _EditPCState extends State<EditPC> {
                     style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                   textInputType: TextInputType.number,
@@ -328,7 +377,7 @@ class _EditPCState extends State<EditPC> {
                   textInputAction: TextInputAction.next,
                   controller: MasaServisController,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -338,7 +387,7 @@ class _EditPCState extends State<EditPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 FieldImage(
                     controller: ImgPCController,
@@ -346,6 +395,52 @@ class _EditPCState extends State<EditPC> {
                         ? ImgPCController.text.split('/').last
                         : '',
                     onPressed: PilihGambarPC),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Kebutuhan',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan[index]['Kebutuhan PC']), // Gunakan kunci yang benar
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan(index); // Fungsi untuk menghapus kebutuhan
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+
+
+                InkWell(
+                  onTap: tambahKebutuhan,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 30),
 
                 Align(

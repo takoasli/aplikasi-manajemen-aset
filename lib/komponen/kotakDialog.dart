@@ -16,13 +16,16 @@ class DialogBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Warna.green,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20)
+      ),
       content: SingleChildScrollView(
         child: Container(
           height: 150,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tambah Task baru...',
+              Text('Tambah Kebutuhan baru...',
               style: TextStyles.body.copyWith(fontSize: 17, color: Warna.white),
               textAlign: TextAlign.left,),
               const SizedBox(height: 7),
@@ -31,10 +34,10 @@ class DialogBox extends StatelessWidget {
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide.none// Radius sudut 20
+                    borderSide: BorderSide.none
                   ),
                   filled: true,
-                  fillColor: Colors.white, // Warna latar belakang putih
+                  fillColor: Colors.white,
                 ),
               ),
               const SizedBox(height: 10),
@@ -44,11 +47,15 @@ class DialogBox extends StatelessWidget {
                 children: [
                   Tombol(
                       text: 'Add',
-                      onPressed: onAdd),
+                      onPressed: onAdd,
+                      backgroundColor: Colors.green.shade500,
+                      textColor: Warna.white,),
                   const SizedBox(width: 15),
                   Tombol(
                       text: 'Cancel',
-                      onPressed: onCancel)
+                      onPressed: onCancel,
+                    backgroundColor: Warna.white,
+                    textColor: Warna.darkgrey)
                 ],
               ),
             ],

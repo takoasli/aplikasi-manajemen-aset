@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:projek_skripsi/Aset/AC/DetailAC.dart';
 import 'package:projek_skripsi/Aset/AC/ManajemenAC.dart';
 
@@ -89,7 +90,15 @@ class _ACState extends State<AC> {
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () async{
+              String barcode = await FlutterBarcodeScanner.scanBarcode(
+                  "#FF0000",
+                  "Cancel",
+                  true,
+                  ScanMode.QR);
+
+              print(barcode);
+            },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),

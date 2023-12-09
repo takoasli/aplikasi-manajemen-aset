@@ -6,7 +6,6 @@ import '../komponen/style.dart';
 class BacaPC extends StatelessWidget {
   const BacaPC({super.key,
     required this.dokumenPC});
-
   final String dokumenPC;
 
   @override

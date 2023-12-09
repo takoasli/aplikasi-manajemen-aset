@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:projek_skripsi/Aset/AC/AC.dart';
 import 'package:projek_skripsi/Aset/Laptop/Laptop.dart';
 import 'package:projek_skripsi/Aset/Mobil/Mobil.dart';
@@ -111,7 +112,7 @@ class _PilihInfoAset extends State<PilihInfoAset> {
 
                     Box(
                         text: 'Laptop',
-                        gambar: 'gambar/laptop.png',
+                        gambar: 'gambar/lepi2.png',
                         halaman: (){
                           Navigator.push(
                             context,
@@ -131,7 +132,15 @@ class _PilihInfoAset extends State<PilihInfoAset> {
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () {},
+              onPressed: () async{
+                String barcode = await FlutterBarcodeScanner.scanBarcode(
+                    "#FF0000",
+                    "Cancel",
+                    true,
+                    ScanMode.QR);
+
+                print(barcode);
+              },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),

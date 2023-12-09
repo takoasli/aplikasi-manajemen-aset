@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../komponen/style.dart';
+import '../../qrView.dart';
+import '../Durability.dart';
 
 class MoreDetail extends StatefulWidget {
   const MoreDetail({super.key,
@@ -17,6 +19,7 @@ class _MoreDetailState extends State<MoreDetail> {
   late DateTime targetDate = DateTime(2024, 2, 1);
   late Timer timer;
   double progressValue = 1.0;
+
 
   @override
   void initState() {
@@ -42,6 +45,7 @@ class _MoreDetailState extends State<MoreDetail> {
       return Colors.red;
     }
   }
+
 
   String _getRemainingTime() {
     Duration difference = targetDate.difference(DateTime.now());
@@ -130,6 +134,47 @@ class _MoreDetailState extends State<MoreDetail> {
                       ),
                     ),
                   ),
+
+                  Positioned(
+                    top: 30,
+                    right: 30,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Warna.white,
+                        ),
+                        child: IconButton(
+                          onPressed: (){
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID PC'], namaAset: widget.data['Merek PC'],),
+                              )
+                            );
+                          },
+                          icon: const Icon(Icons.qr_code_2,
+                          size: 33),
+                        ),
+                      )
+                  ),
+                  Positioned(
+                      top: 100,
+                      right: 30,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Warna.white,
+                        ),
+                        child: IconButton(
+                          onPressed: (){},
+                          icon: const Icon(Icons.border_color_outlined,
+                              size: 33),
+                        ),
+                      )
+                  ),
                   Positioned(
                     top: 170,
                     child: Container(
@@ -152,45 +197,20 @@ class _MoreDetailState extends State<MoreDetail> {
                                   fontSize: 18,
                                 ),
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  color: Colors.grey[300],
-                                ),
-                                child: Stack(
-                                  children: [
-                                    AnimatedContainer(
-                                      duration: const Duration(seconds: 1),
-                                      width: MediaQuery.of(context).size.width * progressValue * 0.8,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        color: _getProgressColor(progressValue),
-                                      ),
-                                    ),
-                                    Positioned.fill(
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Container(
-                                          width: 10,
-                                          height: 10,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _getProgressColor(progressValue),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              showIndicator(
+                                  getValueIndicator(
+                                      widget.data['Hari Service PC'],
+                                      epochTimeToData(
+                                          widget.data['Waktu Service PC'])),
+                                  getProgressColor(
+                                      widget.data['Waktu Service PC'])),
                               SizedBox(height: 5),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    _getRemainingTime(),
+                                    getRemainingTime(
+                                        widget.data['Waktu Service PC']),
                                     style: const TextStyle(
                                       fontSize: 15,
                                     ),
@@ -198,6 +218,37 @@ class _MoreDetailState extends State<MoreDetail> {
                                 ],
                               ),
                               const SizedBox(height: 20),
+                              Text(
+                                  'Kebutuhan Servis',
+                                  style: TextStyles.title.copyWith(
+                                      fontSize: 18,
+                                      color: Warna.darkgrey,
+                                      fontWeight: FontWeight.w500
+                                  )
+                              ),
+                              const SizedBox(height: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: widget.data['kebutuhan'].length,
+                                    itemBuilder: (context, index) {
+                                      final kebutuhan = widget.data['kebutuhan'][index]['Kebutuhan PC'];
+                                      final part = kebutuhan.split(': ');
+                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      return Text(
+                                        '- $hasSplit',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          letterSpacing: 1,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
                               Text(
                                   'Merek PC',
                                   style: TextStyles.title.copyWith(

@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/Laptop/manajemenLaptop.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
+import '../Durability.dart';
 
 class editLaptop extends StatefulWidget {
   const editLaptop({super.key,
@@ -31,8 +33,11 @@ class _editLaptopState extends State<editLaptop> {
   final StorageController = TextEditingController();
   final MonitorController = TextEditingController();
   final MasaServisLaptopController = TextEditingController();
+  final isiKebutuhan_Laptop = TextEditingController();
   final ImagePicker _gambarLaptop = ImagePicker();
   String oldphotoLaptop = '';
+  List Kebutuhan_Laptop = [
+  ];
   Map <String, dynamic> dataLaptop = {};
 
   final Sukses = SnackBar(
@@ -41,7 +46,7 @@ class _editLaptopState extends State<editLaptop> {
     backgroundColor: Colors.transparent,
     content: AwesomeSnackbarContent(
       title: 'SUCCESS',
-      message: 'Data Laptop berhasil Ditambahkan!',
+      message: 'Data Laptop berhasil Diupdate!',
       contentType: ContentType.success,
     ),
   );
@@ -57,6 +62,32 @@ class _editLaptopState extends State<editLaptop> {
       contentType: ContentType.success,
     ),
   );
+
+  void SimpanKebutuhan_Laptop(){
+    setState(() {
+      Kebutuhan_Laptop.add({'Nama Kebutuhan': isiKebutuhan_Laptop.text});
+      isiKebutuhan_Laptop.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+  void tambahKebutuhan_Laptop(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhan_Laptop,
+            onAdd: SimpanKebutuhan_Laptop,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan_laptop(int index) {
+    setState(() {
+      Kebutuhan_Laptop.removeAt(index);
+    });
+  }
 
   void PilihGambarLaptop() async{
     final pilihLaptop = await _gambarLaptop.pickImage(source: ImageSource.gallery);
@@ -92,6 +123,12 @@ class _editLaptopState extends State<editLaptop> {
     try{
       String GambarLaptop;
 
+      List <Map<String, dynamic>> ListKebutuhan_Laptop = [];
+      var timeService = contTimeService(int.parse(MasaServisLaptopController.text));
+      for(var i = 0; i < Kebutuhan_Laptop.length; i++){
+        ListKebutuhan_Laptop.add({'Nama Kebutuhan': Kebutuhan_Laptop[i]['Nama Kebutuhan']});
+      }
+
       if(ImglaptopController.text.isNotEmpty){
         File gambarLaptopBaru = File(ImglaptopController.text);
         GambarLaptop = await unggahGambarLaptop(gambarLaptopBaru);
@@ -109,7 +146,10 @@ class _editLaptopState extends State<editLaptop> {
         'VGA' : VGAController.text,
         'Ukuran Monitor' : MonitorController.text,
         'Masa Servis' : MasaServisLaptopController.text,
-        'Gambar Laptop' : GambarLaptop
+        'Kebutuhan Laptop' : ListKebutuhan_Laptop,
+        'Gambar Laptop' : GambarLaptop,
+        'Waktu Service Laptop': timeService.millisecondsSinceEpoch,
+        'Hari Service Laptop': daysBetween(DateTime.now(), timeService)
       };
 
       await FirebaseFirestore.instance.collection('Laptop').doc(dokLaptop).update(DataLaptopBaru);
@@ -145,6 +185,10 @@ class _editLaptopState extends State<editLaptop> {
       MasaServisLaptopController.text = (data?['Masa Servis'] ?? '').toString();
       final Urllaptop = data?['Gambar Laptop'] ?? '';
       oldphotoLaptop = Urllaptop;
+      final List<dynamic> KebutuhanData = data?['Kebutuhan Laptop'] ?? [];
+      KebutuhanData.forEach((item) {
+        Kebutuhan_Laptop.add({'Nama Kebutuhan' : item['Nama Kebutuhan']});
+      });
     });
   }
 
@@ -350,6 +394,54 @@ class _editLaptopState extends State<editLaptop> {
                         ? ImglaptopController.text.split('/').last
                         : '',
                     onPressed: PilihGambarLaptop),
+
+                SizedBox(height: 10),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Kebutuhan',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan_Laptop.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan_Laptop[index]['Nama Kebutuhan']),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan_laptop(index);
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+
+
+                InkWell(
+                  onTap: tambahKebutuhan_Laptop,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 30),
 
                 Align(

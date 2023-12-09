@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import '../../dashboard.dart';
 import '../../komponen/box.dart';
@@ -22,7 +23,7 @@ class _LaptopState extends State<Laptop> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF61BF9D),
           title: const Text(
-            'AC',
+            'Laptop',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -57,7 +58,7 @@ class _LaptopState extends State<Laptop> {
                     Box(
                       text: 'Detail Laptop',
                       warna: Warna.green,
-                      gambar: 'gambar/laptop.png',
+                      gambar: 'gambar/lepi2.png',
                       halaman: () {
                         Navigator.push(
                           context,
@@ -67,7 +68,7 @@ class _LaptopState extends State<Laptop> {
                     ),
                     SizedBox(width: 40),
                     Box(
-                      text: 'Manajemen AC',
+                      text: 'Manajemen Laptop',
                       warna: Warna.green,
                       gambar: 'gambar/manajement aset.png',
                       halaman: () {
@@ -89,7 +90,15 @@ class _LaptopState extends State<Laptop> {
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () async{
+              String barcode = await FlutterBarcodeScanner.scanBarcode(
+                  "#FF0000",
+                  "Cancel",
+                  true,
+                  ScanMode.QR);
+
+              print(barcode);
+            },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),

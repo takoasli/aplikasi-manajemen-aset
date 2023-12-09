@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:projek_skripsi/catatanAset.dart';
-import 'package:projek_skripsi/komponen/TimeBar.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
 import 'package:projek_skripsi/profile.dart';
-import 'package:projek_skripsi/tesTombol.dart';
+import 'package:projek_skripsi/qrView.dart';
 import 'pilihInfoAset.dart';
 
 
@@ -24,6 +24,14 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+
+  void logout() {
+    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement;
+    FirebaseAuth.instance.signOut();
+  }
+
+
   late List<String> docPenggunas = [];
   @override
   Widget build(BuildContext context) {
@@ -39,6 +47,12 @@ class _DashboardState extends State<Dashboard> {
               letterSpacing: -0.5,
             ),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: logout,
+            ),
+          ],
           centerTitle: false,
         ),
 
@@ -126,9 +140,14 @@ class _DashboardState extends State<Dashboard> {
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => TimeBar()));
+            onPressed: () async{
+              String barcode = await FlutterBarcodeScanner.scanBarcode(
+                  "#FF0000",
+                  "Cancel",
+                  true,
+                  ScanMode.QR);
+
+              print(barcode);
             },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -200,15 +219,19 @@ class _DashboardState extends State<Dashboard> {
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 45.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "gambar/settings.png",
-                        height: 40,
-                        width: 40,
-                      ),
-                    ],
+                  child: GestureDetector(
+                    onTap: (){
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "gambar/settings.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/komponen/boxAset.dart';
-import 'moreDetail.dart';
+import '../../Aset/PC/MoreDetailPC.dart';
 
 class DetailBacaPC extends StatefulWidget {
   const DetailBacaPC({Key? key, required this.detailDokumenPC}) : super(key: key);

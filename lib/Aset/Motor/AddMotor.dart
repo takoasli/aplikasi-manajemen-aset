@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/Motor/ManajemenMotor.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
+import '../Durability.dart';
 
 class AddMotor extends StatefulWidget {
   const AddMotor({super.key});
@@ -30,8 +32,10 @@ class _AddMotorState extends State<AddMotor> {
   final tipeAkiController = TextEditingController();
   final banDepanController = TextEditingController();
   final banBelakangController = TextEditingController();
+  final isiKebutuhan_Motor = TextEditingController();
   final MasaServisMotorController = TextEditingController();
   final ImgMotorController = TextEditingController();
+  List Kebutuhan_Motor = [];
   final Sukses = SnackBar(
     elevation: 0,
     behavior: SnackBarBehavior.floating,
@@ -74,11 +78,44 @@ class _AddMotorState extends State<AddMotor> {
     }
   }
 
+  void SimpanKebutuhan_Motor(){
+    setState(() {
+      Kebutuhan_Motor.add([isiKebutuhan_Motor.text, false]);
+      isiKebutuhan_Motor.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+  void tambahKebutuhan(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhan_Motor,
+            onAdd: SimpanKebutuhan_Motor,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan(int index) {
+    setState(() {
+      Kebutuhan_Motor.removeAt(index);
+    });
+  }
+
 
   void SimpanMotor() async{
     try{
       String lokasiGambarMotor = ImgMotorController.text;
       String fotoMotor = '';
+      List <Map<String, dynamic>> ListKebutuhan_Motor = [];
+
+      for(var i = 0; i < Kebutuhan_Motor.length; i++){
+        ListKebutuhan_Motor.add({
+          'Nama Kebutuhan': Kebutuhan_Motor[i][0]
+        });
+      }
 
       if(lokasiGambarMotor.isNotEmpty) {
         File imgMotor = File(lokasiGambarMotor);
@@ -97,6 +134,7 @@ class _AddMotorState extends State<AddMotor> {
         banDepanController.text.trim(),
         banBelakangController.text.trim(),
         int.parse(MasaServisMotorController.text.trim()),
+        ListKebutuhan_Motor,
         fotoMotor,
 
 
@@ -113,7 +151,8 @@ class _AddMotorState extends State<AddMotor> {
   }
 
   Future tambahMotor (String merek, String id, int kapsMesin, String pendingin,String transmisi, int kapsBB, int kapsMinyak,
-      int aki, String banDpn, String banBlkng,int masaServis, String gambarMotor) async{
+      int aki, String banDpn, String banBlkng,int masaServis,List<Map<String, dynamic>> kebutuhan, String gambarMotor) async{
+    var timeService = contTimeService(masaServis);
     await FirebaseFirestore.instance.collection('Motor').add({
       'Merek Motor' : merek,
       'ID Motor' : id,
@@ -126,7 +165,10 @@ class _AddMotorState extends State<AddMotor> {
       'Ban Depan' : banDpn,
       'Ban Belakang' : banBlkng,
       'Masa Servis' : masaServis,
-      'Gambar Motor' : gambarMotor
+      'Kebutuhan Motor' : kebutuhan,
+      'Gambar Motor' : gambarMotor,
+      'Waktu Service Motor': timeService.millisecondsSinceEpoch,
+      'Hari Service Motor': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -285,7 +327,7 @@ class _AddMotorState extends State<AddMotor> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Tipe Aki',
+                    'Kapasitas Aki',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -365,6 +407,43 @@ class _AddMotorState extends State<AddMotor> {
                         ? ImgMotorController.text.split('/').last
                         : '',
                     onPressed: PilihGambarMotor),
+
+                SizedBox(height: 10),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan_Motor.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan_Motor[index][0]),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan(index);
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+                InkWell(
+                  onTap: tambahKebutuhan,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: EdgeInsets.all(8),
+                    child: Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 30),
 
                 Align(

@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/Laptop/manajemenLaptop.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
+import '../Durability.dart';
 
 class AddLaptop extends StatefulWidget {
   const AddLaptop({super.key});
@@ -27,9 +29,13 @@ class _AddLaptopState extends State<AddLaptop> {
   final VGAController = TextEditingController();
   final ImglaptopController = TextEditingController();
   final StorageController = TextEditingController();
+  final isiKebutuhan_Laptop = TextEditingController();
   final MonitorController = TextEditingController();
   final MasaServisLaptopController = TextEditingController();
   final ImagePicker _gambarLaptop = ImagePicker();
+  List Kebutuhan_Laptop = [
+  ];
+
   final Sukses = SnackBar(
     elevation: 0,
     behavior: SnackBarBehavior.floating,
@@ -71,10 +77,42 @@ class _AddLaptopState extends State<AddLaptop> {
     }
   }
 
+  void SimpanKebutuhan_Laptop(){
+    setState(() {
+      Kebutuhan_Laptop.add([isiKebutuhan_Laptop.text, false]);
+      isiKebutuhan_Laptop.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+  void tambahKebutuhan_Laptop(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhan_Laptop,
+            onAdd: SimpanKebutuhan_Laptop,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan(int index) {
+    setState(() {
+      Kebutuhan_Laptop.removeAt(index);
+    });
+  }
+
   void SimpanLaptop() async{
     try{
       String lokasiGambarPC = ImglaptopController.text;
       String fotoLaptop = '';
+      List <Map<String, dynamic>> ListKebutuhan_Laptop = [];
+      for(var i = 0; i < Kebutuhan_Laptop.length; i++) {
+        ListKebutuhan_Laptop.add({
+          'Nama Kebutuhan': Kebutuhan_Laptop[i][0]
+        });
+      }
 
       if(lokasiGambarPC.isNotEmpty) {
         File imgLaptop = File(lokasiGambarPC);
@@ -91,12 +129,13 @@ class _AddLaptopState extends State<AddLaptop> {
         VGAController.text.trim(),
         MonitorController.text.trim(),
         int.parse(MasaServisLaptopController.text.trim()),
+        ListKebutuhan_Laptop,
         fotoLaptop,
 
       );
       Navigator.pushReplacement(
           context, MaterialPageRoute(
-          builder: (context)=> ManajemenLaptop())
+          builder: (context)=> const ManajemenLaptop())
       );
 
       ScaffoldMessenger.of(context).showSnackBar(Sukses);
@@ -106,7 +145,8 @@ class _AddLaptopState extends State<AddLaptop> {
   }
 
   Future tambahLaptop (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, String monitor,int masaServis, String gambarLaptop) async{
+      String CPU, int ram, int storage, String vga, String monitor,int masaServis,List<Map<String, dynamic>> kebutuhan, String gambarLaptop) async{
+    var timeService = contTimeService(masaServis);
     await FirebaseFirestore.instance.collection('Laptop').add({
       'Merek Laptop' : merek,
       'ID Laptop' : ID,
@@ -117,7 +157,10 @@ class _AddLaptopState extends State<AddLaptop> {
       'VGA' : vga,
       'Ukuran Monitor' : monitor,
       'Masa Servis' : masaServis,
-      'Gambar Laptop' : gambarLaptop
+      'Kebutuhan Laptop' : kebutuhan,
+      'Gambar Laptop' : gambarLaptop,
+      'Waktu Service Laptop': timeService.millisecondsSinceEpoch,
+      'Hari Service Laptop': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -162,14 +205,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: merekLaptopController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -185,7 +228,7 @@ class _AddLaptopState extends State<AddLaptop> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: IdLaptopController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -195,14 +238,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: lokasiRuanganController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -212,14 +255,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: CPUController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -229,14 +272,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: RamController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -246,14 +289,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: StorageController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -263,14 +306,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: VGAController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -280,14 +323,14 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: MonitorController),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -296,7 +339,7 @@ class _AddLaptopState extends State<AddLaptop> {
                     style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 MyTextField(
                   textInputType: TextInputType.number,
@@ -304,7 +347,7 @@ class _AddLaptopState extends State<AddLaptop> {
                   textInputAction: TextInputAction.next,
                   controller: MasaServisLaptopController,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -314,7 +357,7 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
 
                 FieldImage(
                     controller: ImglaptopController,
@@ -322,6 +365,42 @@ class _AddLaptopState extends State<AddLaptop> {
                         ? ImglaptopController.text.split('/').last
                         : '',
                     onPressed: PilihGambarLaptop),
+                const SizedBox(height: 10),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan_Laptop.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan_Laptop[index][0]),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan(index);
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+
+                InkWell(
+                  onTap: tambahKebutuhan_Laptop,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 30),
 
                 Align(

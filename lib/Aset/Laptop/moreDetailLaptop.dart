@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../komponen/style.dart';
+import '../../qrView.dart';
+import '../Durability.dart';
 
 class MoreDetailLaptop extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -33,55 +35,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
     });
   }
 
-  Color _getProgressColor(double progressValue) {
-    if (progressValue >= 0.5) {
-      return Colors.green;
-    } else if (progressValue >= 0.2) {
-      return Colors.yellow;
-    } else {
-      return Colors.red;
-    }
-  }
-
-  String _getRemainingTime() {
-    Duration difference = targetDate.difference(DateTime.now());
-    int days = difference.inDays;
-    int months = days ~/ 30;
-    int remainingDays = days % 30;
-    int hours = difference.inHours % 24;
-    int minutes = difference.inMinutes % 60;
-    int seconds = difference.inSeconds % 60;
-
-    String timeRemaining = '';
-    if (months > 0) {
-      timeRemaining += '$months bulan ';
-    }
-    if (remainingDays > 0) {
-      timeRemaining += '$remainingDays hari ';
-    }
-    if (hours > 0) {
-      timeRemaining += '$hours jam ';
-    }
-    if (minutes > 0) {
-      timeRemaining += '$minutes menit ';
-    }
-    if (seconds > 0) {
-      timeRemaining += '$seconds detik';
-    }
-    if (timeRemaining.isEmpty) {
-      timeRemaining = 'Waktu habis';
-    }
-
-    return timeRemaining;
-  }
-
   @override
   void dispose() {
     timer.cancel();
     super.dispose();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +90,46 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                     ),
                   ),
                   Positioned(
+                      top: 30,
+                      right: 30,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Warna.white,
+                        ),
+                        child: IconButton(
+                          onPressed: (){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID Laptop'], namaAset: widget.data['Merek Laptop'],),
+                                )
+                            );
+                          },
+                          icon: Icon(Icons.qr_code_2,
+                              size: 33),
+                        ),
+                      )
+                  ),
+                  Positioned(
+                      top: 100,
+                      right: 30,
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Warna.white,
+                        ),
+                        child: IconButton(
+                          onPressed: (){},
+                          icon: Icon(Icons.border_color_outlined,
+                              size: 33),
+                        ),
+                      )
+                  ),
+                  Positioned(
                     top: 170,
                     child: Container(
                       width: 320,
@@ -153,45 +151,21 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                   fontSize: 18,
                                 ),
                               ),
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  color: Colors.grey[300],
-                                ),
-                                child: Stack(
-                                  children: [
-                                    AnimatedContainer(
-                                      duration: const Duration(seconds: 1),
-                                      width: MediaQuery.of(context).size.width * progressValue * 0.8,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        color: _getProgressColor(progressValue),
-                                      ),
-                                    ),
-                                    Positioned.fill(
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Container(
-                                          width: 10,
-                                          height: 10,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: _getProgressColor(progressValue),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              SizedBox(height: 5),
+                              showIndicator(
+                                  getValueIndicator(
+                                      widget.data['Hari Service Laptop'],
+                                      epochTimeToData(
+                                          widget.data['Waktu Service Laptop'])),
+                                  getProgressColor(
+                                      widget.data['Waktu Service Laptop'])),
                               SizedBox(height: 5),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    _getRemainingTime(),
+                                    getRemainingTime(
+                                        widget.data['Waktu Service Laptop']),
                                     style: const TextStyle(
                                       fontSize: 15,
                                     ),
@@ -199,6 +173,39 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ],
                               ),
                               const SizedBox(height: 20),
+
+                              Text(
+                                  'Kebutuhan Servis',
+                                  style: TextStyles.title.copyWith(
+                                      fontSize: 18,
+                                      color: Warna.darkgrey,
+                                      fontWeight: FontWeight.w500
+                                  )
+                              ),
+                              const SizedBox(height: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: widget.data['Kebutuhan Laptop'].length,
+                                    itemBuilder: (context, index) {
+                                      final kebutuhan = widget.data['Kebutuhan Laptop'][index]['Nama Kebutuhan'];
+                                      final part = kebutuhan.split(': ');
+                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      return Text(
+                                        '- $hasSplit',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          letterSpacing: 1,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+
                               Text(
                                   'Merek Laptop',
                                   style: TextStyles.title.copyWith(

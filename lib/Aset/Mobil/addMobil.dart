@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/Mobil/manajemenMobil.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
+import '../Durability.dart';
 
 class AddMobil extends StatefulWidget {
   const AddMobil({super.key});
@@ -30,8 +32,11 @@ class _AddMobilState extends State<AddMobil> {
   final ukuranBanController = TextEditingController();
   final akiController = TextEditingController();
   final MasaServisMobilController = TextEditingController();
+  final isiKebutuhan_Mobil = TextEditingController();
   final imgMobilController = TextEditingController();
   final ImagePicker _gambarMobil = ImagePicker();
+  List Kebutuhan_Mobil = [
+  ];
   final Sukses = SnackBar(
     elevation: 0,
     behavior: SnackBarBehavior.floating,
@@ -74,11 +79,44 @@ class _AddMobilState extends State<AddMobil> {
     }
   }
 
+  void SimpanKebutuhan_Mobil(){
+    setState(() {
+      Kebutuhan_Mobil.add([isiKebutuhan_Mobil.text, false]);
+      isiKebutuhan_Mobil.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+  void tambahKebutuhan(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhan_Mobil,
+            onAdd: SimpanKebutuhan_Mobil,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan(int index) {
+    setState(() {
+      Kebutuhan_Mobil.removeAt(index);
+    });
+  }
+
 
   void SimpanMobil() async{
     try{
       String lokasiGambarMobil = imgMobilController.text;
       String fotoMobil = '';
+      List <Map<String, dynamic>> ListKebutuhan_Mobil = [];
+
+      for(var i = 0; i < Kebutuhan_Mobil.length; i++){
+        ListKebutuhan_Mobil.add({
+          'Nama Kebutuhan': Kebutuhan_Mobil[i][0]
+        });
+      }
 
       if(lokasiGambarMobil.isNotEmpty) {
         File imgMobil = File(lokasiGambarMobil);
@@ -96,6 +134,7 @@ class _AddMobilState extends State<AddMobil> {
         ukuranBanController.text.trim(),
         akiController.text.trim(),
         int.parse(MasaServisMobilController.text.trim()),
+        ListKebutuhan_Mobil,
         fotoMobil,
 
       );
@@ -111,7 +150,8 @@ class _AddMobilState extends State<AddMobil> {
   }
 
   Future tambahMobil (String merek, String ID, String tipemesin,
-      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, String Aki, int masaServis, String GambarMobil) async{
+      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, String Aki, int masaServis,List<Map<String, dynamic>> kebutuhan, String GambarMobil) async{
+    var timeService = contTimeService(masaServis);
     await FirebaseFirestore.instance.collection('Mobil').add({
       'Merek Mobil' : merek,
       'ID Mobil' : ID,
@@ -123,7 +163,10 @@ class _AddMobilState extends State<AddMobil> {
       'Ukuran Ban' : ban,
       'Aki' : Aki,
       'Masa Servis' : masaServis,
-      'Gambar Mobil' : GambarMobil
+      'Kebutuhan Mobil' : kebutuhan,
+      'Gambar Mobil' : GambarMobil,
+      'Waktu Service Mobil': timeService.millisecondsSinceEpoch,
+      'Hari Service Mobil': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -196,7 +239,7 @@ class _AddMobilState extends State<AddMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Tipe Mesin',
+                    'Kapasitas Mesin',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -298,7 +341,7 @@ class _AddMobilState extends State<AddMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Tipe Aki',
+                    'Kapasitas Aki',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -345,6 +388,43 @@ class _AddMobilState extends State<AddMobil> {
                         ? imgMobilController.text.split('/').last
                         : '',
                     onPressed: PilihGambarMobil),
+
+                SizedBox(height: 10),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan_Mobil.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan_Mobil[index][0]),
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan(index);
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+                InkWell(
+                  onTap: tambahKebutuhan,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: EdgeInsets.all(8),
+                    child: Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
+
                 const SizedBox(height: 30),
 
                 Align(

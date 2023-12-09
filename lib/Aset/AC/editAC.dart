@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/AC/ManajemenAC.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
+import '../Durability.dart';
 
 class UpdateAC extends StatefulWidget {
   const UpdateAC({super.key, required this.dokumenAC});
@@ -26,10 +28,13 @@ class _UpdateACState extends State<UpdateAC> {
   final PKController = TextEditingController();
   final ruanganController = TextEditingController();
   final MasaServisACController = TextEditingController();
+  final isiKebutuhan_AC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
+  List Kebutuhan_AC = [
+  ];
   String oldphotoIndoor = '';
   String oldphotoOutdoor = '';
   Map <String, dynamic> dataAC = {};
@@ -57,6 +62,31 @@ class _UpdateACState extends State<UpdateAC> {
     ),
   );
 
+  void SimpanKebutuhan_AC(){
+    setState(() {
+      Kebutuhan_AC.add({'Nama Kebutuhan': isiKebutuhan_AC.text});
+      isiKebutuhan_AC.clear();
+    });
+    Navigator.of(context).pop();
+  }
+  void tambahKebutuhan_AC(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhan_AC,
+            onAdd: SimpanKebutuhan_AC,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan_AC(int index) {
+    setState(() {
+      Kebutuhan_AC.removeAt(index);
+    });
+  }
+
 
   void PilihUpdateIndoor() async {
     final pilihIndoor = await _gambarACIndoor.pickImage(source: ImageSource.gallery);
@@ -75,6 +105,7 @@ class _UpdateACState extends State<UpdateAC> {
       });
     }
   }
+
 
   Future<String> unggahACIndoor(File indoor) async {
     try {
@@ -124,6 +155,12 @@ class _UpdateACState extends State<UpdateAC> {
     try{
       String GambarACIndoor;
       String GambarACOutdoor;
+      var timeService = contTimeService(int.parse(MasaServisACController.text));
+
+      List <Map<String, dynamic>> ListKebutuhan_AC = [];
+      for(var i = 0; i < Kebutuhan_AC.length; i++){
+        ListKebutuhan_AC.add({'Nama Kebutuhan': Kebutuhan_AC[i]['Nama Kebutuhan']});
+      }
 
       if(gambarAcIndoorController.text.isNotEmpty&&gambarAcOutdoorController.text.isNotEmpty
       ||gambarAcIndoorController.text.isNotEmpty&&gambarAcOutdoorController.text.isEmpty){
@@ -143,8 +180,11 @@ class _UpdateACState extends State<UpdateAC> {
         'Kapasitas PK': PKController.text,
         'Lokasi Ruangan' : ruanganController.text,
         'Masa Servis' : MasaServisACController.text,
+        'Kebutuhan AC' : ListKebutuhan_AC,
         'Foto AC Indoor': GambarACIndoor,
         'Foto AC Outdoor': GambarACOutdoor,
+        'waktu_service': timeService.millisecondsSinceEpoch,
+        'hari_service': daysBetween(DateTime.now(), timeService)
       };
 
       await FirebaseFirestore.instance.collection('Aset').doc(dokAC).update(DataACBaru);
@@ -178,6 +218,10 @@ class _UpdateACState extends State<UpdateAC> {
       oldphotoIndoor = UrlIndoor;
       final UrlOutdoor = data?['Foto AC Outdoor'] ?? '';
       oldphotoOutdoor = UrlOutdoor;
+      final List<dynamic> KebutuhanData = data?['Kebutuhan AC'] ?? [];
+      KebutuhanData.forEach((item) {
+        Kebutuhan_AC.add({'Nama Kebutuhan' : item['Nama Kebutuhan']});
+      });
     });
   }
 
@@ -348,6 +392,52 @@ class _UpdateACState extends State<UpdateAC> {
                         ? gambarAcOutdoorController.text.split('/').last // Display only the image name
                         : '',
                     onPressed: PilihUpdateOutdoor),
+                SizedBox(height: 10),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Kebutuhan',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan_AC.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan_AC[index]['Nama Kebutuhan']),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan_AC(index);
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+
+
+                InkWell(
+                  onTap: tambahKebutuhan_AC,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 30),
                 Align(

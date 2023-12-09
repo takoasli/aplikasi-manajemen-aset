@@ -8,8 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/Aset/AC/ManajemenAC.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
+import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
+import '../Durability.dart';
 
 class AddAC extends StatefulWidget {
   const AddAC({super.key});
@@ -25,6 +27,7 @@ class _AddACState extends State<AddAC> {
   final PKController = TextEditingController();
   final ruanganController = TextEditingController();
   final MasaServisACController = TextEditingController();
+  final isiKebutuhanAC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
@@ -39,6 +42,8 @@ class _AddACState extends State<AddAC> {
       contentType: ContentType.success,
     ),
   );
+  List Kebutuhan_AC = [
+  ];
 
 
   void PilihIndoor() async {
@@ -104,12 +109,44 @@ class _AddACState extends State<AddAC> {
     }
   }
 
+  void SimpanKebutuhan_AC(){
+    setState(() {
+      Kebutuhan_AC.add([isiKebutuhanAC.text, false]);
+      isiKebutuhanAC.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+  void tambahKebutuhan(){
+    showDialog(
+        context: context,
+        builder: (context){
+          return DialogBox(
+            controller: isiKebutuhanAC,
+            onAdd: SimpanKebutuhan_AC,
+            onCancel: () => Navigator.of(context).pop(),
+          );
+        });
+  }
+
+  void ApusKebutuhan(int index) {
+    setState(() {
+      Kebutuhan_AC.removeAt(index);
+    });
+  }
+
   void SimpanAC() async{
     try{
       String lokasiGambarIndoor = gambarAcIndoorController.text;
       String fotoIndoor = '';
       String lokasiGambarOutdoor = gambarAcOutdoorController.text;
       String fotoOutdoor = '';
+      List <Map<String, dynamic>> ListKebutuhan_AC = [];
+      for(var i = 0; i < Kebutuhan_AC.length; i++){
+        ListKebutuhan_AC.add({
+          'Nama Kebutuhan': Kebutuhan_AC[i][0]
+        });
+      }
 
       if(lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isNotEmpty
       ||lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isEmpty){
@@ -127,6 +164,7 @@ class _AddACState extends State<AddAC> {
         int.parse(PKController.text.trim()),
         ruanganController.text.trim(),
         int.parse(MasaServisACController.text.trim()),
+        ListKebutuhan_AC,
         fotoIndoor,
         fotoOutdoor,
       );
@@ -142,15 +180,13 @@ class _AddACState extends State<AddAC> {
       wattController.clear();
       PKController.clear();
       MasaServisACController.clear();
-
-
-
     }catch(e){
       print("Error: $e");
     }
   }
 
-  Future tambahAC(String merek, String ID, int watt, int pk, String ruangan,int masaServis, String UrlIndoor, String UrlOutdoor) async{
+  Future tambahAC(String merek, String ID, int watt, int pk, String ruangan,int masaServis,List<Map<String, dynamic>> kebutuhan, String UrlIndoor, String UrlOutdoor) async{
+    var timeService = contTimeService(masaServis);
     await FirebaseFirestore.instance.collection('Aset').add({
       'Merek AC' : merek,
       'ID AC' : ID,
@@ -158,8 +194,11 @@ class _AddACState extends State<AddAC> {
       'Kapasitas PK' : pk,
       'Lokasi Ruangan' : ruangan,
       'Masa Servis' : masaServis,
+      'Kebutuhan AC' : kebutuhan,
       'Foto AC Indoor' : UrlIndoor,
-      'Foto AC Outdoor' : UrlOutdoor
+      'Foto AC Outdoor' : UrlOutdoor,
+      'waktu_service': timeService.millisecondsSinceEpoch,
+      'hari_service': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -310,9 +349,9 @@ class _AddACState extends State<AddAC> {
                 FieldImage(
                   controller: gambarAcIndoorController,
                   selectedImageName: gambarAcIndoorController.text.isNotEmpty
-                      ? gambarAcIndoorController.text.split('/').last // Display only the image name
+                      ? gambarAcIndoorController.text.split('/').last
                       : '',
-                  onPressed: PilihIndoor, // Pass the pickImage method to FieldImage
+                  onPressed: PilihIndoor,
                 ),
 
                 SizedBox(height: 10),
@@ -332,6 +371,43 @@ class _AddACState extends State<AddAC> {
                         ? gambarAcOutdoorController.text.split('/').last
                         : '',
                     onPressed: PilihOutdoor),
+                SizedBox(height: 10),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: Kebutuhan_AC.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(Kebutuhan_AC[index][0]), // Menampilkan teks kebutuhan
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          ApusKebutuhan(index); // Fungsi untuk menghapus kebutuhan
+                        },
+                        color: Colors.red,
+                      ),
+                    );
+                  },
+                ),
+
+
+
+                InkWell(
+                  onTap: tambahKebutuhan,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: EdgeInsets.all(8),
+                    child: Row(
+                      children: [Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')],
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: 30),
                 Align(
