@@ -31,7 +31,7 @@ class _ManageAccState extends State<ManageAcc> {
 
   Future<void> getDokumen() async {
     final QuerySnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('User').get();
+        await FirebaseFirestore.instance.collection('User').get();
     setState(() {
       docIDs = snapshot.docs.map((doc) => doc.id).toList();
     });
@@ -53,7 +53,7 @@ class _ManageAccState extends State<ManageAcc> {
   Future<void> hapusUser(String docID) async {
     try {
       final DocumentSnapshot<Map<String, dynamic>> snapshot =
-      await FirebaseFirestore.instance.collection('User').doc(docID).get();
+          await FirebaseFirestore.instance.collection('User').doc(docID).get();
       final data = snapshot.data();
 
       var token = data?['Token'];

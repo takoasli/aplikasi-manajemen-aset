@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:projek_skripsi/manajemenUser.dart';
 import 'package:projek_skripsi/textfield/imageField.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
@@ -117,7 +118,10 @@ class _AddUserState extends State<AddUser> {
           foto,
         );
 
-        Navigator.pop(context, true);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ManageAcc()),
+        );
 
         ScaffoldMessenger.of(context).showSnackBar(Sukses);
         namaController.clear();
