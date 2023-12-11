@@ -77,6 +77,7 @@ class _UpdateACState extends State<UpdateAC> {
             controller: isiKebutuhan_AC,
             onAdd: SimpanKebutuhan_AC,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan AC',
           );
         });
   }

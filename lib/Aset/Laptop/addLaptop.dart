@@ -5,13 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/Laptop/manajemenLaptop.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../Durability.dart';
+import 'manajemenLaptop.dart';
 
 class AddLaptop extends StatefulWidget {
   const AddLaptop({super.key});
@@ -47,9 +47,10 @@ class _AddLaptopState extends State<AddLaptop> {
     ),
   );
 
-  void PilihGambarLaptop() async{
-    final pilihLaptop = await _gambarLaptop.pickImage(source: ImageSource.gallery);
-    if(pilihLaptop != null) {
+  void PilihGambarLaptop() async {
+    final pilihLaptop =
+        await _gambarLaptop.pickImage(source: ImageSource.gallery);
+    if (pilihLaptop != null) {
       setState(() {
         ImglaptopController.text = pilihLaptop.path;
       });
@@ -57,8 +58,8 @@ class _AddLaptopState extends State<AddLaptop> {
   }
 
   Future<String> unggahGambarLaptop(File gambarLaptop) async {
-    try{
-      if(!gambarLaptop.existsSync()){
+    try {
+      if (!gambarLaptop.existsSync()) {
         print('File tidak ditemukan!');
         return '';
       }
@@ -71,7 +72,7 @@ class _AddLaptopState extends State<AddLaptop> {
       await uploadLaptop;
       String fotoLaptop = await penyimpanan.getDownloadURL();
       return fotoLaptop;
-    }catch (e){
+    } catch (e) {
       print('$e');
       return '';
     }
@@ -93,6 +94,7 @@ class _AddLaptopState extends State<AddLaptop> {
             controller: isiKebutuhan_Laptop,
             onAdd: SimpanKebutuhan_Laptop,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan Laptop',
           );
         });
   }
@@ -114,7 +116,7 @@ class _AddLaptopState extends State<AddLaptop> {
         });
       }
 
-      if(lokasiGambarPC.isNotEmpty) {
+      if (lokasiGambarPC.isNotEmpty) {
         File imgLaptop = File(lokasiGambarPC);
         fotoLaptop = await unggahGambarLaptop(imgLaptop);
       }
@@ -131,7 +133,6 @@ class _AddLaptopState extends State<AddLaptop> {
         int.parse(MasaServisLaptopController.text.trim()),
         ListKebutuhan_Laptop,
         fotoLaptop,
-
       );
       Navigator.pushReplacement(
           context, MaterialPageRoute(
@@ -139,7 +140,7 @@ class _AddLaptopState extends State<AddLaptop> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(Sukses);
-    }catch(e){
+    } catch (e) {
       print("Error : $e");
     }
   }
@@ -164,7 +165,6 @@ class _AddLaptopState extends State<AddLaptop> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,7 +182,6 @@ class _AddLaptopState extends State<AddLaptop> {
         elevation: 0,
         centerTitle: false,
       ),
-
       body: Center(
         child: Container(
           width: 370,
@@ -222,7 +221,6 @@ class _AddLaptopState extends State<AddLaptop> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
@@ -336,7 +334,8 @@ class _AddLaptopState extends State<AddLaptop> {
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -402,7 +401,6 @@ class _AddLaptopState extends State<AddLaptop> {
                   ),
                 ),
                 const SizedBox(height: 30),
-
                 Align(
                   alignment: Alignment.center,
                   child: ElevatedButton(
@@ -411,8 +409,7 @@ class _AddLaptopState extends State<AddLaptop> {
                         backgroundColor: Warna.green,
                         minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25))
-                    ),
+                            borderRadius: BorderRadius.circular(25))),
                     child: Container(
                       width: 200,
                       child: Center(

@@ -4,13 +4,15 @@ import 'package:projek_skripsi/komponen/tombol.dart';
 
 class DialogBox extends StatelessWidget {
   final controller;
+  final TextJudul;
   VoidCallback onAdd;
   VoidCallback onCancel;
 
   DialogBox({super. key,
     required this.controller,
     required this.onAdd,
-    required this.onCancel});
+    required this.onCancel,
+    required this.TextJudul});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class DialogBox extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Tambah Kebutuhan baru...',
+              Text(TextJudul,
               style: TextStyles.body.copyWith(fontSize: 17, color: Warna.white),
               textAlign: TextAlign.left,),
               const SizedBox(height: 7),

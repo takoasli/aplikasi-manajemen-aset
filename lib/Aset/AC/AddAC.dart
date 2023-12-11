@@ -5,13 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/AC/ManajemenAC.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../Durability.dart';
+import 'ManajemenAC.dart';
 
 class AddAC extends StatefulWidget {
   const AddAC({super.key});
@@ -45,9 +45,9 @@ class _AddACState extends State<AddAC> {
   List Kebutuhan_AC = [
   ];
 
-
   void PilihIndoor() async {
-    final pilihIndoor = await _gambarACIndoor.pickImage(source: ImageSource.gallery);
+    final pilihIndoor =
+        await _gambarACIndoor.pickImage(source: ImageSource.gallery);
     if (pilihIndoor != null) {
       setState(() {
         gambarAcIndoorController.text = pilihIndoor.path;
@@ -56,14 +56,14 @@ class _AddACState extends State<AddAC> {
   }
 
   void PilihOutdoor() async {
-    final pilihOutdoor = await _gambarACOutdoor.pickImage(source: ImageSource.gallery);
+    final pilihOutdoor =
+        await _gambarACOutdoor.pickImage(source: ImageSource.gallery);
     if (pilihOutdoor != null) {
       setState(() {
         gambarAcOutdoorController.text = pilihOutdoor.path;
       });
     }
   }
-
 
   Future<String> unggahACIndoor(File indoor) async {
     try {
@@ -125,6 +125,7 @@ class _AddACState extends State<AddAC> {
             controller: isiKebutuhanAC,
             onAdd: SimpanKebutuhan_AC,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan AC',
           );
         });
   }
@@ -148,8 +149,8 @@ class _AddACState extends State<AddAC> {
         });
       }
 
-      if(lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isNotEmpty
-      ||lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isEmpty){
+      if (lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isNotEmpty ||
+          lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isEmpty) {
         File indoor = File(lokasiGambarIndoor);
         fotoIndoor = await unggahACIndoor(indoor);
 
@@ -202,8 +203,6 @@ class _AddACState extends State<AddAC> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -221,7 +220,6 @@ class _AddACState extends State<AddAC> {
         elevation: 0,
         centerTitle: false,
       ),
-
       body: Center(
         child: Container(
           width: 370,
@@ -250,9 +248,7 @@ class _AddACState extends State<AddAC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: MerekACController),
-
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -267,68 +263,58 @@ class _AddACState extends State<AddAC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: idACController),
-
                 SizedBox(height: 10),
-
                 Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
+                  padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Kapasitas Watt',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: wattController),
-
                 SizedBox(height: 10),
-
                 Padding(
-                    padding: EdgeInsets.only(bottom: 3),
-                  child: Text('kapasitas PK',
-                  style: TextStyles.title
-                      .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  padding: EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'kapasitas PK',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: PKController),
-
                 SizedBox(height: 10),
-
                 Padding(
-                    padding: EdgeInsets.only(bottom: 3),
-                child: Text('Ruangan',
-                style: TextStyles.title
-                    .copyWith(fontSize: 15, color: Warna.darkgrey)
-                  ,)
-                ,),
-
+                  padding: EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Ruangan',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: ruanganController),
-
-
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                   textInputType: TextInputType.number,
                   hint: '',
@@ -336,7 +322,6 @@ class _AddACState extends State<AddAC> {
                   controller: MasaServisACController,
                 ),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -345,7 +330,6 @@ class _AddACState extends State<AddAC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 FieldImage(
                   controller: gambarAcIndoorController,
                   selectedImageName: gambarAcIndoorController.text.isNotEmpty
@@ -353,9 +337,7 @@ class _AddACState extends State<AddAC> {
                       : '',
                   onPressed: PilihIndoor,
                 ),
-
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -364,7 +346,6 @@ class _AddACState extends State<AddAC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 FieldImage(
                     controller: gambarAcOutdoorController,
                     selectedImageName: gambarAcIndoorController.text.isNotEmpty

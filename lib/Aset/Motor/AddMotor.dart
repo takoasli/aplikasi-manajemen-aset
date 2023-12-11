@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/Motor/ManajemenMotor.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
@@ -47,10 +46,10 @@ class _AddMotorState extends State<AddMotor> {
     ),
   );
 
-
-  void PilihGambarMotor() async{
-    final pilihMotor = await _gambarMotor.pickImage(source: ImageSource.gallery);
-    if(pilihMotor != null) {
+  void PilihGambarMotor() async {
+    final pilihMotor =
+        await _gambarMotor.pickImage(source: ImageSource.gallery);
+    if (pilihMotor != null) {
       setState(() {
         ImgMotorController.text = pilihMotor.path;
       });
@@ -58,8 +57,8 @@ class _AddMotorState extends State<AddMotor> {
   }
 
   Future<String> unggahGambarMotor(File gambarMotor) async {
-    try{
-      if(!gambarMotor.existsSync()){
+    try {
+      if (!gambarMotor.existsSync()) {
         print('File tidak ditemukan!');
         return '';
       }
@@ -72,7 +71,7 @@ class _AddMotorState extends State<AddMotor> {
       await uploadMotor;
       String fotoMotor = await penyimpanan.getDownloadURL();
       return fotoMotor;
-    }catch (e){
+    } catch (e) {
       print('$e');
       return '';
     }
@@ -94,6 +93,7 @@ class _AddMotorState extends State<AddMotor> {
             controller: isiKebutuhan_Motor,
             onAdd: SimpanKebutuhan_Motor,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan Motor',
           );
         });
   }
@@ -117,7 +117,7 @@ class _AddMotorState extends State<AddMotor> {
         });
       }
 
-      if(lokasiGambarMotor.isNotEmpty) {
+      if (lokasiGambarMotor.isNotEmpty) {
         File imgMotor = File(lokasiGambarMotor);
         fotoMotor = await unggahGambarMotor(imgMotor);
       }
@@ -136,16 +136,15 @@ class _AddMotorState extends State<AddMotor> {
         int.parse(MasaServisMotorController.text.trim()),
         ListKebutuhan_Motor,
         fotoMotor,
-
-
       );
-      Navigator.pushReplacement(
+      /*Navigator.pushReplacement(
           context, MaterialPageRoute(
           builder: (context)=> ManajemenMotor())
-      );
+      );*/
+      Navigator.pop(context, true);
 
       ScaffoldMessenger.of(context).showSnackBar(Sukses);
-    }catch(e){
+    } catch (e) {
       print("Error : $e");
     }
   }
@@ -172,8 +171,6 @@ class _AddMotorState extends State<AddMotor> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,7 +188,6 @@ class _AddMotorState extends State<AddMotor> {
         elevation: 0,
         centerTitle: false,
       ),
-
       body: Center(
         child: Container(
           width: 370,
@@ -215,14 +211,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: merekMotorController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -231,14 +225,12 @@ class _AddMotorState extends State<AddMotor> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: idMotorController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -248,14 +240,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: kapasitasMesinController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -265,14 +255,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: pendinginContorller),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -282,14 +270,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: transmisiController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -299,14 +285,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: KapasitasBBController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -316,14 +300,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: KapasitasMinyakController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -333,14 +315,12 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipeAkiController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -349,14 +329,12 @@ class _AddMotorState extends State<AddMotor> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: banDepanController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -365,23 +343,21 @@ class _AddMotorState extends State<AddMotor> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: banBelakangController),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                   textInputType: TextInputType.number,
                   hint: '',
@@ -389,8 +365,6 @@ class _AddMotorState extends State<AddMotor> {
                   controller: MasaServisMotorController,
                 ),
                 SizedBox(height: 10),
-
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -400,7 +374,6 @@ class _AddMotorState extends State<AddMotor> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 FieldImage(
                     controller: ImgMotorController,
                     selectedImageName: ImgMotorController.text.isNotEmpty
@@ -445,7 +418,6 @@ class _AddMotorState extends State<AddMotor> {
                 ),
 
                 const SizedBox(height: 30),
-
                 Align(
                   alignment: Alignment.center,
                   child: ElevatedButton(
@@ -454,8 +426,7 @@ class _AddMotorState extends State<AddMotor> {
                         backgroundColor: Warna.green,
                         minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25))
-                    ),
+                            borderRadius: BorderRadius.circular(25))),
                     child: Container(
                       width: 200,
                       child: Center(

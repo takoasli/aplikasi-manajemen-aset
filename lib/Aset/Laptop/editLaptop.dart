@@ -79,6 +79,7 @@ class _editLaptopState extends State<editLaptop> {
             controller: isiKebutuhan_Laptop,
             onAdd: SimpanKebutuhan_Laptop,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan Laptop',
           );
         });
   }

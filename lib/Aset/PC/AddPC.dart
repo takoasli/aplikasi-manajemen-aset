@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
@@ -8,13 +7,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/PC/ManajemenPC.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../Durability.dart';
+import 'ManajemenPC.dart';
 
 class AddPC extends StatefulWidget {
   const AddPC({super.key,});
@@ -24,7 +22,6 @@ class AddPC extends StatefulWidget {
 }
 
 class _AddPCState extends State<AddPC> {
-
   final merekPCController = TextEditingController();
   final IdPCController = TextEditingController();
   final lokasiRuanganController = TextEditingController();
@@ -54,7 +51,7 @@ class _AddPCState extends State<AddPC> {
 
   void PilihGambarPC() async{
     final pilihPC = await _gambarPC.pickImage(source: ImageSource.gallery);
-    if(pilihPC != null) {
+    if (pilihPC != null) {
       setState(() {
         ImgPCController.text = pilihPC.path;
       });
@@ -77,6 +74,7 @@ class _AddPCState extends State<AddPC> {
             controller: isiKebutuhan,
             onAdd: SimpanKebutuhan,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan PC',
           );
         });
   }
@@ -91,21 +89,21 @@ class _AddPCState extends State<AddPC> {
 
 
   Future<String> unggahGambarPC(File gambarPC) async {
-    try{
-      if(!gambarPC.existsSync()){
+    try {
+      if (!gambarPC.existsSync()) {
         print('File tidak ditemukan!');
         return '';
       }
       Reference penyimpanan = FirebaseStorage.instance
-      .ref()
-      .child('Personal Conputer')
-      .child(ImgPCController.text.split('/').last);
+          .ref()
+          .child('Personal Conputer')
+          .child(ImgPCController.text.split('/').last);
 
       UploadTask uploadPC = penyimpanan.putFile(gambarPC);
       await uploadPC;
       String fotoPC = await penyimpanan.getDownloadURL();
       return fotoPC;
-    }catch (e){
+    } catch (e) {
       print('$e');
       return '';
     }
@@ -175,8 +173,6 @@ class _AddPCState extends State<AddPC> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,7 +190,6 @@ class _AddPCState extends State<AddPC> {
         elevation: 0,
         centerTitle: false,
       ),
-
       body: Center(
         child: Container(
           width: 370,
@@ -218,14 +213,12 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: merekPCController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -234,14 +227,12 @@ class _AddPCState extends State<AddPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: IdPCController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -251,14 +242,12 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: lokasiRuanganController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -268,14 +257,12 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: CPUController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -285,14 +272,12 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: RamController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -302,14 +287,12 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: StorageController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -319,14 +302,12 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: VGAController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -336,23 +317,21 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                     textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: PSUController),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 SizedBox(height: 10),
-
                 MyTextField(
                   textInputType: TextInputType.number,
                   hint: '',
@@ -360,7 +339,6 @@ class _AddPCState extends State<AddPC> {
                   controller: MasaServisController,
                 ),
                 SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -370,7 +348,6 @@ class _AddPCState extends State<AddPC> {
                   ),
                 ),
                 SizedBox(height: 10),
-
                 FieldImage(
                     controller: ImgPCController,
                     selectedImageName: ImgPCController.text.isNotEmpty
@@ -434,8 +411,7 @@ class _AddPCState extends State<AddPC> {
                         backgroundColor: Warna.green,
                         minimumSize: const Size(300, 50),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25))
-                    ),
+                            borderRadius: BorderRadius.circular(25))),
                     child: Container(
                       width: 200,
                       child: Center(

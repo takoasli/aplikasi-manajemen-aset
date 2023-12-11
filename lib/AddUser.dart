@@ -7,11 +7,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:projek_skripsi/manajemenUser.dart';
 import 'package:projek_skripsi/textfield/imageField.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
 import 'komponen/style.dart';
-import 'manajemenUser.dart';
 
 class AddUser extends StatefulWidget {
   const AddUser({super.key});
@@ -318,11 +318,11 @@ class _AddUserState extends State<AddUser> {
                   controller: ImgController,
                   selectedImageName: ImgController.text.isNotEmpty
                       ? ImgController.text
-                      .split('/')
-                      .last // Display only the image name
+                          .split('/')
+                          .last // Display only the image name
                       : '',
                   onPressed:
-                  PilihGambar, // Pass the pickImage method to FieldImage
+                      PilihGambar, // Pass the pickImage method to FieldImage
                 ),
                 const SizedBox(height: 30),
                 Align(

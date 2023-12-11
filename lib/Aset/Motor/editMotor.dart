@@ -110,6 +110,7 @@ class _EditMotorState extends State<EditMotor> {
             controller: isiKebutuhan_Motor,
             onAdd: SimpanKebutuhan_Motor,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan Motor',
           );
         });
   }

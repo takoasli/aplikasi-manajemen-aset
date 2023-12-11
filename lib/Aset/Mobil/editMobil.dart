@@ -107,6 +107,7 @@ class _EditMobilState extends State<EditMobil> {
             controller: isiKebutuhan_Mobil,
             onAdd: SimpanKebutuhan_Mobil,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan Mobil',
           );
         });
   }

@@ -87,6 +87,7 @@ class _EditPCState extends State<EditPC> {
             controller: isiKebutuhan,
             onAdd: SimpanKebutuhan,
             onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Kebutuhan PC',
           );
         });
   }
