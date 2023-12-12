@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -32,16 +33,16 @@ class _AddACState extends State<AddAC> {
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data AC berhasil Ditambahkan!',
-      contentType: ContentType.success,
-    ),
-  );
+  // final Sukses = SnackBar(
+  //   elevation: 0,
+  //   behavior: SnackBarBehavior.floating,
+  //   backgroundColor: Colors.transparent,
+  //   content: AwesomeSnackbarContent(
+  //     title: 'SUCCESS',
+  //     message: 'Data AC berhasil Ditambahkan!',
+  //     contentType: ContentType.success,
+  //   ),
+  // );
   List Kebutuhan_AC = [
   ];
 
@@ -170,17 +171,21 @@ class _AddACState extends State<AddAC> {
         fotoOutdoor,
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ManajemenAC()),
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
-      MerekACController.clear();
-      idACController.clear();
-      wattController.clear();
-      PKController.clear();
-      MasaServisACController.clear();
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data AC Berhasil Ditambahkan',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ManajemenAC()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data AC Berhasil Ditambahkan');
     }catch(e){
       print("Error: $e");
     }

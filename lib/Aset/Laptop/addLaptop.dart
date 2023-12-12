@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -35,17 +36,6 @@ class _AddLaptopState extends State<AddLaptop> {
   final ImagePicker _gambarLaptop = ImagePicker();
   List Kebutuhan_Laptop = [
   ];
-
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data Laptop berhasil Ditambahkan!',
-      contentType: ContentType.success,
-    ),
-  );
 
   void PilihGambarLaptop() async {
     final pilihLaptop =
@@ -134,12 +124,23 @@ class _AddLaptopState extends State<AddLaptop> {
         ListKebutuhan_Laptop,
         fotoLaptop,
       );
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(
-          builder: (context)=> const ManajemenLaptop())
-      );
 
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data Laptop Berhasil Ditambahkan',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ManajemenLaptop()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data Laptop Berhasil Ditambahkan');
+
     } catch (e) {
       print("Error : $e");
     }

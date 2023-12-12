@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -41,28 +42,6 @@ class _EditMotorState extends State<EditMotor> {
   Map <String, dynamic> datamotor = {};
   List Kebutuhan_Motor = [];
   final ImagePicker _gambarMotor = ImagePicker();
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data Motor berhasil Diupdate!',
-      contentType: ContentType.success,
-    ),
-  );
-
-  final gagal = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'FAILED',
-      message:
-      'Data Motor Gagal Dibuat',
-      contentType: ContentType.success,
-    ),
-  );
 
   void PilihGambarMotor() async{
     final pilihMotor = await _gambarMotor.pickImage(source: ImageSource.gallery);
@@ -156,10 +135,21 @@ class _EditMotorState extends State<EditMotor> {
       };
       await FirebaseFirestore.instance.collection('Motor').doc(dokMotor).update(DataMotorBaru);
 
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ManajemenMotor()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data Motor Berhasil Diupdate',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ManajemenMotor()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data Motor Berhasil Diupdate');
+
     }catch (e){
       print(e);
     }

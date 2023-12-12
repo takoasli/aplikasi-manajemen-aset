@@ -4,6 +4,7 @@ import 'package:projek_skripsi/Aset/Motor/DetailMotor.dart';
 import 'package:projek_skripsi/Aset/Motor/ManajemenMotor.dart';
 
 import '../../dashboard.dart';
+import '../../komponen/bottomNavigation.dart';
 import '../../komponen/box.dart';
 import '../../komponen/style.dart';
 import '../../profile.dart';
@@ -87,16 +88,17 @@ class _MotorState extends State<Motor> {
         ),
         backgroundColor: Colors.white,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Container(
+        floatingActionButton: SizedBox(
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () async{
+            onPressed: () async {
               String barcode = await FlutterBarcodeScanner.scanBarcode(
-                  "#FF0000",
-                  "Cancel",
-                  true,
-                  ScanMode.QR);
+                "#FF0000",
+                "Cancel",
+                true,
+                ScanMode.QR,
+              );
 
               print(barcode);
             },
@@ -116,100 +118,7 @@ class _MotorState extends State<Motor> {
             ),
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 65,
-          decoration: const BoxDecoration(
-            color: Color(0xFF61BF9D),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 5.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Dashboard()),
-                      );
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "gambar/home.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 45.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "gambar/notifications.png",
-                        height: 40,
-                        width: 40,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 45.0),
-                  child: GestureDetector(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "gambar/settings.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 5.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Profiles()),
-                      );
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "gambar/profiles.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: BottomNav(),
       ),
     );
   }

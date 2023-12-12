@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -34,16 +35,6 @@ class _AddPCState extends State<AddPC> {
   final MasaServisController = TextEditingController();
   final PSUController = TextEditingController();
   final ImagePicker _gambarPC = ImagePicker();
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data PC berhasil Ditambahkan!',
-      contentType: ContentType.success,
-    ),
-  );
 
   List Kebutuhan = [
   ];
@@ -142,12 +133,22 @@ class _AddPCState extends State<AddPC> {
           fotoPC,
         );
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => ManajemenPC()),
-        );
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data PC Berhasil Ditambahkan',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ManajemenPC()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data PC Berhasil Ditambahkan');
 
-        ScaffoldMessenger.of(context).showSnackBar(Sukses);
     } catch (e) {
       print("Error : $e");
     }

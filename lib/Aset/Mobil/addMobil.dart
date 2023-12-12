@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:projek_skripsi/Aset/Mobil/manajemenMobil.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
@@ -35,16 +37,6 @@ class _AddMobilState extends State<AddMobil> {
   final ImagePicker _gambarMobil = ImagePicker();
   List Kebutuhan_Mobil = [
   ];
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data Mobil berhasil Ditambahkan!',
-      contentType: ContentType.success,
-    ),
-  );
 
   void PilihGambarMobil() async {
     final pilihMobil =
@@ -136,13 +128,23 @@ class _AddMobilState extends State<AddMobil> {
         ListKebutuhan_Mobil,
         fotoMobil,
       );
-      /*Navigator.pushReplacement(
-          context, MaterialPageRoute(
-          builder: (context)=> ManajemenMobil())
-      );*/
-      Navigator.pop(context, true);
 
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data Mobil Berhasil Ditambahkan',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ManajemenMobil()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data Mobil Berhasil Ditambahkan');
+
     } catch (e) {
       print("Error : $e");
     }

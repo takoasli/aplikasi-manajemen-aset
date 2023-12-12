@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -39,29 +39,6 @@ class _editLaptopState extends State<editLaptop> {
   List Kebutuhan_Laptop = [
   ];
   Map <String, dynamic> dataLaptop = {};
-
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data Laptop berhasil Diupdate!',
-      contentType: ContentType.success,
-    ),
-  );
-
-  final gagal = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'FAILED',
-      message:
-      'Data Laptop Gagal Dibuat',
-      contentType: ContentType.success,
-    ),
-  );
 
   void SimpanKebutuhan_Laptop(){
     setState(() {
@@ -155,10 +132,21 @@ class _editLaptopState extends State<editLaptop> {
 
       await FirebaseFirestore.instance.collection('Laptop').doc(dokLaptop).update(DataLaptopBaru);
 
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ManajemenLaptop()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data Laptop Berhasil Diupdate',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ManajemenLaptop()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data Laptop Berhasil Diupdate');
+
     }catch (e){
       print(e);
     }

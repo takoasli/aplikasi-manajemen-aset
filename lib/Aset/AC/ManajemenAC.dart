@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -39,20 +38,28 @@ class _ManajemenAC extends State<ManajemenAC> {
   }
 
   Future<void> hapusAC(String docAC) async {
-    try {
-      await FirebaseFirestore.instance.collection('Aset').doc(docAC).delete();
-      getAC();
-      ScaffoldMessenger.of(context).showSnackBar(berhasil);
-    } catch (e) {
-      print(e);
-    }
+      AwesomeDialog dialog = AwesomeDialog(
+        context: context,
+        dialogType: DialogType.warning,
+        animType: AnimType.bottomSlide,
+        title: 'Yakin ingin menghapus?',
+        desc: 'Data yang dihapus tidak dapat dikembalikan.',
+        btnOkOnPress: () async {
+          await FirebaseFirestore.instance.collection('Aset').doc(docAC).delete();
+          getAC();
+          ScaffoldMessenger.of(context).showSnackBar(berhasil);
+        },
+        btnCancelOnPress: () {},
+      );
+        await dialog.show();
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     getAC();
   }
+
 
 
   @override

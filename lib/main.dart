@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:projek_skripsi/auth.dart';
-
 import 'firebase_options.dart';
 
 void main() async {

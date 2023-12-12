@@ -1,17 +1,17 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projek_skripsi/Aset/Mobil/manajemenMobil.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../Durability.dart';
+import 'manajemenMobil.dart';
 
 class EditMobil extends StatefulWidget {
   const EditMobil({super.key,
@@ -39,28 +39,6 @@ class _EditMobilState extends State<EditMobil> {
   String oldphotoMobil = '';
   Map <String, dynamic> datamobil = {};
   List Kebutuhan_Mobil = [];
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data Mobil berhasil Diupdate!',
-      contentType: ContentType.success,
-    ),
-  );
-
-  final gagal = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'FAILED',
-      message:
-      'Data Mobil Gagal Dibuat',
-      contentType: ContentType.success,
-    ),
-  );
 
   void PilihGambarMobil() async{
     final pilihMobil = await _gambarMobil.pickImage(source: ImageSource.gallery);
@@ -186,10 +164,21 @@ class _EditMobilState extends State<EditMobil> {
       };
       await FirebaseFirestore.instance.collection('Mobil').doc(dokMobil).update(DataMobilBaru);
 
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ManajemenMobil()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data Mobil Berhasil Diupdate',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ManajemenMobil()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data Mobil Berhasil Diupdate');
+
     }catch (e){
       print(e);
     }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -37,28 +38,6 @@ class _EditPCState extends State<EditPC> {
   String oldphotoPC = '';
   Map <String, dynamic> dataPC = {};
   final ImagePicker _gambarPC = ImagePicker();
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data PC berhasil Ditambahkan!',
-      contentType: ContentType.success,
-    ),
-  );
-
-  final gagal = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'FAILED',
-      message:
-      'Data PC Gagal Diubah',
-      contentType: ContentType.success,
-    ),
-  );
 
   List Kebutuhan = [
   ];
@@ -153,9 +132,20 @@ class _EditPCState extends State<EditPC> {
 
       await FirebaseFirestore.instance.collection('PC').doc(dokPC).update(DataPCBaru);
 
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const ManajemenPC()),
-      );
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data PC Berhasil Diupdate',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const ManajemenPC()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data PC Berhasil Diupdate');
     }catch (e){
       print(e);
     }

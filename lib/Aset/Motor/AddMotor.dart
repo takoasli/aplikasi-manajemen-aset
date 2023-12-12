@@ -1,10 +1,11 @@
 import 'dart:io';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:projek_skripsi/Aset/Motor/ManajemenMotor.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
@@ -35,16 +36,6 @@ class _AddMotorState extends State<AddMotor> {
   final MasaServisMotorController = TextEditingController();
   final ImgMotorController = TextEditingController();
   List Kebutuhan_Motor = [];
-  final Sukses = SnackBar(
-    elevation: 0,
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    content: AwesomeSnackbarContent(
-      title: 'SUCCESS',
-      message: 'Data Motor berhasil Ditambahkan!',
-      contentType: ContentType.success,
-    ),
-  );
 
   void PilihGambarMotor() async {
     final pilihMotor =
@@ -137,13 +128,22 @@ class _AddMotorState extends State<AddMotor> {
         ListKebutuhan_Motor,
         fotoMotor,
       );
-      /*Navigator.pushReplacement(
-          context, MaterialPageRoute(
-          builder: (context)=> ManajemenMotor())
-      );*/
-      Navigator.pop(context, true);
 
-      ScaffoldMessenger.of(context).showSnackBar(Sukses);
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data Motor Berhasil Ditambahkan',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => ManajemenMotor()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data Motor Berhasil Ditambahkan');
+
     } catch (e) {
       print("Error : $e");
     }

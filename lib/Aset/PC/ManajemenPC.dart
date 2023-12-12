@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -38,14 +39,21 @@ class _ManajemenPC extends State<ManajemenPC> {
     });
   }
 
-  Future<void> hapusPC(String docAC) async {
-    try {
-      await FirebaseFirestore.instance.collection('PC').doc(docAC).delete();
-      getPC();
-      ScaffoldMessenger.of(context).showSnackBar(berhasil);
-    } catch (e) {
-      print(e);
-    }
+  Future<void> hapusPC(String docPC) async {
+    AwesomeDialog dialog = AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.bottomSlide,
+      title: 'Yakin ingin menghapus?',
+      desc: 'Data yang dihapus tidak dapat dikembalikan.',
+      btnOkOnPress: () async {
+        await FirebaseFirestore.instance.collection('PC').doc(docPC).delete();
+        getPC();
+        ScaffoldMessenger.of(context).showSnackBar(berhasil);
+      },
+      btnCancelOnPress: () {},
+    );
+    await dialog.show();
   }
 
   @override

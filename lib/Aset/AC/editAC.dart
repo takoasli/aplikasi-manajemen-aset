@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -190,9 +191,22 @@ class _UpdateACState extends State<UpdateAC> {
 
       await FirebaseFirestore.instance.collection('Aset').doc(dokAC).update(DataACBaru);
 
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => ManajemenAC()),
-      );
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data AC Berhasil Diupdate',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ManajemenAC()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data AC Berhasil Diupdate');
+
     }catch (e){
       print(e);
     }

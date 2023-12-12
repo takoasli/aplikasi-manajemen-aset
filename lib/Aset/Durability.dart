@@ -25,7 +25,7 @@ Color getProgressColor(int waktu) {
   var sisaHari = difference.inDays;
   print("Sisa Hari $sisaHari");
 
-  if (sisaHari >= 30) {
+  if (sisaHari >= 20) {
     return Colors.green;
   } else if (sisaHari >= 15) {
     return Colors.yellow;

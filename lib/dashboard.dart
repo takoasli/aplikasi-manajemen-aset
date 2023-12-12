@@ -1,14 +1,12 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:projek_skripsi/catatanAset.dart';
+import 'package:projek_skripsi/komponen/bottomNavigation.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
-import 'package:projek_skripsi/profile.dart';
-import 'package:projek_skripsi/qrView.dart';
 import 'pilihInfoAset.dart';
-
 
 void main() {
   runApp(Dashboard());
@@ -24,14 +22,6 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-
-  void logout() {
-    Navigator.of(context).pop();
-    Navigator.of(context).pushReplacement;
-    FirebaseAuth.instance.signOut();
-  }
-
-
   late List<String> docPenggunas = [];
 
   @override
@@ -58,7 +48,6 @@ class _DashboardState extends State<Dashboard> {
           ],
           centerTitle: false,
         ),
-
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -68,9 +57,10 @@ class _DashboardState extends State<Dashboard> {
               child: Text(
                 'Selamat Datang, ' + widget.pengguna.email!.split('@')[0],
                 style: TextStyles.title.copyWith(
-                    color: Warna.darkgrey,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold),
+                  color: Warna.darkgrey,
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -99,53 +89,54 @@ class _DashboardState extends State<Dashboard> {
                     // );
                   },
                 ),
+
                 Box(
-                  text: 'Manajemen \nAset',
-                  gambar: 'gambar/manajemen.png',
+                  text: 'Manajemen\nUser',
+                  gambar: 'gambar/users.png',
                   warna: Warna.green,
-                  halaman: () {},
+                  halaman: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ManageAcc()),
+                    );
+                  },
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 45.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Box(
-                    text: 'Manajemen\nUser',
-                    gambar: 'gambar/users.png',
-                    warna: Warna.green,
-                    halaman: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ManageAcc()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            )
           ],
         ),
-
         backgroundColor: Colors.white,
-
-        //bottom navbar
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Container(
+        floatingActionButton: SizedBox(
           width: 75,
           height: 75,
           child: FloatingActionButton(
-            onPressed: () async{
+            onPressed: () async {
               String barcode = await FlutterBarcodeScanner.scanBarcode(
-                  "#FF0000",
-                  "Cancel",
-                  true,
-                  ScanMode.QR);
+                "#FF0000",
+                "Cancel",
+                true,
+                ScanMode.QR,
+              );
+              if (barcode != '-1') {
+                AwesomeDialog(
+                  context: context,
+                  dialogType: DialogType.success,
+                  animType: AnimType.bottomSlide,
+                  title: 'Berhasil!',
+                  desc: barcode,
+                  btnOkOnPress: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Dashboard()),
+                    );
+                  },
+                  autoHide: Duration(seconds: 5),
+                ).show();
+              }
 
               print(barcode);
+
             },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -163,103 +154,14 @@ class _DashboardState extends State<Dashboard> {
             ),
           ),
         ),
-        bottomNavigationBar: Container(
-          height: 65,
-          decoration: const BoxDecoration(
-            color: Color(0xFF61BF9D),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 5.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Dashboard()),
-                      );
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "gambar/home.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 45.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "gambar/notifications.png",
-                        height: 40,
-                        width: 40,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 45.0),
-                  child: GestureDetector(
-                    onTap: (){
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "gambar/settings.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 5.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Profiles()),
-                      );
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "gambar/profiles.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        bottomNavigationBar: BottomNav(),
       ),
     );
+  }
+
+  void logout() {
+    Navigator.of(context).pop();
+    Navigator.of(context).pushReplacement;
+    FirebaseAuth.instance.signOut();
   }
 }
