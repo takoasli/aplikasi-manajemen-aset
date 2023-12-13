@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../komponen/style.dart';
 import '../../qrView.dart';
-import '../Durability.dart';
+import '../ControllerLogic.dart';
 
 class MoreDetailmobil extends StatefulWidget {
   const MoreDetailmobil({super.key,

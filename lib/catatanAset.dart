@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'Aset/ControllerLogic.dart';
 import 'komponen/checklists.dart';
 import 'komponen/kotakBiaya.dart';
 import 'komponen/kotakDialog.dart';
 import 'komponen/style.dart';
-import 'package:intl/intl.dart';
 
 
 class Catatan extends StatefulWidget {
@@ -28,8 +28,7 @@ class _CatatanState extends State<Catatan> {
   late String idAC;
   late String merekAC;
   List<List<dynamic>> List_Kebutuhan = [];
-  List Biaya_Kebutuhan = [
-  ];
+  List<CatatanBiaya> biayaKebutuhans = [];
 
 
   void checkBoxberubah(bool? value, int index){
@@ -40,7 +39,7 @@ class _CatatanState extends State<Catatan> {
   });
   }
 
-  void SimpanTask(){
+  void SimpanTask(BuildContext context) {
     setState(() {
       List_Kebutuhan.add([isiDialog.text, false]);
       isiDialog.clear();
@@ -48,18 +47,19 @@ class _CatatanState extends State<Catatan> {
     Navigator.of(context).pop();
   }
 
-  void tambahTugas(){
+  void tambahTugas() {
     showDialog(
         context: context,
-        builder: (context){
+        builder: (context) {
           return DialogBox(
             controller: isiDialog,
-            onAdd: SimpanTask,
+            onAdd: () => SimpanTask(context),
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Kebutuhan Tambahan',
           );
         });
   }
+
 
   void ApusTask(int index){
   setState(() {
@@ -67,29 +67,30 @@ class _CatatanState extends State<Catatan> {
   });
   }
 
-  void SimpanBiaya_AC(){
+  void SimpanBiaya_AC(BuildContext context) {
     setState(() {
       // Pastikan isiBiayaAC dan hargaIsiBiayaAC tidak kosong
       if (isiBiayaAC.text.isNotEmpty && hargaIsiBiayaAC.text.isNotEmpty) {
         // Tambahkan nama biaya dan harga ke Biaya_Kebutuhan
-        Biaya_Kebutuhan.add([isiBiayaAC.text, hargaIsiBiayaAC.text]);
+        biayaKebutuhans.add(
+            CatatanBiaya(isiBiayaAC.text, double.parse(hargaIsiBiayaAC.text)));
         isiBiayaAC.clear();
         hargaIsiBiayaAC.clear();
-      }else{
+      } else {
         print('tolong tambahkan informasi yang diminta');
       }
     });
     Navigator.of(context).pop();
   }
 
-  void tambahListBiaya(){
+  void tambahListBiaya() {
     showDialog(
         context: context,
-        builder: (context){
+        builder: (context) {
           return DialogBiaya(
             NamaBiayacontroller: isiBiayaAC,
             HargaBiayacontroller: hargaIsiBiayaAC,
-            onAdd: SimpanBiaya_AC,
+            onAdd: () => SimpanBiaya_AC(context),
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Nama Biaya',
           );
@@ -98,14 +99,14 @@ class _CatatanState extends State<Catatan> {
 
   void ApusBiayaAC(int index) {
     setState(() {
-      Biaya_Kebutuhan.removeAt(index);
+      biayaKebutuhans.removeAt(index);
     });
   }
 
   double hitungTotalBiaya() {
     double totalBiaya = 0.0;
-    for (int i = 0; i < Biaya_Kebutuhan.length; i++) {
-      totalBiaya += double.parse(Biaya_Kebutuhan[i][1]);
+    for (int i = 0; i < biayaKebutuhans.length; i++) {
+      totalBiaya += biayaKebutuhans[i].biaya;
     }
     return totalBiaya;
   }
@@ -226,8 +227,6 @@ class _CatatanState extends State<Catatan> {
                         children: [
                           Expanded(
                               child: ListView.builder(
-                                // shrinkWrap: true,
-                                // physics: const NeverScrollableScrollPhysics(),
                                 itemCount: List_Kebutuhan.length,
                                 itemBuilder: (context, index){
                                   return Checklist(
@@ -262,19 +261,17 @@ class _CatatanState extends State<Catatan> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: ListView(
-                        // shrinkWrap: true,
-                        // physics: NeverScrollableScrollPhysics(),
                         children: [
                           Expanded(
                             child: ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: Biaya_Kebutuhan.length,
+                              itemCount: biayaKebutuhans.length,
                               itemBuilder: (context, index) {
-                                final formatter = NumberFormat.currency(locale: 'id', symbol: 'Rp ');
                                 return ListTile(
-                                  title: Text(Biaya_Kebutuhan[index][0]),
-                                  subtitle: Text('Rp: ${Biaya_Kebutuhan[index][1]}'),
+                                  title: Text(biayaKebutuhans[index].nama),
+                                  subtitle: Text(convertToRupiah(
+                                      biayaKebutuhans[index].biaya)),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
@@ -330,9 +327,9 @@ class _CatatanState extends State<Catatan> {
                           ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 185.0),
+                              padding: const EdgeInsets.only(left: 10),
                               child: Text(
-                                'Rp ${hitungTotalBiaya().toStringAsFixed(3)}',
+                                convertToRupiah(hitungTotalBiaya()),
                                 style: TextStyles.title.copyWith(
                                   fontSize: 18,
                                   color: Warna.darkgrey,

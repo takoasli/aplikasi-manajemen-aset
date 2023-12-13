@@ -1,5 +1,6 @@
 // Hitung hari antara 2 tangal
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 // Hitung perbandingan tanggal berupa hari
 int daysBetween(DateTime from, DateTime to) {
@@ -81,4 +82,19 @@ LinearProgressIndicator showIndicator(double value, Color color) {
       minHeight: 15,
       color: color,
       value: value);
+}
+
+String convertToRupiah(dynamic number) {
+  NumberFormat currencyFormatter = NumberFormat.currency(
+    locale: 'id',
+    symbol: 'Rp ',
+    decimalDigits: 0,
+  );
+  return currencyFormatter.format(number);
+}
+
+class CatatanBiaya {
+  CatatanBiaya(this.nama, this.biaya);
+  late String nama;
+  late double biaya;
 }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
-import '../Durability.dart';
+import '../ControllerLogic.dart';
 
 class MoreDetailAC extends StatefulWidget {
   const MoreDetailAC({super.key, required this.data});

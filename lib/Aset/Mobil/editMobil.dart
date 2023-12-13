@@ -10,7 +10,7 @@ import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
-import '../Durability.dart';
+import '../ControllerLogic.dart';
 import 'manajemenMobil.dart';
 
 class EditMobil extends StatefulWidget {

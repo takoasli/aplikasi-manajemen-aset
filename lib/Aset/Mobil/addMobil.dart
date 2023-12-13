@@ -12,7 +12,7 @@ import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
-import '../Durability.dart';
+import '../ControllerLogic.dart';
 
 class AddMobil extends StatefulWidget {
   const AddMobil({super.key});

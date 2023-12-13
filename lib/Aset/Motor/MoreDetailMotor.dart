@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../komponen/style.dart';
 import '../../qrView.dart';
-import '../Durability.dart';
+import '../ControllerLogic.dart';
 
 class MoreDetailMotor extends StatefulWidget {
   const MoreDetailMotor({super.key,

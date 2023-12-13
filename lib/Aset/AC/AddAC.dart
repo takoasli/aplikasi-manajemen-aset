@@ -11,7 +11,7 @@ import 'package:projek_skripsi/textfield/textfields.dart';
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
-import '../Durability.dart';
+import '../ControllerLogic.dart';
 import 'ManajemenAC.dart';
 
 class AddAC extends StatefulWidget {

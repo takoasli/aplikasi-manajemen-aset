@@ -10,12 +10,14 @@ class CurrencyInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    int value = int.parse(newValue.text.replaceAll('.', ''));
+    // Hilangkan titik pemisah ribuan dan koma desimal
+    int value = int.parse(newValue.text.replaceAll('.', '').replaceAll(',', ''));
+
     final formatter = NumberFormat('#,###');
     String newText = formatter.format(value);
 
     return newValue.copyWith(
-      text: newText.replaceAll(',', '.'), // ganti koma dengan titik
+      text: newText.replaceAll(',', '.'), // Ganti koma dengan titik sebagai desimal
       selection: TextSelection.collapsed(offset: newText.length),
     );
   }
