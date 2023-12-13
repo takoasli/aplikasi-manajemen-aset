@@ -28,6 +28,7 @@ class _UpdateACState extends State<UpdateAC> {
   final wattController = TextEditingController();
   final PKController = TextEditingController();
   final ruanganController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisACController = TextEditingController();
   final isiKebutuhan_AC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
@@ -79,6 +80,7 @@ class _UpdateACState extends State<UpdateAC> {
             onAdd: SimpanKebutuhan_AC,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan AC',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }

@@ -27,22 +27,13 @@ class _AddACState extends State<AddAC> {
   final wattController = TextEditingController();
   final PKController = TextEditingController();
   final ruanganController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisACController = TextEditingController();
   final isiKebutuhanAC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
-  // final Sukses = SnackBar(
-  //   elevation: 0,
-  //   behavior: SnackBarBehavior.floating,
-  //   backgroundColor: Colors.transparent,
-  //   content: AwesomeSnackbarContent(
-  //     title: 'SUCCESS',
-  //     message: 'Data AC berhasil Ditambahkan!',
-  //     contentType: ContentType.success,
-  //   ),
-  // );
   List Kebutuhan_AC = [
   ];
 
@@ -127,6 +118,7 @@ class _AddACState extends State<AddAC> {
             onAdd: SimpanKebutuhan_AC,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan AC',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }

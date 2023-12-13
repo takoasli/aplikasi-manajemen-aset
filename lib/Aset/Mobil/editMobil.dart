@@ -33,6 +33,7 @@ class _EditMobilState extends State<EditMobil> {
   final isiKebutuhan_Mobil = TextEditingController();
   final ukuranBanController = TextEditingController();
   final akiController = TextEditingController();
+  final masaKebutuhanController = TextEditingController();
   final MasaServisMobilController = TextEditingController();
   final imgMobilController = TextEditingController();
   final ImagePicker _gambarMobil = ImagePicker();
@@ -86,6 +87,7 @@ class _EditMobilState extends State<EditMobil> {
             onAdd: SimpanKebutuhan_Mobil,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan Mobil',
+            JangkaKebutuhan: masaKebutuhanController,
           );
         });
   }

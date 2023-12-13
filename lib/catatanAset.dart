@@ -1,3 +1,5 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'Aset/ControllerLogic.dart';
 import 'komponen/checklists.dart';
@@ -23,21 +25,24 @@ class Catatan extends StatefulWidget {
 class _CatatanState extends State<Catatan> {
 
   final isiDialog = TextEditingController();
+  final MasaKebutuhan = TextEditingController();
   final isiBiayaAC = TextEditingController();
+  final CatatanLengkapController = TextEditingController();
   final hargaIsiBiayaAC = TextEditingController(text: '');
-  late String idAC;
-  late String merekAC;
+  late String idAset;
+  late String merekAset;
   List<List<dynamic>> List_Kebutuhan = [];
-  List<CatatanBiaya> biayaKebutuhans = [];
+  List biayaKebutuhans = [];
 
 
-  void checkBoxberubah(bool? value, int index){
-  setState(() {
-    if(value != null){
-      List_Kebutuhan[index][1] = value;
-    }
-  });
+  void checkBoxberubah(bool? value, int index) {
+    setState(() {
+      if (value != null) {
+        List_Kebutuhan[index][1] = value;
+      }
+    });
   }
+
 
   void SimpanTask(BuildContext context) {
     setState(() {
@@ -56,6 +61,7 @@ class _CatatanState extends State<Catatan> {
             onAdd: () => SimpanTask(context),
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Kebutuhan Tambahan',
+            JangkaKebutuhan: MasaKebutuhan,
           );
         });
   }
@@ -67,13 +73,13 @@ class _CatatanState extends State<Catatan> {
   });
   }
 
-  void SimpanBiaya_AC(BuildContext context) {
+  void SimpanBiaya(BuildContext context) {
     setState(() {
-      // Pastikan isiBiayaAC dan hargaIsiBiayaAC tidak kosong
+      // Pastikan isiBiaya dan hargaIsiBiaya tidak kosong
       if (isiBiayaAC.text.isNotEmpty && hargaIsiBiayaAC.text.isNotEmpty) {
         // Tambahkan nama biaya dan harga ke Biaya_Kebutuhan
         biayaKebutuhans.add(
-            CatatanBiaya(isiBiayaAC.text, double.parse(hargaIsiBiayaAC.text)));
+            CatatanBiaya(isiBiayaAC.text, double.parse(hargaIsiBiayaAC.text.replaceAll(".", ""))));
         isiBiayaAC.clear();
         hargaIsiBiayaAC.clear();
       } else {
@@ -90,7 +96,7 @@ class _CatatanState extends State<Catatan> {
           return DialogBiaya(
             NamaBiayacontroller: isiBiayaAC,
             HargaBiayacontroller: hargaIsiBiayaAC,
-            onAdd: () => SimpanBiaya_AC(context),
+            onAdd: () => SimpanBiaya(context),
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Nama Biaya',
           );
@@ -111,11 +117,59 @@ class _CatatanState extends State<Catatan> {
     return totalBiaya;
   }
 
+  void SimpanCatatan() async {
+    try {
+      List<Map<String, dynamic>> ListKebutuhanDone = [];
+      for (var i = 0; i < List_Kebutuhan.length; i++) {
+        String status = List_Kebutuhan[i][1] == true ? "Done" : "unDone";
+        ListKebutuhanDone.add({
+          'Nama Kebutuhan': List_Kebutuhan[i][0],
+          'Status': status,
+        });
+      }
+
+      List<Map<String, dynamic>> HargaKebutuhan = [];
+      for (var i = 0; i < biayaKebutuhans.length; i++) {
+        HargaKebutuhan.add({
+          'Biaya Pengeluaran PC': biayaKebutuhans[i][0],
+        });
+      }
+
+      await FirebaseFirestore.instance.collection('Catatan Servis').add({
+        'ID_Aset': idAset,
+        'Nama_Aset': merekAset,
+        'Kebutuhan Done': ListKebutuhanDone,
+        'Harga Kebutuhan': HargaKebutuhan,
+        'Catatan Lengkap': CatatanLengkapController.text,
+      });
+
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Catatan Servis Berhasil Tersimpan!',
+        btnOkOnPress: () {
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => ManajemenPC()),
+          // );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+      print('Data PC Berhasil Ditambahkan');
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+
+
   @override
   void initState(){
     super.initState();
-    idAC = '${widget.ID_Aset}';
-    merekAC = '${widget.Nama_Aset}';
+    idAset = '${widget.ID_Aset}';
+    merekAset = '${widget.Nama_Aset}';
     List_Kebutuhan = List<List<dynamic>>.from(widget.List_Kebutuhan.map((item) => [item, false]));
   }
 
@@ -195,10 +249,10 @@ class _CatatanState extends State<Catatan> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(merekAC,
+                              Text(merekAset,
                               style: TextStyles.title.copyWith(fontSize: 20)
                               ),
-                              Text(idAC,
+                              Text(idAset,
                               style: TextStyles.body.copyWith(fontSize: 17),
                               )
                             ],
@@ -304,6 +358,38 @@ class _CatatanState extends State<Catatan> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 15),
+
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 25.0),
+                        child: Text('Catatan Lengkap',
+                          style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white),),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    Container(
+                      width: 350,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: Warna.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: TextField(
+                          controller: CatatanLengkapController,
+                          maxLines: null, // Untuk mengizinkan multiple baris teks
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Masukkan catatan tambahan...',
+                          ),
+                        ),
+                      ),
+                    ),
+
                     SizedBox(height: 10),
                     Container(
                       width: 350,
@@ -345,7 +431,7 @@ class _CatatanState extends State<Catatan> {
                     Align(
                       alignment: Alignment.center,
                       child: ElevatedButton(
-                          onPressed: (){},
+                          onPressed: SimpanCatatan,
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Warna.white,
                               minimumSize: const Size(200, 50),

@@ -23,6 +23,13 @@ class EditPC extends StatefulWidget {
   State<EditPC> createState() => _EditPCState();
 }
 
+class KebutuhanUpdateModel {
+  String namaKebutuhan;
+  String masaKebutuhan;
+
+  KebutuhanUpdateModel(this.namaKebutuhan, this.masaKebutuhan);
+}
+
 class _EditPCState extends State<EditPC> {
   final merekPCController = TextEditingController();
   final IdPCController = TextEditingController();
@@ -34,13 +41,12 @@ class _EditPCState extends State<EditPC> {
   final StorageController = TextEditingController();
   final isiKebutuhan = TextEditingController();
   final PSUController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisController = TextEditingController();
   String oldphotoPC = '';
   Map <String, dynamic> dataPC = {};
   final ImagePicker _gambarPC = ImagePicker();
-
-  List Kebutuhan = [
-  ];
+  List Kebutuhan = [];
 
   void PilihGambarPC() async{
     final pilihPC = await _gambarPC.pickImage(source: ImageSource.gallery);
@@ -51,13 +57,18 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
-  void SimpanKebutuhan(){
+  void SimpanKebutuhan() {
     setState(() {
-      Kebutuhan.add({'Kebutuhan PC': isiKebutuhan.text});
+      Kebutuhan.add({
+        'Kebutuhan PC': isiKebutuhan.text,
+        'Masa Kebutuhan': MasaKebutuhanController.text
+      });
       isiKebutuhan.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
+
   void tambahKebutuhan(){
     showDialog(
         context: context,
@@ -67,6 +78,7 @@ class _EditPCState extends State<EditPC> {
             onAdd: SimpanKebutuhan,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan PC',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }
@@ -101,11 +113,13 @@ class _EditPCState extends State<EditPC> {
   Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async{
     try{
       String GambarPC;
-      List <Map<String, dynamic>> ListKebutuhan = [];
       var timeService = contTimeService(int.parse(MasaServisController.text));
-      for(var i = 0; i < Kebutuhan.length; i++){
-        ListKebutuhan.add({'Kebutuhan PC': Kebutuhan[i]['Kebutuhan PC']});
-      }
+      List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
+        return {
+          'Kebutuhan PC': kebutuhan['Kebutuhan PC'],
+          'Masa Kebutuhan': kebutuhan['Masa Kebutuhan']
+        };
+      }).toList();
 
       if(ImgPCController.text.isNotEmpty){
         File gambarPCBaru = File(ImgPCController.text);
@@ -124,7 +138,7 @@ class _EditPCState extends State<EditPC> {
         'VGA' : VGAController.text,
         'Kapasitas Power Supply' : PSUController.text,
         'Masa Servis' : MasaServisController.text,
-        'kebutuhan' : ListKebutuhan,
+        'kebutuhan' : listKebutuhan,
         'Gambar PC' : GambarPC,
         'Waktu Service PC': timeService.millisecondsSinceEpoch,
         'Hari Service PC': daysBetween(DateTime.now(), timeService)
@@ -174,11 +188,13 @@ class _EditPCState extends State<EditPC> {
         MasaServisController.text = (data?['Masa Servis'] ?? '').toString();
         final UrlPC = data?['Gambar PC'] ?? '';
         oldphotoPC = UrlPC;
-        final List<dynamic> KebutuhanData = data?['kebutuhan'] ?? [];
-        KebutuhanData.forEach((item) {
-          Kebutuhan.add({'Kebutuhan PC' : item['Kebutuhan PC']});
-        });
-
+        final List<dynamic> kebutuhanData = data?['kebutuhan'] ?? [];
+        Kebutuhan = kebutuhanData.map((item) {
+          return {
+            'Kebutuhan PC': item['Kebutuhan PC'],
+            'Masa Kebutuhan': item['Masa Kebutuhan'],
+          };
+        }).toList();
       });
     }catch(e){
       print('Terjadi kesalahan: $e');
@@ -402,7 +418,8 @@ class _EditPCState extends State<EditPC> {
                   itemCount: Kebutuhan.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan[index]['Kebutuhan PC']), // Gunakan kunci yang benar
+                      title: Text(Kebutuhan[index]['Kebutuhan PC']),
+                      subtitle: Text('${Kebutuhan[index]['Masa Kebutuhan']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
@@ -457,7 +474,8 @@ class _EditPCState extends State<EditPC> {
                       ),
                     ),
                   ),
-                )
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

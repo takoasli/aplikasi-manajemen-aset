@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -117,7 +118,21 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            List<dynamic> kebutuhanMobil = widget.data['Kebutuhan Motor'];
+
+                            List<String> namaKebutuhan = [];
+                            for (var kebutuhan in kebutuhanMobil) {
+                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
+                              }
+                            }
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
+                              List_Kebutuhan: namaKebutuhan,
+                              ID_Aset: widget.data['ID Motor'],
+                              Nama_Aset: widget.data['Merek Motor'],)));
+                          },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),
                         ),

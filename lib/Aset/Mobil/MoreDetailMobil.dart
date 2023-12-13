@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -118,7 +119,21 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            List<dynamic> kebutuhanMobil = widget.data['Kebutuhan Mobil'];
+
+                            List<String> namaKebutuhan = [];
+                            for (var kebutuhan in kebutuhanMobil) {
+                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
+                              }
+                            }
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
+                              List_Kebutuhan: namaKebutuhan,
+                              ID_Aset: widget.data['ID Mobil'],
+                              Nama_Aset: widget.data['Merek Mobil'],)));
+                          },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),
                         ),

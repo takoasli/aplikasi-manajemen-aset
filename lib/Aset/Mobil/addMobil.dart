@@ -31,6 +31,7 @@ class _AddMobilState extends State<AddMobil> {
   final kapasitasBBController = TextEditingController();
   final ukuranBanController = TextEditingController();
   final akiController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisMobilController = TextEditingController();
   final isiKebutuhan_Mobil = TextEditingController();
   final imgMobilController = TextEditingController();
@@ -86,6 +87,7 @@ class _AddMobilState extends State<AddMobil> {
             onAdd: SimpanKebutuhan_Mobil,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan Mobil',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }

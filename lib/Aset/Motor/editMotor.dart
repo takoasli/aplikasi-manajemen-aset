@@ -36,6 +36,7 @@ class _EditMotorState extends State<EditMotor> {
   final banDepanController = TextEditingController();
   final banBelakangController = TextEditingController();
   final isiKebutuhan_Motor = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisMotorController = TextEditingController();
   final ImgMotorController = TextEditingController();
   String oldphotoMotor = '';
@@ -90,6 +91,7 @@ class _EditMotorState extends State<EditMotor> {
             onAdd: SimpanKebutuhan_Motor,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan Motor',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }

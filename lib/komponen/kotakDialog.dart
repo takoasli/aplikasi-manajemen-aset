@@ -5,6 +5,7 @@ import 'package:projek_skripsi/komponen/tombol.dart';
 class DialogBox extends StatelessWidget {
   final controller;
   final TextJudul;
+  final JangkaKebutuhan;
   VoidCallback onAdd;
   VoidCallback onCancel;
 
@@ -12,7 +13,8 @@ class DialogBox extends StatelessWidget {
     required this.controller,
     required this.onAdd,
     required this.onCancel,
-    required this.TextJudul});
+    required this.TextJudul,
+    required this.JangkaKebutuhan});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class DialogBox extends StatelessWidget {
       ),
       content: SingleChildScrollView(
         child: Container(
-          height: 150,
+          height: 250,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -43,7 +45,23 @@ class DialogBox extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              //tombol
+              Text('Masa Kebutuhan',
+                style: TextStyles.body.copyWith(fontSize: 17, color: Warna.white),
+                textAlign: TextAlign.left,),
+              const SizedBox(height: 10),
+              TextField(
+                controller: JangkaKebutuhan,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
