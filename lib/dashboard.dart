@@ -6,6 +6,8 @@ import 'package:projek_skripsi/komponen/bottomNavigation.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
+
+import 'catatanAset.dart';
 import 'pilihInfoAset.dart';
 
 void main() {
@@ -83,13 +85,17 @@ class _DashboardState extends State<Dashboard> {
                   gambar: 'gambar/catatan.png',
                   warna: Warna.green,
                   halaman: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => Catatan()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Catatan(
+                                List_Kebutuhan: [],
+                                ID_Aset: '',
+                                Nama_Aset: '',
+                              )),
+                    );
                   },
                 ),
-
                 Box(
                   text: 'Manajemen\nUser',
                   gambar: 'gambar/users.png',
@@ -136,7 +142,6 @@ class _DashboardState extends State<Dashboard> {
               }
 
               print(barcode);
-
             },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
