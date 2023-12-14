@@ -23,9 +23,15 @@ class AddPC extends StatefulWidget {
 
 class KebutuhanModel {
   String namaKebutuhan;
-  String masaKebutuhan;
+  int masaKebutuhan;
+  int WaktuKebutuhan;
+  int HariKebutuhan;
 
-  KebutuhanModel(this.namaKebutuhan, this.masaKebutuhan);
+  KebutuhanModel(this.namaKebutuhan,
+      this.masaKebutuhan,
+      this.WaktuKebutuhan,
+      this.HariKebutuhan
+      );
 }
 
 class _AddPCState extends State<AddPC> {
@@ -41,6 +47,8 @@ class _AddPCState extends State<AddPC> {
   final StorageController = TextEditingController();
   final MasaServisController = TextEditingController();
   final PSUController = TextEditingController();
+  final hariKebutuhan = TextEditingController();
+  final waktuKebutuhan = TextEditingController();
   final ImagePicker _gambarPC = ImagePicker();
   List Kebutuhan = [];
 
@@ -56,7 +64,10 @@ class _AddPCState extends State<AddPC> {
 
   void SimpanKebutuhan(){
     setState(() {
-      Kebutuhan.add(KebutuhanModel(isiKebutuhan.text, MasaKebutuhan.text));
+      Kebutuhan.add(KebutuhanModel(isiKebutuhan.text,
+          int.parse(MasaKebutuhan.text),
+          int.parse(waktuKebutuhan.text),
+          int.parse(hariKebutuhan.text)));
       isiKebutuhan.clear();
       MasaKebutuhan.clear();
     });
@@ -111,7 +122,9 @@ class _AddPCState extends State<AddPC> {
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
         return {
           'Kebutuhan PC': kebutuhan.namaKebutuhan,
-          'Masa Kebutuhan': kebutuhan.masaKebutuhan
+          'Masa Kebutuhan': kebutuhan.masaKebutuhan,
+          'Waktu Kebutuhan PC': kebutuhan.WaktuKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), kebutuhan.HariKebutuhan)
         };
       }).toList();
 
@@ -161,24 +174,21 @@ class _AddPCState extends State<AddPC> {
   Future tambahPC (String merek, String ID, String ruangan,
       String CPU, int ram, int storage, String vga, int psu, int masaServis, List<Map<String, dynamic>> kebutuhan, String gambarPC) async{
     var timeService = contTimeService(masaServis);
-    var timeKebutuhan = contTimeService(int.parse(MasaKebutuhan.text));
-    await FirebaseFirestore.instance.collection('PC').add({
-      'Merek PC' : merek,
-      'ID PC' : ID,
-      'Lokasi Ruangan' : ruangan,
-      'CPU' : CPU,
-      'RAM' : ram,
-      'Kapasitas Penyimpanan' : storage,
-      'VGA' : vga,
-      'Kapasitas Power Supply' : psu,
-      'Masa Servis' : masaServis,
-      'kebutuhan' : kebutuhan,
-      'Gambar PC' : gambarPC,
-      'Waktu Service PC': timeService.millisecondsSinceEpoch,
-      'Hari Service PC': daysBetween(DateTime.now(), timeService),
-      'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
-      'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
-    });
+      await FirebaseFirestore.instance.collection('PC').add({
+        'Merek PC' : merek,
+        'ID PC' : ID,
+        'Lokasi Ruangan' : ruangan,
+        'CPU' : CPU,
+        'RAM' : ram,
+        'Kapasitas Penyimpanan' : storage,
+        'VGA' : vga,
+        'Kapasitas Power Supply' : psu,
+        'Masa Servis' : masaServis,
+        'kebutuhan' : kebutuhan,
+        'Gambar PC' : gambarPC,
+        'Waktu Service PC': timeService.millisecondsSinceEpoch,
+        'Hari Service PC': daysBetween(DateTime.now(), timeService),
+      });
   }
 
   @override

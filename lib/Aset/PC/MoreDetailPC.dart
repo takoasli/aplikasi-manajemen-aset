@@ -206,20 +206,39 @@ class _MoreDetailState extends State<MoreDetail> {
                                     itemCount: widget.data['kebutuhan'].length,
                                     itemBuilder: (context, index) {
                                       final kebutuhan = widget.data['kebutuhan'][index]['Kebutuhan PC'];
+                                      final masaKebutuhan = widget.data['kebutuhan'][index]['Masa Kebutuhan'];
+
                                       final part = kebutuhan.split(': ');
                                       final hasSplit = part.length > 1 ? part[1] : kebutuhan;
-                                      return Text(
-                                        '- $hasSplit',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          letterSpacing: 1,
+
+                                      return SizedBox(
+                                        height: 50,
+                                        child: ListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                          title: Text(
+                                            '- $hasSplit',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            '$masaKebutuhan Bulan',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
                                         ),
                                       );
                                     },
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
+
+
+                              const SizedBox(height: 30),
                               Text(
                                   'Merek PC',
                                   style: TextStyles.title.copyWith(

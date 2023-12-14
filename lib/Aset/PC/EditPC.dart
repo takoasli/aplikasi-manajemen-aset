@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -21,13 +20,6 @@ class EditPC extends StatefulWidget {
 
   @override
   State<EditPC> createState() => _EditPCState();
-}
-
-class KebutuhanUpdateModel {
-  String namaKebutuhan;
-  String masaKebutuhan;
-
-  KebutuhanUpdateModel(this.namaKebutuhan, this.masaKebutuhan);
 }
 
 class _EditPCState extends State<EditPC> {
@@ -110,10 +102,12 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
-  Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async{
-    try{
+  Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async {
+    try {
       String GambarPC;
       var timeService = contTimeService(int.parse(MasaServisController.text));
+
+      // Memastikan bahwa Kebutuhan adalah List<Map<String, dynamic>>
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
         return {
           'Kebutuhan PC': kebutuhan['Kebutuhan PC'],
@@ -121,31 +115,39 @@ class _EditPCState extends State<EditPC> {
         };
       }).toList();
 
-      if(ImgPCController.text.isNotEmpty){
+      if (ImgPCController.text.isNotEmpty) {
         File gambarPCBaru = File(ImgPCController.text);
         GambarPC = await unggahGambarPC(gambarPCBaru);
-      }else{
+      } else {
         GambarPC = oldphotoPC;
       }
 
-      Map<String, dynamic> DataPCBaru = {
-        'Merek PC' : merekPCController.text,
-        'ID PC' : IdPCController.text,
-        'Lokasi Ruangan' : lokasiRuanganController.text,
-        'CPU' : CPUController.text,
-        'RAM' : RamController.text,
-        'Kapasitas Penyimpanan' : StorageController.text,
-        'VGA' : VGAController.text,
-        'Kapasitas Power Supply' : PSUController.text,
-        'Masa Servis' : MasaServisController.text,
-        'kebutuhan' : listKebutuhan,
-        'Gambar PC' : GambarPC,
-        'Waktu Service PC': timeService.millisecondsSinceEpoch,
-        'Hari Service PC': daysBetween(DateTime.now(), timeService)
-      };
+      // Menjalankan proses update untuk setiap item kebutuhan
+      for (var item in listKebutuhan) {
+        var waktuKebutuhan = contTimeService(int.parse(item['Masa Kebutuhan'].toString()));
+        Map<String, dynamic> DataPCBaru = {
+          'Merek PC': merekPCController.text,
+          'ID PC': IdPCController.text,
+          'Lokasi Ruangan': lokasiRuanganController.text,
+          'CPU': CPUController.text,
+          'RAM': RamController.text,
+          'Kapasitas Penyimpanan': StorageController.text,
+          'VGA': VGAController.text,
+          'Kapasitas Power Supply': PSUController.text,
+          'Masa Servis': MasaServisController.text,
+          'kebutuhan': listKebutuhan,
+          'Gambar PC': GambarPC,
+          'Waktu Service PC': timeService.millisecondsSinceEpoch,
+          'Hari Service PC': daysBetween(DateTime.now(), timeService),
+          'Waktu Kebutuhan PC': waktuKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), waktuKebutuhan)
+        };
 
-      await FirebaseFirestore.instance.collection('PC').doc(dokPC).update(DataPCBaru);
+        // Update dokumen Firestore sesuai dengan dokPC
+        await FirebaseFirestore.instance.collection('PC').doc(dokPC).update(DataPCBaru);
+      }
 
+      // Menampilkan dialog sukses setelah update berhasil
       AwesomeDialog(
         context: context,
         dialogType: DialogType.success,
@@ -154,16 +156,19 @@ class _EditPCState extends State<EditPC> {
         desc: 'Data PC Berhasil Diupdate',
         btnOkOnPress: () {
           Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const ManajemenPC()),
+            context,
+            MaterialPageRoute(builder: (context) => const ManajemenPC()),
           );
         },
         autoHide: Duration(seconds: 5),
       ).show();
+
       print('Data PC Berhasil Diupdate');
-    }catch (e){
+    } catch (e) {
       print(e);
     }
   }
+
 
   void initState(){
     super.initState();
