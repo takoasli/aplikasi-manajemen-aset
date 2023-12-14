@@ -67,7 +67,8 @@ class _AddPCState extends State<AddPC> {
       Kebutuhan.add(KebutuhanModel(isiKebutuhan.text,
           int.parse(MasaKebutuhan.text),
           int.parse(waktuKebutuhan.text),
-          int.parse(hariKebutuhan.text)));
+          int.parse(hariKebutuhan.text)
+      ));
       isiKebutuhan.clear();
       MasaKebutuhan.clear();
     });
