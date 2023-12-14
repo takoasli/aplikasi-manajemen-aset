@@ -24,13 +24,9 @@ class AddPC extends StatefulWidget {
 class KebutuhanModel {
   String namaKebutuhan;
   int masaKebutuhan;
-  int WaktuKebutuhan;
-  int HariKebutuhan;
 
   KebutuhanModel(this.namaKebutuhan,
       this.masaKebutuhan,
-      this.WaktuKebutuhan,
-      this.HariKebutuhan
       );
 }
 
@@ -47,8 +43,6 @@ class _AddPCState extends State<AddPC> {
   final StorageController = TextEditingController();
   final MasaServisController = TextEditingController();
   final PSUController = TextEditingController();
-  final hariKebutuhan = TextEditingController();
-  final waktuKebutuhan = TextEditingController();
   final ImagePicker _gambarPC = ImagePicker();
   List Kebutuhan = [];
 
@@ -65,9 +59,7 @@ class _AddPCState extends State<AddPC> {
   void SimpanKebutuhan(){
     setState(() {
       Kebutuhan.add(KebutuhanModel(isiKebutuhan.text,
-          int.parse(MasaKebutuhan.text),
-          int.parse(waktuKebutuhan.text),
-          int.parse(hariKebutuhan.text)
+          int.parse(MasaKebutuhan.text)
       ));
       isiKebutuhan.clear();
       MasaKebutuhan.clear();
@@ -120,12 +112,13 @@ class _AddPCState extends State<AddPC> {
     try {
       String lokasiGambarPC = ImgPCController.text;
       String fotoPC = '';
+      var timeKebutuhan = contTimeService(int.parse(MasaKebutuhan.text));
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
         return {
           'Kebutuhan PC': kebutuhan.namaKebutuhan,
           'Masa Kebutuhan': kebutuhan.masaKebutuhan,
-          'Waktu Kebutuhan PC': kebutuhan.WaktuKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan PC': daysBetween(DateTime.now(), kebutuhan.HariKebutuhan)
+          'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
         };
       }).toList();
 
