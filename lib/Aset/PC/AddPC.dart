@@ -112,8 +112,8 @@ class _AddPCState extends State<AddPC> {
     try {
       String lokasiGambarPC = ImgPCController.text;
       String fotoPC = '';
-      var timeKebutuhan = contTimeService(int.parse(MasaKebutuhan.text));
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhan);
         return {
           'Kebutuhan PC': kebutuhan.namaKebutuhan,
           'Masa Kebutuhan': kebutuhan.masaKebutuhan,

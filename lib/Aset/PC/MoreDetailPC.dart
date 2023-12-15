@@ -207,12 +207,14 @@ class _MoreDetailState extends State<MoreDetail> {
                                     itemBuilder: (context, index) {
                                       final kebutuhan = widget.data['kebutuhan'][index]['Kebutuhan PC'];
                                       final masaKebutuhan = widget.data['kebutuhan'][index]['Masa Kebutuhan'];
+                                      final hariKebutuhan = widget.data['kebutuhan'][index]['Hari Kebutuhan PC'];
+                                      final waktuKebutuhan = widget.data['kebutuhan'][index]['Waktu Kebutuhan PC'];
 
                                       final part = kebutuhan.split(': ');
                                       final hasSplit = part.length > 1 ? part[1] : kebutuhan;
 
                                       return SizedBox(
-                                        height: 50,
+                                        height: 80,
                                         child: ListTile(
                                           dense: true,
                                           contentPadding: EdgeInsets.symmetric(horizontal: 8),
@@ -223,17 +225,33 @@ class _MoreDetailState extends State<MoreDetail> {
                                               letterSpacing: 1,
                                             ),
                                           ),
-                                          subtitle: Text(
-                                            '$masaKebutuhan Bulan',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
+                                          subtitle: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              showIndicator(
+                                                getValueIndicator(hariKebutuhan, epochTimeToData(waktuKebutuhan)),
+                                                getProgressColor(waktuKebutuhan),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    getRemainingTime(masaKebutuhan),
+                                                    style: const TextStyle(
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       );
                                     },
                                   ),
+
+
                                 ],
                               ),
 

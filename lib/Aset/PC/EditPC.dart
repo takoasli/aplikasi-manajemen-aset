@@ -22,6 +22,21 @@ class EditPC extends StatefulWidget {
   State<EditPC> createState() => _EditPCState();
 }
 
+class KebutuhanModelUpdate {
+  String namaKebutuhan;
+  int masaKebutuhan;
+
+  KebutuhanModelUpdate(this.namaKebutuhan, this.masaKebutuhan);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Kebutuhan PC': namaKebutuhan,
+      'Masa Kebutuhan': masaKebutuhan,
+    };
+  }
+}
+
+
 class _EditPCState extends State<EditPC> {
   final merekPCController = TextEditingController();
   final IdPCController = TextEditingController();
@@ -51,15 +66,17 @@ class _EditPCState extends State<EditPC> {
 
   void SimpanKebutuhan() {
     setState(() {
-      Kebutuhan.add({
-        'Kebutuhan PC': isiKebutuhan.text,
-        'Masa Kebutuhan': MasaKebutuhanController.text
-      });
+      KebutuhanModelUpdate kebutuhan = KebutuhanModelUpdate(
+        isiKebutuhan.text,
+        int.parse(MasaKebutuhanController.text),
+      );
+      Kebutuhan.add(kebutuhan.toMap());
       isiKebutuhan.clear();
       MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
+
 
   void tambahKebutuhan(){
     showDialog(
@@ -107,11 +124,13 @@ class _EditPCState extends State<EditPC> {
       String GambarPC;
       var timeService = contTimeService(int.parse(MasaServisController.text));
 
-      // Memastikan bahwa Kebutuhan adalah List<Map<String, dynamic>>
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan'].toString()));
         return {
           'Kebutuhan PC': kebutuhan['Kebutuhan PC'],
-          'Masa Kebutuhan': kebutuhan['Masa Kebutuhan']
+          'Masa Kebutuhan': kebutuhan['Masa Kebutuhan'],
+          'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
         };
       }).toList();
 
@@ -168,6 +187,7 @@ class _EditPCState extends State<EditPC> {
       print(e);
     }
   }
+
 
 
   void initState(){
@@ -435,6 +455,7 @@ class _EditPCState extends State<EditPC> {
                     );
                   },
                 ),
+
 
 
 
