@@ -1,30 +1,36 @@
 import 'dart:typed_data';
 import 'dart:ui';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'komponen/style.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
-class QR_View extends StatefulWidget {
-  QR_View({Key? key, required this.QR_ID,
-    required this.namaAset,}) : super(key: key);
+import 'komponen/style.dart';
 
-  final String QR_ID;
-  final String namaAset;
+class QRView extends StatefulWidget {
+  const QRView({
+    Key? key,
+    required this.assetCollection,
+    required this.assetId,
+    required this.assetName,
+  }) : super(key: key);
+
+  final String assetCollection;
+  final String assetId;
+  final String assetName;
 
   @override
-  State<QR_View> createState() => _QR_ViewState();
+  State<QRView> createState() => _QRViewState();
 }
 
-class _QR_ViewState extends State<QR_View> {
+class _QRViewState extends State<QRView> {
   late String idAset;
   late String namaAset;
   final GlobalKey _qrImageGlobalKey = GlobalKey();
   Uint8List? _imageData;
-
 
   Future<void> PermissionAja() async {
     if (_imageData != null) {
@@ -64,15 +70,15 @@ class _QR_ViewState extends State<QR_View> {
     }
   }
 
-
   Future<void> AmbilGambar() async {
     try {
       if (_qrImageGlobalKey.currentContext != null) {
-        RenderRepaintBoundary boundary =
-        _qrImageGlobalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+        RenderRepaintBoundary boundary = _qrImageGlobalKey.currentContext!
+            .findRenderObject() as RenderRepaintBoundary;
         if (boundary != null) {
           var image = await boundary.toImage(pixelRatio: 3.0);
-          ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+          ByteData? byteData =
+              await image.toByteData(format: ImageByteFormat.png);
           if (byteData != null) {
             setState(() {
               _imageData = byteData.buffer.asUint8List();
@@ -91,12 +97,11 @@ class _QR_ViewState extends State<QR_View> {
     }
   }
 
-
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    idAset = '${widget.QR_ID}';
-    namaAset = '${widget.namaAset}';
+    idAset = '${widget.assetId}';
+    namaAset = '${widget.assetName}';
   }
 
   @override
@@ -117,100 +122,92 @@ class _QR_ViewState extends State<QR_View> {
         centerTitle: false,
       ),
       body: Center(
-            child: Container(
-              width: 370,
-              height: 585,
-              decoration: BoxDecoration(
-                color: Warna.white,
-                borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 370,
+          height: 585,
+          decoration: BoxDecoration(
+            color: Warna.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 10),
+              Text(
+                idAset,
+                style: TextStyles.title.copyWith(
+                  fontSize: 25,
+                  color: Warna.black,
+                ),
               ),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              const SizedBox(height: 10),
+              Text(
+                namaAset,
+                style: TextStyles.body.copyWith(
+                  fontSize: 20,
+                  color: Warna.darkgrey,
+                ),
+              ),
+              const SizedBox(height: 10),
+              RepaintBoundary(
+                key: _qrImageGlobalKey,
+                child: Container(
+                  height: 200,
+                  width: 200,
+                  child: QrImageView(
+                    data: '${widget.assetCollection},${widget.assetId}',
+                    version: QrVersions.auto,
+                    size: 200.0,
+                    backgroundColor: Warna.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  await AmbilGambar();
+                  await PermissionAja();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Warna.green,
+                  minimumSize: const Size(170, 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text(
+                  'Download',
+                  style: TextStyles.body.copyWith(fontSize: 20),
+                ),
+              ),
+              SizedBox(height: 30),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    "Cara Mengaplikasikan\n QR Code ke Aset",
+                    style: TextStyles.title
+                        .copyWith(fontSize: 20, fontWeight: FontWeight.w500),
+                  ),
                   SizedBox(height: 10),
                   Text(
-                    idAset,
-                    style: TextStyles.title.copyWith(
-                      fontSize: 25,
-                      color: Warna.black,
-                    ),
+                    "1. Download Gambar QR Code",
+                    style: TextStyle(fontSize: 16),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    namaAset,
-                    style: TextStyles.body.copyWith(
-                      fontSize: 20,
-                      color: Warna.darkgrey,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                    RepaintBoundary(
-                      key: _qrImageGlobalKey,
-                      child: Container(
-                        height: 200,
-                        width: 200,
-                              child: QrImageView(
-                                data: widget.QR_ID,
-                                version: QrVersions.auto,
-                                size: 200.0,
-                                backgroundColor: Warna.white,
-                              ),
-                            ),
-                    ),
-
-                  const SizedBox(height: 20),
-
-                  ElevatedButton(
-                    onPressed:() async{
-                      await AmbilGambar();
-                      await PermissionAja();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Warna.green,
-                      minimumSize: const Size(170, 40),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      'Download',
-                      style: TextStyles.body.copyWith(fontSize: 20),
-                    ),
-                  ),
-                  SizedBox(height: 30),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Cara Mengaplikasikan\n QR Code ke Aset",
-                        style: TextStyles.title.copyWith(fontSize: 20, fontWeight: FontWeight.w500),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        "1. Download Gambar QR Code",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "2. Print Gambar QR Code",
-                          style: TextStyle(fontSize: 16)
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "3. Tempelkan Gambar QR Code ke \n     Unit Aset",
-                          style: TextStyle(fontSize: 16)
-                      ),
-                    ],
-                  ),
+                  SizedBox(height: 5),
+                  Text("2. Print Gambar QR Code",
+                      style: TextStyle(fontSize: 16)),
+                  SizedBox(height: 5),
+                  Text("3. Tempelkan Gambar QR Code ke \n     Unit Aset",
+                      style: TextStyle(fontSize: 16)),
                 ],
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
   }
-
 }
-

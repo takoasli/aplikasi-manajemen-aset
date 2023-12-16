@@ -8,8 +8,8 @@ import '../../qrView.dart';
 import '../ControllerLogic.dart';
 
 class MoreDetailmobil extends StatefulWidget {
-  const MoreDetailmobil({super.key,
-    required this.data});
+  const MoreDetailmobil({super.key, required this.data});
+
   final Map<String, dynamic> data;
 
   @override
@@ -28,7 +28,9 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
       if (DateTime.now().isBefore(targetDate)) {
         setState(() {
           progressValue = targetDate.difference(DateTime.now()).inSeconds /
-              targetDate.difference(DateTime(targetDate.year, targetDate.month, 0)).inSeconds;
+              targetDate
+                  .difference(DateTime(targetDate.year, targetDate.month, 0))
+                  .inSeconds;
         });
       } else {
         timer.cancel();
@@ -36,20 +38,14 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     String imageUrl = widget.data['Gambar Mobil'] ?? '';
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF61BF9D),
-        title: Text(
-            '${widget.data['ID Mobil']}',
-            style: TextStyles.title.copyWith(
-                fontSize: 20,
-                color: Warna.white
-            )
-        ),
+        title: Text('${widget.data['ID Mobil']}',
+            style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white)),
         elevation: 0,
         centerTitle: false,
       ),
@@ -76,13 +72,13 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                       ),
                       child: imageUrl.isNotEmpty
                           ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                      )
+                              imageUrl,
+                              fit: BoxFit.contain,
+                            )
                           : Image.asset(
-                        'gambar/mobil.png',
-                        fit: BoxFit.contain,
-                      ),
+                              'gambar/mobil.png',
+                              fit: BoxFit.contain,
+                            ),
                     ),
                   ),
                   Positioned(
@@ -96,18 +92,20 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID Mobil'], namaAset: widget.data['Merek Mobil'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "Mobile",
+                                    assetId: widget.data['ID Mobil'],
+                                    assetName: widget.data['Merek Mobil'],
+                                  ),
+                                ));
                           },
-                          icon: Icon(Icons.qr_code_2,
-                              size: 33),
+                          icon: Icon(Icons.qr_code_2, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                       top: 100,
                       right: 30,
@@ -119,26 +117,30 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
-                            List<dynamic> kebutuhanMobil = widget.data['Kebutuhan Mobil'];
+                          onPressed: () {
+                            List<dynamic> kebutuhanMobil =
+                                widget.data['Kebutuhan Mobil'];
 
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanMobil) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                              if (kebutuhan is Map<String, dynamic> &&
+                                  kebutuhan.containsKey('Nama Kebutuhan')) {
                                 namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
                               }
                             }
 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
-                              List_Kebutuhan: namaKebutuhan,
-                              ID_Aset: widget.data['ID Mobil'],
-                              Nama_Aset: widget.data['Merek Mobil'],)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Catatan(
+                                          List_Kebutuhan: namaKebutuhan,
+                                          ID_Aset: widget.data['ID Mobil'],
+                                          Nama_Aset: widget.data['Merek Mobil'],
+                                        )));
                           },
-                          icon: Icon(Icons.border_color_outlined,
-                              size: 33),
+                          icon: Icon(Icons.border_color_outlined, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                     top: 170,
                     child: Container(
@@ -182,26 +184,26 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ],
                               ),
                               SizedBox(height: 10),
-
-                              Text(
-                                  'Kebutuhan Servis',
+                              Text('Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               const SizedBox(height: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: widget.data['Kebutuhan Mobil'].length,
+                                    itemCount:
+                                        widget.data['Kebutuhan Mobil'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan Mobil'][index]['Nama Kebutuhan'];
+                                      final kebutuhan =
+                                          widget.data['Kebutuhan Mobil'][index]
+                                              ['Nama Kebutuhan'];
                                       final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      final hasSplit =
+                                          part.length > 1 ? part[1] : kebutuhan;
                                       return Text(
                                         '- $hasSplit',
                                         style: const TextStyle(
@@ -214,14 +216,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              Text(
-                                  'Merek Mobil',
+                              Text('Merek Mobil',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Merek Mobil']}',
@@ -231,15 +230,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'ID Mobil',
+                              Text('ID Mobil',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['ID Mobil']}',
@@ -249,15 +244,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Kapasitas Mesin',
+                              Text('Kapasitas Mesin',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Tipe Mesin']} cc',
@@ -267,15 +258,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Jenis Bahan Bakar',
+                              Text('Jenis Bahan Bakar',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Jenis Bahan Bakar']}',
@@ -285,15 +272,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Pendingin Mesin',
+                              Text('Pendingin Mesin',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Sistem Pendingin Mesin']}',
@@ -303,15 +286,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Tipe Transmisi',
+                              Text('Tipe Transmisi',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Tipe Transmisi']}',
@@ -321,15 +300,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Kapasitas Bahan Bakar',
+                              Text('Kapasitas Bahan Bakar',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Kapasitas Bahan Bakar']}',
@@ -339,15 +314,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Ukuran Ban',
+                              Text('Ukuran Ban',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Ukuran Ban']}',
@@ -357,15 +328,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Aki',
+                              Text('Aki',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Aki']}',
@@ -375,15 +342,11 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Tempo Maintenance',
+                              Text('Tempo Maintenance',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Masa Servis']} Bulan',
@@ -393,7 +356,6 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
                             ],
                           ),
                         ),

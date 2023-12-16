@@ -8,8 +8,8 @@ import '../../qrView.dart';
 import '../ControllerLogic.dart';
 
 class MoreDetailMotor extends StatefulWidget {
-  const MoreDetailMotor({super.key,
-    required this.data});
+  const MoreDetailMotor({super.key, required this.data});
+
   final Map<String, dynamic> data;
 
   @override
@@ -28,7 +28,9 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
       if (DateTime.now().isBefore(targetDate)) {
         setState(() {
           progressValue = targetDate.difference(DateTime.now()).inSeconds /
-              targetDate.difference(DateTime(targetDate.year, targetDate.month, 0)).inSeconds;
+              targetDate
+                  .difference(DateTime(targetDate.year, targetDate.month, 0))
+                  .inSeconds;
         });
       } else {
         timer.cancel();
@@ -42,13 +44,8 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF61BF9D),
-        title: Text(
-            '${widget.data['ID Motor']}',
-            style: TextStyles.title.copyWith(
-                fontSize: 20,
-                color: Warna.white
-            )
-        ),
+        title: Text('${widget.data['ID Motor']}',
+            style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white)),
         elevation: 0,
         centerTitle: false,
       ),
@@ -75,13 +72,13 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                       ),
                       child: imageUrl.isNotEmpty
                           ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                      )
+                              imageUrl,
+                              fit: BoxFit.contain,
+                            )
                           : Image.asset(
-                        'gambar/motor.png',
-                        fit: BoxFit.contain,
-                      ),
+                              'gambar/motor.png',
+                              fit: BoxFit.contain,
+                            ),
                     ),
                   ),
                   Positioned(
@@ -95,18 +92,20 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID Motor'], namaAset: widget.data['Merek Motor'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "Motor",
+                                    assetId: widget.data['ID Motor'],
+                                    assetName: widget.data['Merek Motor'],
+                                  ),
+                                ));
                           },
-                          icon: Icon(Icons.qr_code_2,
-                              size: 33),
+                          icon: Icon(Icons.qr_code_2, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                       top: 100,
                       right: 30,
@@ -118,26 +117,30 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
-                            List<dynamic> kebutuhanMobil = widget.data['Kebutuhan Motor'];
+                          onPressed: () {
+                            List<dynamic> kebutuhanMobil =
+                                widget.data['Kebutuhan Motor'];
 
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanMobil) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                              if (kebutuhan is Map<String, dynamic> &&
+                                  kebutuhan.containsKey('Nama Kebutuhan')) {
                                 namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
                               }
                             }
 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
-                              List_Kebutuhan: namaKebutuhan,
-                              ID_Aset: widget.data['ID Motor'],
-                              Nama_Aset: widget.data['Merek Motor'],)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Catatan(
+                                          List_Kebutuhan: namaKebutuhan,
+                                          ID_Aset: widget.data['ID Motor'],
+                                          Nama_Aset: widget.data['Merek Motor'],
+                                        )));
                           },
-                          icon: Icon(Icons.border_color_outlined,
-                              size: 33),
+                          icon: Icon(Icons.border_color_outlined, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                     top: 170,
                     child: Container(
@@ -181,28 +184,27 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                   ),
                                 ],
                               ),
-
                               SizedBox(height: 20),
-
-                              Text(
-                                  'Kebutuhan Servis',
+                              Text('Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               const SizedBox(height: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: widget.data['Kebutuhan Motor'].length,
+                                    itemCount:
+                                        widget.data['Kebutuhan Motor'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan Motor'][index]['Nama Kebutuhan'];
+                                      final kebutuhan =
+                                          widget.data['Kebutuhan Motor'][index]
+                                              ['Nama Kebutuhan'];
                                       final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      final hasSplit =
+                                          part.length > 1 ? part[1] : kebutuhan;
                                       return Text(
                                         '- $hasSplit',
                                         style: const TextStyle(
@@ -215,14 +217,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ],
                               ),
                               SizedBox(height: 10),
-                              Text(
-                                  'Merek Motor',
+                              Text('Merek Motor',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Merek Motor']}',
@@ -232,15 +231,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'ID Motor',
+                              Text('ID Motor',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['ID Motor']}',
@@ -250,15 +245,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Kapasitas Mesin',
+                              Text('Kapasitas Mesin',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Kapasitas Mesin']}',
@@ -268,15 +259,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Sistem Pendingin',
+                              Text('Sistem Pendingin',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Sistem Pendingin']}',
@@ -286,15 +273,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Tipe Transmisi',
+                              Text('Tipe Transmisi',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Tipe Transmisi']}',
@@ -304,15 +287,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Kapasitas Bahan Bakar',
+                              Text('Kapasitas Bahan Bakar',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Kapasitas Bahan Bakar']}',
@@ -322,15 +301,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Kapasitas Minyak Rem',
+                              Text('Kapasitas Minyak Rem',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Kapasitas Minyak']}',
@@ -340,15 +315,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Tipe Aki',
+                              Text('Tipe Aki',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Tipe Aki']}',
@@ -358,15 +329,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Ukuran Ban Depan',
+                              Text('Ukuran Ban Depan',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Ban Depan']}',
@@ -376,15 +343,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 15),
-
-                              Text(
-                                  'Ukuran Ban Belakang',
+                              Text('Ukuran Ban Belakang',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Ban Belakang']}',
@@ -394,15 +357,11 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Tempo Maintenance',
+                              Text('Tempo Maintenance',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Masa Servis']} Bulan',
@@ -412,7 +371,6 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
                             ],
                           ),
                         ),

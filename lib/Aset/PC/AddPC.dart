@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
+
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../textfield/imageField.dart';
@@ -15,7 +14,9 @@ import '../ControllerLogic.dart';
 import 'ManajemenPC.dart';
 
 class AddPC extends StatefulWidget {
-  const AddPC({super.key,});
+  const AddPC({
+    super.key,
+  });
 
   @override
   State<AddPC> createState() => _AddPCState();
@@ -25,9 +26,10 @@ class KebutuhanModel {
   String namaKebutuhan;
   int masaKebutuhan;
 
-  KebutuhanModel(this.namaKebutuhan,
-      this.masaKebutuhan,
-      );
+  KebutuhanModel(
+    this.namaKebutuhan,
+    this.masaKebutuhan,
+  );
 }
 
 class _AddPCState extends State<AddPC> {
@@ -46,8 +48,7 @@ class _AddPCState extends State<AddPC> {
   final ImagePicker _gambarPC = ImagePicker();
   List Kebutuhan = [];
 
-
-  void PilihGambarPC() async{
+  void PilihGambarPC() async {
     final pilihPC = await _gambarPC.pickImage(source: ImageSource.gallery);
     if (pilihPC != null) {
       setState(() {
@@ -56,21 +57,20 @@ class _AddPCState extends State<AddPC> {
     }
   }
 
-  void SimpanKebutuhan(){
+  void SimpanKebutuhan() {
     setState(() {
-      Kebutuhan.add(KebutuhanModel(isiKebutuhan.text,
-          int.parse(MasaKebutuhan.text)
-      ));
+      Kebutuhan.add(
+          KebutuhanModel(isiKebutuhan.text, int.parse(MasaKebutuhan.text)));
       isiKebutuhan.clear();
       MasaKebutuhan.clear();
     });
     Navigator.of(context).pop();
   }
 
-  void tambahKebutuhan(){
+  void tambahKebutuhan() {
     showDialog(
         context: context,
-        builder: (context){
+        builder: (context) {
           return DialogBox(
             controller: isiKebutuhan,
             onAdd: SimpanKebutuhan,
@@ -122,27 +122,26 @@ class _AddPCState extends State<AddPC> {
         };
       }).toList();
 
-
       // kalo lokasiGambarPC tidak kosong, unggah gambar PC
       if (lokasiGambarPC.isNotEmpty) {
         File imgPC = File(lokasiGambarPC);
         fotoPC = await unggahGambarPC(imgPC);
       }
 
-        // Tambahkan data PC ke Firestore
-        await tambahPC(
-          merekPCController.text.trim(),
-          IdPCController.text.trim(),
-          lokasiRuanganController.text.trim(),
-          CPUController.text.trim(),
-          int.parse(RamController.text.trim()),
-          int.parse(StorageController.text.trim()),
-          VGAController.text.trim(),
-          int.parse(PSUController.text.trim()),
-          int.parse(MasaServisController.text.trim()),
-          listKebutuhan,
-          fotoPC,
-        );
+      // Tambahkan data PC ke Firestore
+      await tambahPC(
+        merekPCController.text.trim(),
+        IdPCController.text.trim(),
+        lokasiRuanganController.text.trim(),
+        CPUController.text.trim(),
+        int.parse(RamController.text.trim()),
+        int.parse(StorageController.text.trim()),
+        VGAController.text.trim(),
+        int.parse(PSUController.text.trim()),
+        int.parse(MasaServisController.text.trim()),
+        listKebutuhan,
+        fotoPC,
+      );
 
       AwesomeDialog(
         context: context,
@@ -159,30 +158,39 @@ class _AddPCState extends State<AddPC> {
         autoHide: Duration(seconds: 5),
       ).show();
       print('Data PC Berhasil Ditambahkan');
-
     } catch (e) {
       print("Error : $e");
     }
   }
 
-  Future tambahPC (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, int psu, int masaServis, List<Map<String, dynamic>> kebutuhan, String gambarPC) async{
+  Future tambahPC(
+      String merek,
+      String ID,
+      String ruangan,
+      String CPU,
+      int ram,
+      int storage,
+      String vga,
+      int psu,
+      int masaServis,
+      List<Map<String, dynamic>> kebutuhan,
+      String gambarPC) async {
     var timeService = contTimeService(masaServis);
-      await FirebaseFirestore.instance.collection('PC').add({
-        'Merek PC' : merek,
-        'ID PC' : ID,
-        'Lokasi Ruangan' : ruangan,
-        'CPU' : CPU,
-        'RAM' : ram,
-        'Kapasitas Penyimpanan' : storage,
-        'VGA' : vga,
-        'Kapasitas Power Supply' : psu,
-        'Masa Servis' : masaServis,
-        'kebutuhan' : kebutuhan,
-        'Gambar PC' : gambarPC,
-        'Waktu Service PC': timeService.millisecondsSinceEpoch,
-        'Hari Service PC': daysBetween(DateTime.now(), timeService),
-      });
+    await FirebaseFirestore.instance.collection('PC').add({
+      'Merek PC': merek,
+      'ID PC': ID,
+      'Lokasi Ruangan': ruangan,
+      'CPU': CPU,
+      'RAM': ram,
+      'Kapasitas Penyimpanan': storage,
+      'VGA': vga,
+      'Kapasitas Power Supply': psu,
+      'Masa Servis': masaServis,
+      'kebutuhan': kebutuhan,
+      'Gambar PC': gambarPC,
+      'Waktu Service PC': timeService.millisecondsSinceEpoch,
+      'Hari Service PC': daysBetween(DateTime.now(), timeService),
+    });
   }
 
   @override
@@ -367,7 +375,6 @@ class _AddPCState extends State<AddPC> {
                         : '',
                     onPressed: PilihGambarPC),
                 const SizedBox(height: 10),
-
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -376,7 +383,6 @@ class _AddPCState extends State<AddPC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-
                 ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
@@ -388,16 +394,14 @@ class _AddPCState extends State<AddPC> {
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
-                          ApusKebutuhan(index); // Fungsi untuk menghapus kebutuhan
+                          ApusKebutuhan(
+                              index); // Fungsi untuk menghapus kebutuhan
                         },
                         color: Colors.red,
                       ),
                     );
                   },
                 ),
-
-
-
                 InkWell(
                   onTap: tambahKebutuhan,
                   child: Container(
@@ -407,15 +411,15 @@ class _AddPCState extends State<AddPC> {
                     ),
                     padding: EdgeInsets.all(8),
                     child: Row(
-                      children: [Icon(Icons.add),
-                      SizedBox(width: 5),
-                      Text('Tambah Kebutuhan...')],
+                      children: [
+                        Icon(Icons.add),
+                        SizedBox(width: 5),
+                        Text('Tambah Kebutuhan...')
+                      ],
                     ),
                   ),
                 ),
-
                 SizedBox(height: 30),
-
                 Align(
                   alignment: Alignment.center,
                   child: ElevatedButton(

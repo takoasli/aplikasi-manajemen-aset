@@ -9,8 +9,8 @@ import '../ControllerLogic.dart';
 
 class MoreDetailLaptop extends StatefulWidget {
   final Map<String, dynamic> data;
-  const MoreDetailLaptop({super.key,
-    required this.data});
+
+  const MoreDetailLaptop({super.key, required this.data});
 
   @override
   State<MoreDetailLaptop> createState() => _MoreDetailLaptopState();
@@ -28,7 +28,9 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
       if (DateTime.now().isBefore(targetDate)) {
         setState(() {
           progressValue = targetDate.difference(DateTime.now()).inSeconds /
-              targetDate.difference(DateTime(targetDate.year, targetDate.month, 0)).inSeconds;
+              targetDate
+                  .difference(DateTime(targetDate.year, targetDate.month, 0))
+                  .inSeconds;
         });
       } else {
         timer.cancel();
@@ -48,13 +50,8 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF61BF9D),
-        title: Text(
-            '${widget.data['ID Laptop']}',
-            style: TextStyles.title.copyWith(
-                fontSize: 20,
-                color: Warna.white
-            )
-        ),
+        title: Text('${widget.data['ID Laptop']}',
+            style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white)),
         elevation: 0,
         centerTitle: false,
       ),
@@ -81,13 +78,13 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                       ),
                       child: imageUrl.isNotEmpty
                           ? Image.network(
-                        imageUrl,
-                        fit: BoxFit.contain,
-                      )
+                              imageUrl,
+                              fit: BoxFit.contain,
+                            )
                           : Image.asset(
-                        'gambar/laptop.png',
-                        fit: BoxFit.contain,
-                      ),
+                              'gambar/laptop.png',
+                              fit: BoxFit.contain,
+                            ),
                     ),
                   ),
                   Positioned(
@@ -101,18 +98,20 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID Laptop'], namaAset: widget.data['Merek Laptop'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "Leptop",
+                                    assetId: widget.data['ID Laptop'],
+                                    assetName: widget.data['Merek Laptop'],
+                                  ),
+                                ));
                           },
-                          icon: Icon(Icons.qr_code_2,
-                              size: 33),
+                          icon: Icon(Icons.qr_code_2, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                       top: 100,
                       right: 30,
@@ -124,26 +123,31 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
-                            List<dynamic> kebutuhanLaptop = widget.data['Kebutuhan Laptop'];
+                          onPressed: () {
+                            List<dynamic> kebutuhanLaptop =
+                                widget.data['Kebutuhan Laptop'];
 
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanLaptop) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                              if (kebutuhan is Map<String, dynamic> &&
+                                  kebutuhan.containsKey('Nama Kebutuhan')) {
                                 namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
                               }
                             }
 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
-                              List_Kebutuhan: namaKebutuhan,
-                              ID_Aset: widget.data['ID Laptop'],
-                              Nama_Aset: widget.data['Merek Laptop'],)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Catatan(
+                                          List_Kebutuhan: namaKebutuhan,
+                                          ID_Aset: widget.data['ID Laptop'],
+                                          Nama_Aset:
+                                              widget.data['Merek Laptop'],
+                                        )));
                           },
-                          icon: Icon(Icons.border_color_outlined,
-                              size: 33),
+                          icon: Icon(Icons.border_color_outlined, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                     top: 170,
                     child: Container(
@@ -188,26 +192,26 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ],
                               ),
                               const SizedBox(height: 20),
-
-                              Text(
-                                  'Kebutuhan Servis',
+                              Text('Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               const SizedBox(height: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: widget.data['Kebutuhan Laptop'].length,
+                                    itemCount:
+                                        widget.data['Kebutuhan Laptop'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan Laptop'][index]['Nama Kebutuhan'];
+                                      final kebutuhan =
+                                          widget.data['Kebutuhan Laptop'][index]
+                                              ['Nama Kebutuhan'];
                                       final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      final hasSplit =
+                                          part.length > 1 ? part[1] : kebutuhan;
                                       return Text(
                                         '- $hasSplit',
                                         style: const TextStyle(
@@ -220,15 +224,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Merek Laptop',
+                              Text('Merek Laptop',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Merek Laptop']}',
@@ -238,15 +238,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'ID laptop',
+                              Text('ID laptop',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['ID Laptop']}',
@@ -256,15 +252,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Lokasi Ruangan',
+                              Text('Lokasi Ruangan',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Lokasi Ruangan']}',
@@ -274,15 +266,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'CPU',
+                              Text('CPU',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['CPU']}',
@@ -292,15 +280,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'RAM',
+                              Text('RAM',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['RAM']} GB',
@@ -310,15 +294,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Kapasitas Penyimpanan',
+                              Text('Kapasitas Penyimpanan',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Kapasitas Penyimpanan']} GB',
@@ -328,15 +308,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'VGA',
+                              Text('VGA',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['VGA']}',
@@ -346,15 +322,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Ukuran Monitor',
+                              Text('Ukuran Monitor',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Ukuran Monitor']} inch',
@@ -364,15 +336,11 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Tempo Maintenance',
+                              Text('Tempo Maintenance',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               SizedBox(height: 5),
                               Text(
                                 '${widget.data['Masa Servis']} Bulan',
@@ -382,7 +350,6 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
                             ],
                           ),
                         ),

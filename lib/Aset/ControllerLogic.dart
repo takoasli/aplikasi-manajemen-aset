@@ -24,7 +24,6 @@ Color getProgressColor(int waktu) {
   var timeProgress = epochTimeToData(waktu);
   Duration difference = timeProgress.difference(DateTime.now());
   var sisaHari = difference.inDays;
-  print("Sisa Hari $sisaHari");
 
   if (sisaHari >= 20) {
     return Colors.green;

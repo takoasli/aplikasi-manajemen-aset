@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+
 import '../../catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
@@ -111,18 +112,20 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID AC'], namaAset: widget.data['Merek AC'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "Aset",
+                                    assetId: widget.data['ID AC'],
+                                    assetName: widget.data['Merek AC'],
+                                  ),
+                                ));
                           },
-                          icon: Icon(Icons.qr_code_2,
-                              size: 33),
+                          icon: Icon(Icons.qr_code_2, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                       top: 100,
                       right: 30,
@@ -134,27 +137,30 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
-                            List<dynamic> kebutuhanAC = widget.data['Kebutuhan AC'];
+                          onPressed: () {
+                            List<dynamic> kebutuhanAC =
+                                widget.data['Kebutuhan AC'];
 
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanAC) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                              if (kebutuhan is Map<String, dynamic> &&
+                                  kebutuhan.containsKey('Nama Kebutuhan')) {
                                 namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
                               }
                             }
 
-
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
-                              List_Kebutuhan: namaKebutuhan,
-                              ID_Aset: widget.data['ID AC'],
-                              Nama_Aset: widget.data['Merek AC'],)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Catatan(
+                                          List_Kebutuhan: namaKebutuhan,
+                                          ID_Aset: widget.data['ID AC'],
+                                          Nama_Aset: widget.data['Merek AC'],
+                                        )));
                           },
-                          icon: Icon(Icons.border_color_outlined,
-                              size: 33),
+                          icon: Icon(Icons.border_color_outlined, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                     top: 170,
                     child: Container(
@@ -199,25 +205,26 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                                 ],
                               ),
                               const SizedBox(height: 20),
-                              Text(
-                                  'Kebutuhan Servis',
+                              Text('Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
+                                      fontWeight: FontWeight.w500)),
                               const SizedBox(height: 5),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ListView.builder(
                                     shrinkWrap: true,
-                                    itemCount: widget.data['Kebutuhan AC'].length,
+                                    itemCount:
+                                        widget.data['Kebutuhan AC'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan AC'][index]['Nama Kebutuhan'];
+                                      final kebutuhan =
+                                          widget.data['Kebutuhan AC'][index]
+                                              ['Nama Kebutuhan'];
                                       final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      final hasSplit =
+                                          part.length > 1 ? part[1] : kebutuhan;
                                       return Text(
                                         '- $hasSplit',
                                         style: const TextStyle(
@@ -230,8 +237,7 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                                 ],
                               ),
                               const SizedBox(height: 10),
-                              Text(
-                                  'Merek AC',
+                              Text('Merek AC',
                                   style: TextStyles.title.copyWith(
                                       fontSize: 18,
                                       color: Warna.darkgrey,

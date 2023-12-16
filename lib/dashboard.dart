@@ -1,11 +1,18 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:projek_skripsi/Aset/AC/moreDetailAC.dart';
+import 'package:projek_skripsi/Aset/Laptop/moreDetailLaptop.dart';
+import 'package:projek_skripsi/Aset/Mobil/MoreDetailMobil.dart';
+import 'package:projek_skripsi/Aset/Motor/MoreDetailMotor.dart';
 import 'package:projek_skripsi/komponen/bottomNavigation.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
+
+import 'Aset/PC/MoreDetailPC.dart';
 import 'pilihInfoAset.dart';
 
 void main() {
@@ -89,7 +96,6 @@ class _DashboardState extends State<Dashboard> {
                     // );
                   },
                 ),
-
                 Box(
                   text: 'Manajemen\nUser',
                   gambar: 'gambar/users.png',
@@ -112,31 +118,7 @@ class _DashboardState extends State<Dashboard> {
           height: 75,
           child: FloatingActionButton(
             onPressed: () async {
-              String barcode = await FlutterBarcodeScanner.scanBarcode(
-                "#FF0000",
-                "Cancel",
-                true,
-                ScanMode.QR,
-              );
-              if (barcode != '-1') {
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.success,
-                  animType: AnimType.bottomSlide,
-                  title: 'Berhasil!',
-                  desc: barcode,
-                  btnOkOnPress: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Dashboard()),
-                    );
-                  },
-                  autoHide: Duration(seconds: 5),
-                ).show();
-              }
-
-              print(barcode);
-
+              qrCodeScanner(context);
             },
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
@@ -163,5 +145,91 @@ class _DashboardState extends State<Dashboard> {
     Navigator.of(context).pop();
     Navigator.of(context).pushReplacement;
     FirebaseAuth.instance.signOut();
+  }
+
+  // Fungsi ketika scan QR Code Aset
+  void qrCodeScanner(BuildContext context) async {
+    String barcode = await FlutterBarcodeScanner.scanBarcode(
+      "#FF0000",
+      "Cancel",
+      true,
+      ScanMode.QR,
+    );
+
+    Map<String, dynamic> data = {};
+    final splits = barcode.split(',');
+    var collection = splits[0];
+    var id = splits[1];
+    var fieldId = "ID $collection";
+    if (collection == "Aset") {
+      fieldId = "ID AC";
+    }
+
+    print("Field ID = $fieldId");
+    CollectionReference reference =
+        FirebaseFirestore.instance.collection(collection);
+    reference
+        .where(fieldId, isEqualTo: id)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.size > 0) {
+        data = querySnapshot.docs[0].data() as Map<String, dynamic>;
+        print("Data : $data");
+        if (data.isNotEmpty) {
+          // Arahkan ke tiap2 detail untuk masing2 Asset
+          if (collection == "Aset") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MoreDetailAC(data: data),
+              ),
+            );
+          } else if (collection == "PC") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MoreDetail(data: data),
+              ),
+            );
+          } else if (collection == "Leptop") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MoreDetailLaptop(data: data),
+              ),
+            );
+          } else if (collection == "Mobil") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MoreDetailmobil(data: data),
+              ),
+            );
+          } else if (collection == "Motor") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MoreDetailMotor(data: data),
+              ),
+            );
+          }
+        }
+      } else {
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.warning,
+          animType: AnimType.bottomSlide,
+          title: 'Tidak ditemukan',
+          desc: "Aset dengan id $barcode tidak ditemukan",
+          btnOkOnPress: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Dashboard()),
+            );
+          },
+          autoHide: Duration(seconds: 5),
+        ).show();
+      }
+    });
   }
 }
