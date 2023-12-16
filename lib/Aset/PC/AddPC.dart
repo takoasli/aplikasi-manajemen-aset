@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +21,15 @@ class AddPC extends StatefulWidget {
   State<AddPC> createState() => _AddPCState();
 }
 
+class KebutuhanModel {
+  String namaKebutuhan;
+  int masaKebutuhan;
+
+  KebutuhanModel(this.namaKebutuhan,
+      this.masaKebutuhan,
+      );
+}
+
 class _AddPCState extends State<AddPC> {
   final merekPCController = TextEditingController();
   final IdPCController = TextEditingController();
@@ -30,14 +38,13 @@ class _AddPCState extends State<AddPC> {
   final RamController = TextEditingController();
   final VGAController = TextEditingController();
   final isiKebutuhan = TextEditingController();
+  final MasaKebutuhan = TextEditingController();
   final ImgPCController = TextEditingController();
   final StorageController = TextEditingController();
   final MasaServisController = TextEditingController();
   final PSUController = TextEditingController();
   final ImagePicker _gambarPC = ImagePicker();
-
-  List Kebutuhan = [
-  ];
+  List Kebutuhan = [];
 
 
   void PilihGambarPC() async{
@@ -51,8 +58,11 @@ class _AddPCState extends State<AddPC> {
 
   void SimpanKebutuhan(){
     setState(() {
-      Kebutuhan.add([isiKebutuhan.text, false]);
+      Kebutuhan.add(KebutuhanModel(isiKebutuhan.text,
+          int.parse(MasaKebutuhan.text)
+      ));
       isiKebutuhan.clear();
+      MasaKebutuhan.clear();
     });
     Navigator.of(context).pop();
   }
@@ -66,6 +76,7 @@ class _AddPCState extends State<AddPC> {
             onAdd: SimpanKebutuhan,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan PC',
+            JangkaKebutuhan: MasaKebutuhan,
           );
         });
   }
@@ -75,9 +86,6 @@ class _AddPCState extends State<AddPC> {
       Kebutuhan.removeAt(index);
     });
   }
-
-
-
 
   Future<String> unggahGambarPC(File gambarPC) async {
     try {
@@ -104,12 +112,15 @@ class _AddPCState extends State<AddPC> {
     try {
       String lokasiGambarPC = ImgPCController.text;
       String fotoPC = '';
-      List <Map<String, dynamic>> ListKebutuhan = [];
-      for(var i = 0; i < Kebutuhan.length; i++){
-        ListKebutuhan.add({
-          'Kebutuhan PC': Kebutuhan[i][0]
-        });
-      }
+      List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhan);
+        return {
+          'Kebutuhan PC': kebutuhan.namaKebutuhan,
+          'Masa Kebutuhan': kebutuhan.masaKebutuhan,
+          'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
 
       // kalo lokasiGambarPC tidak kosong, unggah gambar PC
@@ -129,7 +140,7 @@ class _AddPCState extends State<AddPC> {
           VGAController.text.trim(),
           int.parse(PSUController.text.trim()),
           int.parse(MasaServisController.text.trim()),
-          ListKebutuhan,
+          listKebutuhan,
           fotoPC,
         );
 
@@ -140,7 +151,7 @@ class _AddPCState extends State<AddPC> {
         title: 'Berhasil!',
         desc: 'Data PC Berhasil Ditambahkan',
         btnOkOnPress: () {
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ManajemenPC()),
           );
@@ -155,23 +166,23 @@ class _AddPCState extends State<AddPC> {
   }
 
   Future tambahPC (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, int psu, int masaServis,List<Map<String, dynamic>> kebutuhan,  String gambarPC) async{
+      String CPU, int ram, int storage, String vga, int psu, int masaServis, List<Map<String, dynamic>> kebutuhan, String gambarPC) async{
     var timeService = contTimeService(masaServis);
-    await FirebaseFirestore.instance.collection('PC').add({
-      'Merek PC' : merek,
-      'ID PC' : ID,
-      'Lokasi Ruangan' : ruangan,
-      'CPU' : CPU,
-      'RAM' : ram,
-      'Kapasitas Penyimpanan' : storage,
-      'VGA' : vga,
-      'Kapasitas Power Supply' : psu,
-      'Masa Servis' : masaServis,
-      'kebutuhan' : kebutuhan,
-      'Gambar PC' : gambarPC,
-      'Waktu Service PC': timeService.millisecondsSinceEpoch,
-      'Hari Service PC': daysBetween(DateTime.now(), timeService)
-    });
+      await FirebaseFirestore.instance.collection('PC').add({
+        'Merek PC' : merek,
+        'ID PC' : ID,
+        'Lokasi Ruangan' : ruangan,
+        'CPU' : CPU,
+        'RAM' : ram,
+        'Kapasitas Penyimpanan' : storage,
+        'VGA' : vga,
+        'Kapasitas Power Supply' : psu,
+        'Masa Servis' : masaServis,
+        'kebutuhan' : kebutuhan,
+        'Gambar PC' : gambarPC,
+        'Waktu Service PC': timeService.millisecondsSinceEpoch,
+        'Hari Service PC': daysBetween(DateTime.now(), timeService),
+      });
   }
 
   @override
@@ -372,7 +383,8 @@ class _AddPCState extends State<AddPC> {
                   itemCount: Kebutuhan.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan[index][0]), // Menampilkan teks kebutuhan
+                      title: Text(Kebutuhan[index].namaKebutuhan),
+                      subtitle: Text('${Kebutuhan[index].masaKebutuhan} Bulan'),
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {

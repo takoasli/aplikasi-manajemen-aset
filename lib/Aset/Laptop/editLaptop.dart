@@ -32,6 +32,7 @@ class _editLaptopState extends State<editLaptop> {
   final ImglaptopController = TextEditingController();
   final StorageController = TextEditingController();
   final MonitorController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisLaptopController = TextEditingController();
   final isiKebutuhan_Laptop = TextEditingController();
   final ImagePicker _gambarLaptop = ImagePicker();
@@ -57,6 +58,7 @@ class _editLaptopState extends State<editLaptop> {
             onAdd: SimpanKebutuhan_Laptop,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan Laptop',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }

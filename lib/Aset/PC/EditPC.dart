@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +22,21 @@ class EditPC extends StatefulWidget {
   State<EditPC> createState() => _EditPCState();
 }
 
+class KebutuhanModelUpdate {
+  String namaKebutuhan;
+  int masaKebutuhan;
+
+  KebutuhanModelUpdate(this.namaKebutuhan, this.masaKebutuhan);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Kebutuhan PC': namaKebutuhan,
+      'Masa Kebutuhan': masaKebutuhan,
+    };
+  }
+}
+
+
 class _EditPCState extends State<EditPC> {
   final merekPCController = TextEditingController();
   final IdPCController = TextEditingController();
@@ -34,13 +48,12 @@ class _EditPCState extends State<EditPC> {
   final StorageController = TextEditingController();
   final isiKebutuhan = TextEditingController();
   final PSUController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisController = TextEditingController();
   String oldphotoPC = '';
   Map <String, dynamic> dataPC = {};
   final ImagePicker _gambarPC = ImagePicker();
-
-  List Kebutuhan = [
-  ];
+  List Kebutuhan = [];
 
   void PilihGambarPC() async{
     final pilihPC = await _gambarPC.pickImage(source: ImageSource.gallery);
@@ -51,13 +64,20 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
-  void SimpanKebutuhan(){
+  void SimpanKebutuhan() {
     setState(() {
-      Kebutuhan.add({'Kebutuhan PC': isiKebutuhan.text});
+      KebutuhanModelUpdate kebutuhan = KebutuhanModelUpdate(
+        isiKebutuhan.text,
+        int.parse(MasaKebutuhanController.text),
+      );
+      Kebutuhan.add(kebutuhan.toMap());
       isiKebutuhan.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
+
+
   void tambahKebutuhan(){
     showDialog(
         context: context,
@@ -67,6 +87,7 @@ class _EditPCState extends State<EditPC> {
             onAdd: SimpanKebutuhan,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan PC',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }
@@ -98,40 +119,54 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
-  Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async{
-    try{
+  Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async {
+    try {
       String GambarPC;
-      List <Map<String, dynamic>> ListKebutuhan = [];
       var timeService = contTimeService(int.parse(MasaServisController.text));
-      for(var i = 0; i < Kebutuhan.length; i++){
-        ListKebutuhan.add({'Kebutuhan PC': Kebutuhan[i]['Kebutuhan PC']});
-      }
 
-      if(ImgPCController.text.isNotEmpty){
+      List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan'].toString()));
+        return {
+          'Kebutuhan PC': kebutuhan['Kebutuhan PC'],
+          'Masa Kebutuhan': kebutuhan['Masa Kebutuhan'],
+          'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
+
+      if (ImgPCController.text.isNotEmpty) {
         File gambarPCBaru = File(ImgPCController.text);
         GambarPC = await unggahGambarPC(gambarPCBaru);
-      }else{
+      } else {
         GambarPC = oldphotoPC;
       }
 
-      Map<String, dynamic> DataPCBaru = {
-        'Merek PC' : merekPCController.text,
-        'ID PC' : IdPCController.text,
-        'Lokasi Ruangan' : lokasiRuanganController.text,
-        'CPU' : CPUController.text,
-        'RAM' : RamController.text,
-        'Kapasitas Penyimpanan' : StorageController.text,
-        'VGA' : VGAController.text,
-        'Kapasitas Power Supply' : PSUController.text,
-        'Masa Servis' : MasaServisController.text,
-        'kebutuhan' : ListKebutuhan,
-        'Gambar PC' : GambarPC,
-        'Waktu Service PC': timeService.millisecondsSinceEpoch,
-        'Hari Service PC': daysBetween(DateTime.now(), timeService)
-      };
+      // Menjalankan proses update untuk setiap item kebutuhan
+      for (var item in listKebutuhan) {
+        var waktuKebutuhan = contTimeService(int.parse(item['Masa Kebutuhan'].toString()));
+        Map<String, dynamic> DataPCBaru = {
+          'Merek PC': merekPCController.text,
+          'ID PC': IdPCController.text,
+          'Lokasi Ruangan': lokasiRuanganController.text,
+          'CPU': CPUController.text,
+          'RAM': RamController.text,
+          'Kapasitas Penyimpanan': StorageController.text,
+          'VGA': VGAController.text,
+          'Kapasitas Power Supply': PSUController.text,
+          'Masa Servis': MasaServisController.text,
+          'kebutuhan': listKebutuhan,
+          'Gambar PC': GambarPC,
+          'Waktu Service PC': timeService.millisecondsSinceEpoch,
+          'Hari Service PC': daysBetween(DateTime.now(), timeService),
+          'Waktu Kebutuhan PC': waktuKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), waktuKebutuhan)
+        };
 
-      await FirebaseFirestore.instance.collection('PC').doc(dokPC).update(DataPCBaru);
+        // Update dokumen Firestore sesuai dengan dokPC
+        await FirebaseFirestore.instance.collection('PC').doc(dokPC).update(DataPCBaru);
+      }
 
+      // Menampilkan dialog sukses setelah update berhasil
       AwesomeDialog(
         context: context,
         dialogType: DialogType.success,
@@ -140,16 +175,20 @@ class _EditPCState extends State<EditPC> {
         desc: 'Data PC Berhasil Diupdate',
         btnOkOnPress: () {
           Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const ManajemenPC()),
+            context,
+            MaterialPageRoute(builder: (context) => const ManajemenPC()),
           );
         },
         autoHide: Duration(seconds: 5),
       ).show();
+
       print('Data PC Berhasil Diupdate');
-    }catch (e){
+    } catch (e) {
       print(e);
     }
   }
+
+
 
   void initState(){
     super.initState();
@@ -174,11 +213,13 @@ class _EditPCState extends State<EditPC> {
         MasaServisController.text = (data?['Masa Servis'] ?? '').toString();
         final UrlPC = data?['Gambar PC'] ?? '';
         oldphotoPC = UrlPC;
-        final List<dynamic> KebutuhanData = data?['kebutuhan'] ?? [];
-        KebutuhanData.forEach((item) {
-          Kebutuhan.add({'Kebutuhan PC' : item['Kebutuhan PC']});
-        });
-
+        final List<dynamic> kebutuhanData = data?['kebutuhan'] ?? [];
+        Kebutuhan = kebutuhanData.map((item) {
+          return {
+            'Kebutuhan PC': item['Kebutuhan PC'],
+            'Masa Kebutuhan': item['Masa Kebutuhan'],
+          };
+        }).toList();
       });
     }catch(e){
       print('Terjadi kesalahan: $e');
@@ -402,7 +443,8 @@ class _EditPCState extends State<EditPC> {
                   itemCount: Kebutuhan.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan[index]['Kebutuhan PC']), // Gunakan kunci yang benar
+                      title: Text(Kebutuhan[index]['Kebutuhan PC']),
+                      subtitle: Text('${Kebutuhan[index]['Masa Kebutuhan']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
@@ -413,6 +455,7 @@ class _EditPCState extends State<EditPC> {
                     );
                   },
                 ),
+
 
 
 
@@ -457,7 +500,8 @@ class _EditPCState extends State<EditPC> {
                       ),
                     ),
                   ),
-                )
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),

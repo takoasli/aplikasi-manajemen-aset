@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -123,7 +124,21 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            List<dynamic> kebutuhanLaptop = widget.data['Kebutuhan Laptop'];
+
+                            List<String> namaKebutuhan = [];
+                            for (var kebutuhan in kebutuhanLaptop) {
+                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
+                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
+                              }
+                            }
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
+                              List_Kebutuhan: namaKebutuhan,
+                              ID_Aset: widget.data['ID Laptop'],
+                              Nama_Aset: widget.data['Merek Laptop'],)));
+                          },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),
                         ),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -34,49 +35,6 @@ class _MoreDetailState extends State<MoreDetail> {
         timer.cancel();
       }
     });
-  }
-
-  Color _getProgressColor(double progressValue) {
-    if (progressValue >= 0.5) {
-      return Colors.green;
-    } else if (progressValue >= 0.2) {
-      return Colors.yellow;
-    } else {
-      return Colors.red;
-    }
-  }
-
-
-  String _getRemainingTime() {
-    Duration difference = targetDate.difference(DateTime.now());
-    int days = difference.inDays;
-    int months = days ~/ 30;
-    int remainingDays = days % 30;
-    int hours = difference.inHours % 24;
-    int minutes = difference.inMinutes % 60;
-    int seconds = difference.inSeconds % 60;
-
-    String timeRemaining = '';
-    if (months > 0) {
-      timeRemaining += '$months bulan ';
-    }
-    if (remainingDays > 0) {
-      timeRemaining += '$remainingDays hari ';
-    }
-    if (hours > 0) {
-      timeRemaining += '$hours jam ';
-    }
-    if (minutes > 0) {
-      timeRemaining += '$minutes menit ';
-    }
-    if (seconds > 0) {
-      timeRemaining += '$seconds detik';
-    }
-    if (timeRemaining.isEmpty) {
-      timeRemaining = 'Waktu habis';
-    }
-
-    return timeRemaining;
   }
 
   @override
@@ -169,7 +127,20 @@ class _MoreDetailState extends State<MoreDetail> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            List<dynamic> kebutuhanPC = widget.data['kebutuhan'];
+                            List<String> namaKebutuhan = [];
+                            for (var kebutuhan in kebutuhanPC) {
+                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Kebutuhan PC')) {
+                                namaKebutuhan.add(kebutuhan['Kebutuhan PC']);
+                              }
+                            }
+
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
+                              List_Kebutuhan: namaKebutuhan,
+                              ID_Aset: widget.data['ID PC'],
+                              Nama_Aset: widget.data['Merek PC'],)));
+                          },
                           icon: const Icon(Icons.border_color_outlined,
                               size: 33),
                         ),
@@ -235,20 +206,57 @@ class _MoreDetailState extends State<MoreDetail> {
                                     itemCount: widget.data['kebutuhan'].length,
                                     itemBuilder: (context, index) {
                                       final kebutuhan = widget.data['kebutuhan'][index]['Kebutuhan PC'];
+                                      final masaKebutuhan = widget.data['kebutuhan'][index]['Masa Kebutuhan'];
+                                      final hariKebutuhan = widget.data['kebutuhan'][index]['Hari Kebutuhan PC'];
+                                      final waktuKebutuhan = widget.data['kebutuhan'][index]['Waktu Kebutuhan PC'];
+
                                       final part = kebutuhan.split(': ');
                                       final hasSplit = part.length > 1 ? part[1] : kebutuhan;
-                                      return Text(
-                                        '- $hasSplit',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          letterSpacing: 1,
+
+                                      return SizedBox(
+                                        height: 80,
+                                        child: ListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                          title: Text(
+                                            '- $hasSplit',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              showIndicator(
+                                                getValueIndicator(hariKebutuhan, epochTimeToData(waktuKebutuhan)),
+                                                getProgressColor(waktuKebutuhan),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    getRemainingTime(masaKebutuhan),
+                                                    style: const TextStyle(
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },
                                   ),
+
+
                                 ],
                               ),
-                              const SizedBox(height: 10),
+
+
+                              const SizedBox(height: 30),
                               Text(
                                   'Merek PC',
                                   style: TextStyles.title.copyWith(

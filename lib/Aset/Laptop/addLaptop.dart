@@ -32,6 +32,7 @@ class _AddLaptopState extends State<AddLaptop> {
   final StorageController = TextEditingController();
   final isiKebutuhan_Laptop = TextEditingController();
   final MonitorController = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisLaptopController = TextEditingController();
   final ImagePicker _gambarLaptop = ImagePicker();
   List Kebutuhan_Laptop = [
@@ -85,6 +86,7 @@ class _AddLaptopState extends State<AddLaptop> {
             onAdd: SimpanKebutuhan_Laptop,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan Laptop',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }

@@ -33,6 +33,7 @@ class _AddMotorState extends State<AddMotor> {
   final banDepanController = TextEditingController();
   final banBelakangController = TextEditingController();
   final isiKebutuhan_Motor = TextEditingController();
+  final MasaKebutuhanController = TextEditingController();
   final MasaServisMotorController = TextEditingController();
   final ImgMotorController = TextEditingController();
   List Kebutuhan_Motor = [];
@@ -85,6 +86,7 @@ class _AddMotorState extends State<AddMotor> {
             onAdd: SimpanKebutuhan_Motor,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan Motor',
+            JangkaKebutuhan: MasaKebutuhanController,
           );
         });
   }
