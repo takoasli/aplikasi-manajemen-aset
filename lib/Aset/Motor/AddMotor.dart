@@ -19,6 +19,15 @@ class AddMotor extends StatefulWidget {
   @override
   State<AddMotor> createState() => _AddMotorState();
 }
+class KebutuhanModelMotor {
+  String namaKebutuhanMotor;
+  int masaKebutuhanMotor;
+
+  KebutuhanModelMotor(
+      this.namaKebutuhanMotor,
+      this.masaKebutuhanMotor,
+      );
+}
 
 class _AddMotorState extends State<AddMotor> {
   final ImagePicker _gambarMotor = ImagePicker();
@@ -71,8 +80,11 @@ class _AddMotorState extends State<AddMotor> {
 
   void SimpanKebutuhan_Motor(){
     setState(() {
-      Kebutuhan_Motor.add([isiKebutuhan_Motor.text, false]);
+      Kebutuhan_Motor.add(KebutuhanModelMotor(isiKebutuhan_Motor.text,
+          int.parse(MasaKebutuhanController.text)
+      ));
       isiKebutuhan_Motor.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -102,13 +114,15 @@ class _AddMotorState extends State<AddMotor> {
     try{
       String lokasiGambarMotor = ImgMotorController.text;
       String fotoMotor = '';
-      List <Map<String, dynamic>> ListKebutuhan_Motor = [];
-
-      for(var i = 0; i < Kebutuhan_Motor.length; i++){
-        ListKebutuhan_Motor.add({
-          'Nama Kebutuhan': Kebutuhan_Motor[i][0]
-        });
-      }
+      List<Map<String, dynamic>> ListKebutuhan_Motor = Kebutuhan_Motor.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanMotor);
+        return {
+          'Nama Kebutuhan Motor': kebutuhan.namaKebutuhanMotor,
+          'Masa Kebutuhan Motor': kebutuhan.masaKebutuhanMotor,
+          'Waktu Kebutuhan Motor': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan Motor': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if (lokasiGambarMotor.isNotEmpty) {
         File imgMotor = File(lokasiGambarMotor);
@@ -391,7 +405,8 @@ class _AddMotorState extends State<AddMotor> {
                   itemCount: Kebutuhan_Motor.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_Motor[index][0]),
+                      title: Text(Kebutuhan_Motor[index].namaKebutuhanMotor),
+                      subtitle: Text('${Kebutuhan_Motor[index].masaKebutuhanMotor} Bulan'),
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {

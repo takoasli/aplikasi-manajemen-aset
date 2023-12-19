@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +18,16 @@ class AddLaptop extends StatefulWidget {
 
   @override
   State<AddLaptop> createState() => _AddLaptopState();
+}
+
+class KebutuhanModelLaptop {
+  String namaKebutuhanLaptop;
+  int masaKebutuhanLaptop;
+
+  KebutuhanModelLaptop(
+      this.namaKebutuhanLaptop,
+      this.masaKebutuhanLaptop,
+      );
 }
 
 class _AddLaptopState extends State<AddLaptop> {
@@ -71,8 +80,11 @@ class _AddLaptopState extends State<AddLaptop> {
 
   void SimpanKebutuhan_Laptop(){
     setState(() {
-      Kebutuhan_Laptop.add([isiKebutuhan_Laptop.text, false]);
+      Kebutuhan_Laptop.add(KebutuhanModelLaptop(isiKebutuhan_Laptop.text,
+          int.parse(MasaKebutuhanController.text)
+      ));
       isiKebutuhan_Laptop.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -101,12 +113,16 @@ class _AddLaptopState extends State<AddLaptop> {
     try{
       String lokasiGambarPC = ImglaptopController.text;
       String fotoLaptop = '';
-      List <Map<String, dynamic>> ListKebutuhan_Laptop = [];
-      for(var i = 0; i < Kebutuhan_Laptop.length; i++) {
-        ListKebutuhan_Laptop.add({
-          'Nama Kebutuhan': Kebutuhan_Laptop[i][0]
-        });
-      }
+      List<Map<String, dynamic>> ListKebutuhan_Laptop = Kebutuhan_Laptop.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanLaptop);
+        return {
+          'Nama Kebutuhan Laptop': kebutuhan.namaKebutuhanLaptop,
+          'Masa Kebutuhan Laptop': kebutuhan.masaKebutuhanLaptop,
+          'Waktu Kebutuhan Laptop': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan Laptop': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
+
 
       if (lokasiGambarPC.isNotEmpty) {
         File imgLaptop = File(lokasiGambarPC);
@@ -371,13 +387,14 @@ class _AddLaptopState extends State<AddLaptop> {
 
                 ListView.builder(
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: Kebutuhan_Laptop.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_Laptop[index][0]),
+                      title: Text(Kebutuhan_Laptop[index].namaKebutuhanLaptop),
+                      subtitle: Text('${Kebutuhan_Laptop[index].masaKebutuhanLaptop} Bulan'),
                       trailing: IconButton(
-                        icon: const Icon(Icons.delete),
+                        icon: Icon(Icons.delete),
                         onPressed: () {
                           ApusKebutuhan(index);
                         },

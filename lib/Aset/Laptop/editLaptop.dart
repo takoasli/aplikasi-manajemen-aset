@@ -22,6 +22,20 @@ class editLaptop extends StatefulWidget {
   State<editLaptop> createState() => _editLaptopState();
 }
 
+class KebutuhanModelUpdateLaptop {
+  String namaKebutuhanLaptop;
+  int masaKebutuhanLaptop;
+
+  KebutuhanModelUpdateLaptop(this.namaKebutuhanLaptop, this.masaKebutuhanLaptop);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Nama Kebutuhan Laptop': namaKebutuhanLaptop,
+      'Masa Kebutuhan Laptop': masaKebutuhanLaptop,
+    };
+  }
+}
+
 class _editLaptopState extends State<editLaptop> {
   final merekLaptopController = TextEditingController();
   final IdLaptopController = TextEditingController();
@@ -43,8 +57,13 @@ class _editLaptopState extends State<editLaptop> {
 
   void SimpanKebutuhan_Laptop(){
     setState(() {
-      Kebutuhan_Laptop.add({'Nama Kebutuhan': isiKebutuhan_Laptop.text});
+      KebutuhanModelUpdateLaptop kebutuhan = KebutuhanModelUpdateLaptop(
+        isiKebutuhan_Laptop.text,
+        int.parse(MasaKebutuhanController.text),
+      );
+      Kebutuhan_Laptop.add(kebutuhan.toMap());
       isiKebutuhan_Laptop.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -103,11 +122,15 @@ class _editLaptopState extends State<editLaptop> {
     try{
       String GambarLaptop;
 
-      List <Map<String, dynamic>> ListKebutuhan_Laptop = [];
-      var timeService = contTimeService(int.parse(MasaServisLaptopController.text));
-      for(var i = 0; i < Kebutuhan_Laptop.length; i++){
-        ListKebutuhan_Laptop.add({'Nama Kebutuhan': Kebutuhan_Laptop[i]['Nama Kebutuhan']});
-      }
+      List<Map<String, dynamic>> ListKebutuhan_Laptop = Kebutuhan_Laptop.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan Laptop'].toString()));
+        return {
+          'Nama Kebutuhan Laptop': kebutuhan['Nama Kebutuhan Laptop'],
+          'Masa Kebutuhan Laptop': kebutuhan['Masa Kebutuhan Laptop'],
+          'Waktu Kebutuhan Laptop': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan Laptop': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if(ImglaptopController.text.isNotEmpty){
         File gambarLaptopBaru = File(ImglaptopController.text);
@@ -116,23 +139,25 @@ class _editLaptopState extends State<editLaptop> {
         GambarLaptop = oldphotoLaptop;
       }
 
-      Map<String, dynamic> DataLaptopBaru = {
-        'Merek Laptop' : merekLaptopController.text,
-        'ID Laptop' : IdLaptopController.text,
-        'Lokasi Ruangan' : lokasiRuanganController.text,
-        'CPU' : CPUController.text,
-        'RAM' : RamController.text,
-        'Kapasitas Penyimpanan' : StorageController.text,
-        'VGA' : VGAController.text,
-        'Ukuran Monitor' : MonitorController.text,
-        'Masa Servis' : MasaServisLaptopController.text,
-        'Kebutuhan Laptop' : ListKebutuhan_Laptop,
-        'Gambar Laptop' : GambarLaptop,
-        'Waktu Service Laptop': timeService.millisecondsSinceEpoch,
-        'Hari Service Laptop': daysBetween(DateTime.now(), timeService)
-      };
-
-      await FirebaseFirestore.instance.collection('Laptop').doc(dokLaptop).update(DataLaptopBaru);
+      for(var item in ListKebutuhan_Laptop){
+        var waktuKebutuhanLaptop = contTimeService(int.parse(item['Masa Kebutuhan Laptop'].toString()));
+        Map<String, dynamic> DataLaptopBaru = {
+          'Merek Laptop' : merekLaptopController.text,
+          'ID Laptop' : IdLaptopController.text,
+          'Lokasi Ruangan' : lokasiRuanganController.text,
+          'CPU' : CPUController.text,
+          'RAM' : RamController.text,
+          'Kapasitas Penyimpanan' : StorageController.text,
+          'VGA' : VGAController.text,
+          'Ukuran Monitor' : MonitorController.text,
+          'Masa Servis' : MasaServisLaptopController.text,
+          'Kebutuhan Laptop' : ListKebutuhan_Laptop,
+          'Gambar Laptop' : GambarLaptop,
+          'Waktu Service Laptop': waktuKebutuhanLaptop.millisecondsSinceEpoch,
+          'Hari Service Laptop': daysBetween(DateTime.now(), waktuKebutuhanLaptop)
+        };
+        await FirebaseFirestore.instance.collection('Laptop').doc(dokLaptop).update(DataLaptopBaru);
+      }
 
       AwesomeDialog(
         context: context,
@@ -177,9 +202,12 @@ class _editLaptopState extends State<editLaptop> {
       final Urllaptop = data?['Gambar Laptop'] ?? '';
       oldphotoLaptop = Urllaptop;
       final List<dynamic> KebutuhanData = data?['Kebutuhan Laptop'] ?? [];
-      KebutuhanData.forEach((item) {
-        Kebutuhan_Laptop.add({'Nama Kebutuhan' : item['Nama Kebutuhan']});
-      });
+      Kebutuhan_Laptop = KebutuhanData.map((item) {
+        return {
+          'Nama Kebutuhan Laptop': item['Nama Kebutuhan Laptop'],
+          'Masa Kebutuhan Laptop': item['Masa Kebutuhan Laptop'],
+        };
+      }).toList();
     });
   }
 
@@ -403,7 +431,8 @@ class _editLaptopState extends State<editLaptop> {
                   itemCount: Kebutuhan_Laptop.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_Laptop[index]['Nama Kebutuhan']),
+                      title: Text(Kebutuhan_Laptop[index]['Nama Kebutuhan Laptop']),
+                      subtitle: Text('${Kebutuhan_Laptop[index]['Masa Kebutuhan Laptop']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {

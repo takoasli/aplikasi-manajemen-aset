@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../catatanAset.dart';
+import '../../Catatan/catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -94,8 +94,8 @@ class _MoreDetailState extends State<MoreDetail> {
                   ),
 
                   Positioned(
-                    top: 30,
-                    right: 30,
+                      top: 30,
+                      right: 30,
                       child: Container(
                         width: 50,
                         height: 50,
@@ -104,18 +104,20 @@ class _MoreDetailState extends State<MoreDetail> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
+                          onPressed: () {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID PC'], namaAset: widget.data['Merek PC'],),
-                              )
-                            );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "PC",
+                                    assetId: widget.data['ID PC'],
+                                    assetName: widget.data['Merek PC'],
+                                  ),
+                                ));
                           },
-                          icon: const Icon(Icons.qr_code_2,
-                          size: 33),
+                          icon: const Icon(Icons.qr_code_2, size: 33),
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                       top: 100,
                       right: 30,
@@ -127,22 +129,28 @@ class _MoreDetailState extends State<MoreDetail> {
                           color: Warna.white,
                         ),
                         child: IconButton(
-                          onPressed: (){
-                            List<dynamic> kebutuhanPC = widget.data['kebutuhan'];
+                          onPressed: () {
+                            List<dynamic> kebutuhanPC =
+                            widget.data['kebutuhan'];
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanPC) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Kebutuhan PC')) {
+                              if (kebutuhan is Map<String, dynamic> &&
+                                  kebutuhan.containsKey('Kebutuhan PC')) {
                                 namaKebutuhan.add(kebutuhan['Kebutuhan PC']);
                               }
                             }
 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
-                              List_Kebutuhan: namaKebutuhan,
-                              ID_Aset: widget.data['ID PC'],
-                              Nama_Aset: widget.data['Merek PC'],)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Catatan(
+                                      List_Kebutuhan: namaKebutuhan,
+                                      ID_Aset: widget.data['ID PC'],
+                                      Nama_Aset: widget.data['Merek PC'],
+                                    )));
                           },
-                          icon: const Icon(Icons.border_color_outlined,
-                              size: 33),
+                          icon:
+                          const Icon(Icons.border_color_outlined, size: 33),
                         ),
                       )
                   ),
@@ -205,19 +213,28 @@ class _MoreDetailState extends State<MoreDetail> {
                                     shrinkWrap: true,
                                     itemCount: widget.data['kebutuhan'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['kebutuhan'][index]['Kebutuhan PC'];
-                                      final masaKebutuhan = widget.data['kebutuhan'][index]['Masa Kebutuhan'];
-                                      final hariKebutuhan = widget.data['kebutuhan'][index]['Hari Kebutuhan PC'];
-                                      final waktuKebutuhan = widget.data['kebutuhan'][index]['Waktu Kebutuhan PC'];
+                                      final kebutuhan = widget.data['kebutuhan']
+                                      [index]['Kebutuhan PC'];
+                                      final masaKebutuhan =
+                                      widget.data['kebutuhan'][index]
+                                      ['Masa Kebutuhan'];
+                                      final hariKebutuhan =
+                                      widget.data['kebutuhan'][index]
+                                      ['Hari Kebutuhan PC'];
+                                      final waktuKebutuhan =
+                                      widget.data['kebutuhan'][index]
+                                      ['Waktu Kebutuhan PC'];
 
                                       final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
+                                      final hasSplit =
+                                      part.length > 1 ? part[1] : kebutuhan;
 
                                       return SizedBox(
                                         height: 80,
                                         child: ListTile(
                                           dense: true,
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 8),
                                           title: Text(
                                             '- $hasSplit',
                                             style: const TextStyle(
@@ -226,20 +243,29 @@ class _MoreDetailState extends State<MoreDetail> {
                                             ),
                                           ),
                                           subtitle: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                             children: [
                                               showIndicator(
-                                                getValueIndicator(hariKebutuhan, epochTimeToData(waktuKebutuhan)),
-                                                getProgressColor(waktuKebutuhan),
+                                                getValueIndicator(
+                                                    hariKebutuhan,
+                                                    epochTimeToData(
+                                                        waktuKebutuhan)),
+                                                getProgressColor(
+                                                    waktuKebutuhan),
                                               ),
                                               const SizedBox(height: 5),
                                               Row(
-                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                                 children: [
                                                   Text(
-                                                    getRemainingTime(masaKebutuhan),
+                                                    overflow:
+                                                    TextOverflow.ellipsis,
+                                                    getRemainingTime(
+                                                        waktuKebutuhan),
                                                     style: const TextStyle(
-                                                      fontSize: 15,
+                                                      fontSize: 13,
                                                     ),
                                                   ),
                                                 ],
@@ -250,12 +276,8 @@ class _MoreDetailState extends State<MoreDetail> {
                                       );
                                     },
                                   ),
-
-
                                 ],
                               ),
-
-
                               const SizedBox(height: 30),
                               Text(
                                   'Merek PC',

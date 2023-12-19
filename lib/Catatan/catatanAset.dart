@@ -1,11 +1,11 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'Aset/ControllerLogic.dart';
-import 'komponen/checklists.dart';
-import 'komponen/kotakBiaya.dart';
-import 'komponen/kotakDialog.dart';
-import 'komponen/style.dart';
+import '../Aset/ControllerLogic.dart';
+import '../komponen/checklists.dart';
+import '../komponen/kotakBiaya.dart';
+import '../komponen/kotakDialog.dart';
+import '../komponen/style.dart';
 
 
 class Catatan extends StatefulWidget {
@@ -25,10 +25,9 @@ class Catatan extends StatefulWidget {
 class _CatatanState extends State<Catatan> {
 
   final isiDialog = TextEditingController();
-  final MasaKebutuhan = TextEditingController();
-  final isiBiayaAC = TextEditingController();
+  final isiBiaya = TextEditingController();
   final CatatanLengkapController = TextEditingController();
-  final hargaIsiBiayaAC = TextEditingController(text: '');
+  final hargaIsiBiaya = TextEditingController(text: '');
   late String idAset;
   late String merekAset;
   List<List<dynamic>> List_Kebutuhan = [];
@@ -61,7 +60,6 @@ class _CatatanState extends State<Catatan> {
             onAdd: () => SimpanTask(context),
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Kebutuhan Tambahan',
-            JangkaKebutuhan: MasaKebutuhan,
           );
         });
   }
@@ -76,12 +74,12 @@ class _CatatanState extends State<Catatan> {
   void SimpanBiaya(BuildContext context) {
     setState(() {
       // Pastikan isiBiaya dan hargaIsiBiaya tidak kosong
-      if (isiBiayaAC.text.isNotEmpty && hargaIsiBiayaAC.text.isNotEmpty) {
+      if (isiBiaya.text.isNotEmpty && hargaIsiBiaya.text.isNotEmpty) {
         // Tambahkan nama biaya dan harga ke Biaya_Kebutuhan
         biayaKebutuhans.add(
-            CatatanBiaya(isiBiayaAC.text, double.parse(hargaIsiBiayaAC.text.replaceAll(".", ""))));
-        isiBiayaAC.clear();
-        hargaIsiBiayaAC.clear();
+            CatatanBiaya(isiBiaya.text, double.parse(hargaIsiBiaya.text.replaceAll(".", ""))));
+        isiBiaya.clear();
+        hargaIsiBiaya.clear();
       } else {
         print('tolong tambahkan informasi yang diminta');
       }
@@ -94,8 +92,8 @@ class _CatatanState extends State<Catatan> {
         context: context,
         builder: (context) {
           return DialogBiaya(
-            NamaBiayacontroller: isiBiayaAC,
-            HargaBiayacontroller: hargaIsiBiayaAC,
+            NamaBiayacontroller: isiBiaya,
+            HargaBiayacontroller: hargaIsiBiaya,
             onAdd: () => SimpanBiaya(context),
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Nama Biaya',
@@ -119,49 +117,68 @@ class _CatatanState extends State<Catatan> {
 
   void SimpanCatatan() async {
     try {
-      List<Map<String, dynamic>> ListKebutuhanDone = [];
-      for (var i = 0; i < List_Kebutuhan.length; i++) {
-        String status = List_Kebutuhan[i][1] == true ? "Done" : "unDone";
-        ListKebutuhanDone.add({
+      // Construct List of Kebutuhan data
+      List<Map<String, dynamic>> DataKebutuhan = [];
+      for (int i = 0; i < List_Kebutuhan.length; i++) {
+        DataKebutuhan.add({
           'Nama Kebutuhan': List_Kebutuhan[i][0],
-          'Status': status,
+          'status': List_Kebutuhan[i][1] ? 'Done' : 'unDone',
         });
       }
 
-      List<Map<String, dynamic>> HargaKebutuhan = [];
-      for (var i = 0; i < biayaKebutuhans.length; i++) {
-        HargaKebutuhan.add({
-          'Biaya Pengeluaran PC': biayaKebutuhans[i][0],
+      List<Map<String, dynamic>> CatatanBiaya = [];
+      for (int i = 0; i < biayaKebutuhans.length; i++) {
+        CatatanBiaya.add({
+          'Nama Biaya': biayaKebutuhans[i].nama,
+          'Harga Biaya': biayaKebutuhans[i].biaya,
         });
       }
 
-      await FirebaseFirestore.instance.collection('Catatan Servis').add({
-        'ID_Aset': idAset,
-        'Nama_Aset': merekAset,
-        'Kebutuhan Done': ListKebutuhanDone,
-        'Harga Kebutuhan': HargaKebutuhan,
-        'Catatan Lengkap': CatatanLengkapController.text,
-      });
+      // Save data into Firestore
+      await tambahCatatan(
+          merekAset,
+          idAset,
+          DataKebutuhan,
+          CatatanBiaya,
+          CatatanLengkapController.text,
+          hitungTotalBiaya()
+      );
 
       AwesomeDialog(
         context: context,
         dialogType: DialogType.success,
         animType: AnimType.bottomSlide,
         title: 'Berhasil!',
-        desc: 'Catatan Servis Berhasil Tersimpan!',
+        desc: 'Catatan Berhasil Ditambahkan!',
         btnOkOnPress: () {
-          // Navigator.pushReplacement(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => ManajemenPC()),
-          // );
+          Navigator.of(context).pop();
         },
         autoHide: Duration(seconds: 5),
       ).show();
-      print('Data PC Berhasil Ditambahkan');
+      print('Data Catatan Berhasil Disimpan!');
+
     } catch (e) {
       print("Error: $e");
     }
   }
+
+  Future tambahCatatan (String merekAset,
+      String idAset,
+      List<Map<String, dynamic>> ListButuh,
+      List<Map<String, dynamic>> CatatanBiaya,
+      String CatatanLengkap,
+      double totalBiaya,) async{
+    await FirebaseFirestore.instance.collection('Catatan Servis').add({
+      'Nama Aset': merekAset,
+      'ID Aset': idAset,
+      'List Kebutuhan' : ListButuh,
+      'Catatan Biaya' : CatatanBiaya,
+      'Catatan Tambahan' : CatatanLengkap,
+      'Total Biaya' : totalBiaya,
+      'Tanggal Dilakukan Servis': FieldValue.serverTimestamp(),
+    });
+  }
+
 
 
 
@@ -178,7 +195,7 @@ class _CatatanState extends State<Catatan> {
     return Scaffold(
       backgroundColor: Warna.green,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF61BF9D),
+        backgroundColor: const Color(0xFF80C5AD),
         title: const Text(
           'Catatan Servis',
           style: TextStyle(
@@ -190,25 +207,6 @@ class _CatatanState extends State<Catatan> {
         elevation: 0,
         centerTitle: false,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      floatingActionButton: Container(
-        height: 60,
-        width: 60,
-        margin: const EdgeInsets.only(top: 70, right: 10),
-        child: FloatingActionButton(
-          onPressed: tambahTugas,
-          backgroundColor: Warna.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(40.0),
-          ),
-          child: const Icon(
-            Icons.add,
-            color: Warna.black,
-            size: 30,
-          ),
-        ),
-
-      ),
 
       body: SingleChildScrollView(
         child: Center(
@@ -218,6 +216,7 @@ class _CatatanState extends State<Catatan> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    SizedBox(height: 15),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
@@ -266,7 +265,8 @@ class _CatatanState extends State<Catatan> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 25.0),
                         child: Text('List Kebutuhan',
-                        style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white),),
+                        style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -280,29 +280,46 @@ class _CatatanState extends State<Catatan> {
                       child: Column(
                         children: [
                           Expanded(
-                              child: ListView.builder(
-                                itemCount: List_Kebutuhan.length,
-                                itemBuilder: (context, index){
-                                  return Checklist(
-                                    namaTask: List_Kebutuhan[index][0],
-                                    TaskKelar: List_Kebutuhan[index][1],
-                                    onChanged: (value) =>checkBoxberubah(value, index),
-                                    Hapus: (context) => ApusTask(index),
-                                  );
-                                },
+                            child: ListView.builder(
+                              itemCount: List_Kebutuhan.length,
+                              itemBuilder: (context, index) {
+                                return Checklist(
+                                  namaTask: List_Kebutuhan[index][0],
+                                  TaskKelar: List_Kebutuhan[index][1],
+                                  onChanged: (value) => checkBoxberubah(value, index),
+                                  Hapus: (context) => ApusTask(index),
+                                );
+                              },
+                            ),
+                          ),
+                          InkWell(
+                            onTap: tambahTugas,
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
                               ),
+                              padding: const EdgeInsets.all(8),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.add),
+                                  SizedBox(width: 5),
+                                  Text('Tambah Kebutuhan Lainnya...'),
+                                ],
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 20),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 25.0),
                         child: Text('Catatan Biaya',
-                          style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white),),
+                          style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white)
+                        ),
                       ),
                     ),
                     const SizedBox(height: 15),

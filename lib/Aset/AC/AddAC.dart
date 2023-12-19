@@ -20,6 +20,16 @@ class AddAC extends StatefulWidget {
   State<AddAC> createState() => _AddACState();
 }
 
+class KebutuhanModelAC {
+  String namaKebutuhanAC;
+  int masaKebutuhanAC;
+
+  KebutuhanModelAC(
+      this.namaKebutuhanAC,
+      this.masaKebutuhanAC,
+      );
+}
+
 class _AddACState extends State<AddAC> {
   final MerekACController = TextEditingController();
   final idACController = TextEditingController();
@@ -33,8 +43,7 @@ class _AddACState extends State<AddAC> {
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
-  List Kebutuhan_AC = [
-  ];
+  List Kebutuhan_AC = [];
 
   void PilihIndoor() async {
     final pilihIndoor =
@@ -102,11 +111,15 @@ class _AddACState extends State<AddAC> {
 
   void SimpanKebutuhan_AC(){
     setState(() {
-      Kebutuhan_AC.add([isiKebutuhanAC.text, false]);
+      Kebutuhan_AC.add(KebutuhanModelAC(isiKebutuhanAC.text,
+          int.parse(MasaKebutuhanController.text)
+      ));
       isiKebutuhanAC.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
+
 
   void tambahKebutuhan(){
     showDialog(
@@ -134,12 +147,15 @@ class _AddACState extends State<AddAC> {
       String fotoIndoor = '';
       String lokasiGambarOutdoor = gambarAcOutdoorController.text;
       String fotoOutdoor = '';
-      List <Map<String, dynamic>> ListKebutuhan_AC = [];
-      for(var i = 0; i < Kebutuhan_AC.length; i++){
-        ListKebutuhan_AC.add({
-          'Nama Kebutuhan': Kebutuhan_AC[i][0]
-        });
-      }
+      List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanAC);
+        return {
+          'Nama Kebutuhan AC': kebutuhan.namaKebutuhanAC,
+          'Masa Kebutuhan AC': kebutuhan.masaKebutuhanAC,
+          'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if (lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isNotEmpty ||
           lokasiGambarIndoor.isNotEmpty && lokasiGambarOutdoor.isEmpty) {
@@ -194,8 +210,8 @@ class _AddACState extends State<AddAC> {
       'Kebutuhan AC' : kebutuhan,
       'Foto AC Indoor' : UrlIndoor,
       'Foto AC Outdoor' : UrlOutdoor,
-      'waktu_service': timeService.millisecondsSinceEpoch,
-      'hari_service': daysBetween(DateTime.now(), timeService)
+      'Waktu Service': timeService.millisecondsSinceEpoch,
+      'Hari Service': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -356,19 +372,18 @@ class _AddACState extends State<AddAC> {
                   itemCount: Kebutuhan_AC.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_AC[index][0]), // Menampilkan teks kebutuhan
+                      title: Text(Kebutuhan_AC[index].namaKebutuhanAC), // Accessing the property directly
+                      subtitle: Text('${Kebutuhan_AC[index].masaKebutuhanAC} Bulan'), // Accessing the property directly
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
-                          ApusKebutuhan(index); // Fungsi untuk menghapus kebutuhan
+                          ApusKebutuhan(index);
                         },
                         color: Colors.red,
                       ),
                     );
                   },
                 ),
-
-
 
                 InkWell(
                   onTap: tambahKebutuhan,

@@ -24,6 +24,20 @@ class EditMotor extends StatefulWidget {
   State<EditMotor> createState() => _EditMotorState();
 }
 
+class KebutuhanModelUpdateMotor {
+  String namaKebutuhanMotor;
+  int masaKebutuhanMotor;
+
+  KebutuhanModelUpdateMotor(this.namaKebutuhanMotor, this.masaKebutuhanMotor);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Nama Kebutuhan Motor': namaKebutuhanMotor,
+      'Masa Kebutuhan Motor': masaKebutuhanMotor,
+    };
+  }
+}
+
 class _EditMotorState extends State<EditMotor> {
   final merekMotorController = TextEditingController();
   final idMotorController = TextEditingController();
@@ -76,8 +90,13 @@ class _EditMotorState extends State<EditMotor> {
 
   void SimpanKebutuhan_Motor(){
     setState(() {
-      Kebutuhan_Motor.add({'Nama Kebutuhan': isiKebutuhan_Motor.text});
+      KebutuhanModelUpdateMotor kebutuhan = KebutuhanModelUpdateMotor(
+        isiKebutuhan_Motor.text,
+        int.parse(MasaKebutuhanController.text),
+      );
+      Kebutuhan_Motor.add(kebutuhan.toMap());
       isiKebutuhan_Motor.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -96,7 +115,7 @@ class _EditMotorState extends State<EditMotor> {
         });
   }
 
-  void ApusKebutuhan_laptop(int index) {
+  void ApusKebutuhan_Motor(int index) {
     setState(() {
       Kebutuhan_Motor.removeAt(index);
     });
@@ -105,11 +124,15 @@ class _EditMotorState extends State<EditMotor> {
   Future<void> UpdateMotor(String dokMotor, Map<String, dynamic> DataMotor) async{
     try{
       String GambarMotor;
-      List <Map<String, dynamic>> ListKebutuhan_Motor = [];
-      var timeService = contTimeService(int.parse(MasaServisMotorController.text));
-      for(var i = 0; i < Kebutuhan_Motor.length; i++){
-        ListKebutuhan_Motor.add({'Nama Kebutuhan': Kebutuhan_Motor[i]['Nama Kebutuhan']});
-      }
+      List<Map<String, dynamic>> ListKebutuhan_Motor = Kebutuhan_Motor.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan Motor'].toString()));
+        return {
+          'Nama Kebutuhan Motor': kebutuhan['Nama Kebutuhan Motor'],
+          'Masa Kebutuhan Motor': kebutuhan['Masa Kebutuhan Motor'],
+          'Waktu Kebutuhan Motor': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan Motor': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if(ImgMotorController.text.isNotEmpty){
         File gambarMotorBaru = File(ImgMotorController.text);
@@ -118,24 +141,27 @@ class _EditMotorState extends State<EditMotor> {
         GambarMotor = oldphotoMotor;
       }
 
-      Map<String, dynamic> DataMotorBaru = {
-        'Merek Motor' : merekMotorController.text,
-        'ID Motor' : idMotorController.text,
-        'Kapasitas Mesin' : kapasitasMesinController.text,
-        'Sistem Pendingin' : pendinginContorller.text,
-        'Tipe Transmisi' : transmisiController.text,
-        'Kapasitas Bahan Bakar' : kapasitasMesinController.text,
-        'Kapasitas Minyak' : KapasitasMinyakController.text,
-        'Tipe Aki' : tipeAkiController.text,
-        'Ban Depan' : banDepanController.text,
-        'Ban Belakang' : banBelakangController.text,
-        'Masa Servis' : MasaServisMotorController.text,
-        'Kebutuhan Motor' : ListKebutuhan_Motor,
-        'Gambar Motor' : GambarMotor,
-        'Waktu Service Motor': timeService.millisecondsSinceEpoch,
-        'Hari Service Motor': daysBetween(DateTime.now(), timeService)
-      };
-      await FirebaseFirestore.instance.collection('Motor').doc(dokMotor).update(DataMotorBaru);
+      for(var item in ListKebutuhan_Motor){
+        var waktuKebutuhanMotor = contTimeService(int.parse(item['Masa Kebutuhan Motor'].toString()));
+        Map<String, dynamic> DataMotorBaru = {
+          'Merek Motor' : merekMotorController.text,
+          'ID Motor' : idMotorController.text,
+          'Kapasitas Mesin' : kapasitasMesinController.text,
+          'Sistem Pendingin' : pendinginContorller.text,
+          'Tipe Transmisi' : transmisiController.text,
+          'Kapasitas Bahan Bakar' : kapasitasMesinController.text,
+          'Kapasitas Minyak' : KapasitasMinyakController.text,
+          'Tipe Aki' : tipeAkiController.text,
+          'Ban Depan' : banDepanController.text,
+          'Ban Belakang' : banBelakangController.text,
+          'Masa Servis' : MasaServisMotorController.text,
+          'Kebutuhan Motor' : ListKebutuhan_Motor,
+          'Gambar Motor' : GambarMotor,
+          'Waktu Service Motor': waktuKebutuhanMotor.millisecondsSinceEpoch,
+          'Hari Service Motor': daysBetween(DateTime.now(), waktuKebutuhanMotor)
+        };
+        await FirebaseFirestore.instance.collection('Motor').doc(dokMotor).update(DataMotorBaru);
+      }
 
       AwesomeDialog(
         context: context,
@@ -183,10 +209,12 @@ class _EditMotorState extends State<EditMotor> {
       final UrlMotor = data?['Gambar Motor'] ?? '';
       oldphotoMotor = UrlMotor;
       final List<dynamic> KebutuhanData = data?['Kebutuhan Motor'] ?? [];
-      KebutuhanData.forEach((item) {
-        Kebutuhan_Motor.add({'Nama Kebutuhan' : item['Nama Kebutuhan']});
-      });
-
+      Kebutuhan_Motor = KebutuhanData.map((item) {
+        return {
+          'Nama Kebutuhan Motor': item['Nama Kebutuhan Motor'],
+          'Masa Kebutuhan Motor': item['Masa Kebutuhan Motor'],
+        };
+      }).toList();
     });
   }
 
@@ -443,11 +471,12 @@ class _EditMotorState extends State<EditMotor> {
                   itemCount: Kebutuhan_Motor.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_Motor[index]['Nama Kebutuhan']),
+                      title: Text(Kebutuhan_Motor[index]['Nama Kebutuhan Motor']),
+                      subtitle: Text('${Kebutuhan_Motor[index]['Masa Kebutuhan Motor']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          ApusKebutuhan_laptop(index);
+                          ApusKebutuhan_Motor(index);
                         },
                         color: Colors.red,
                       ),

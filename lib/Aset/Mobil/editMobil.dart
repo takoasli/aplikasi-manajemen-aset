@@ -22,6 +22,20 @@ class EditMobil extends StatefulWidget {
   State<EditMobil> createState() => _EditMobilState();
 }
 
+class KebutuhanModelUpdateMobil {
+  String namaKebutuhanMobil;
+  int masaKebutuhanMobil;
+
+  KebutuhanModelUpdateMobil(this.namaKebutuhanMobil, this.masaKebutuhanMobil);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Nama Kebutuhan Mobil': namaKebutuhanMobil,
+      'Masa Kebutuhan Mobil': masaKebutuhanMobil,
+    };
+  }
+}
+
 class _EditMobilState extends State<EditMobil> {
   final merekMobilController =TextEditingController();
   final idMobilCOntroller = TextEditingController();
@@ -73,8 +87,13 @@ class _EditMobilState extends State<EditMobil> {
 
   void SimpanKebutuhan_Mobil(){
     setState(() {
-      Kebutuhan_Mobil.add({'Nama Kebutuhan': isiKebutuhan_Mobil.text});
+      KebutuhanModelUpdateMobil kebutuhan = KebutuhanModelUpdateMobil(
+        isiKebutuhan_Mobil.text,
+        int.parse(masaKebutuhanController.text),
+      );
+      Kebutuhan_Mobil.add(kebutuhan.toMap());
       isiKebutuhan_Mobil.clear();
+      masaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -112,22 +131,24 @@ class _EditMobilState extends State<EditMobil> {
     setState(() {
       merekMobilController.text = data?['Merek Mobil'] ?? '';
       idMobilCOntroller.text = data?['ID Mobil'] ?? '';
-      tipemesinController.text = data?['Tipe Mesin'] ?? '';
+      tipemesinController.text = (data?['Tipe Mesin' ?? '']).toString();
       tipeBahanBakarController.text = data?['Jenis Bahan Bakar'] ?? '';
       pendinginController.text = data?['Sistem Pendingin Mesin'] ?? '';
       transmisController.text = data?['Tipe Transmisi'] ?? '';
       kapasitasBBController.text = (data?['Kapasitas Bahan Bakar' ?? '']).toString();
       ukuranBanController.text = data?['Ukuran Ban' ?? ''];
-      akiController.text = data?['Aki' ?? ''];
+      akiController.text = (data?['Aki' ?? '']).toString();
       ukuranBanController.text = data?['Ukuran Ban' ?? ''];
       MasaServisMobilController.text = (data?['Masa Servis' ?? '']).toString();
       final UrlMobil = data?['Gambar Mobil'] ?? '';
       oldphotoMobil = UrlMobil;
       final List<dynamic> KebutuhanData = data?['Kebutuhan Mobil'] ?? [];
-      KebutuhanData.forEach((item) {
-        Kebutuhan_Mobil.add({'Nama Kebutuhan' : item['Nama Kebutuhan']});
-      });
-
+      Kebutuhan_Mobil = KebutuhanData.map((item) {
+        return {
+          'Nama Kebutuhan Mobil': item['Nama Kebutuhan Mobil'],
+          'Masa Kebutuhan Mobil': item['Masa Kebutuhan Mobil'],
+        };
+      }).toList();
     });
   }
 
@@ -135,11 +156,15 @@ class _EditMobilState extends State<EditMobil> {
     try{
       String GambarMobil;
 
-      List <Map<String, dynamic>> ListKebutuhan_Mobil = [];
-      var timeService = contTimeService(int.parse(MasaServisMobilController.text));
-      for(var i = 0; i < Kebutuhan_Mobil.length; i++){
-        ListKebutuhan_Mobil.add({'Nama Kebutuhan': Kebutuhan_Mobil[i]['Nama Kebutuhan']});
-      }
+      List<Map<String, dynamic>> ListKebutuhan_Mobil = Kebutuhan_Mobil.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan Mobil'].toString()));
+        return {
+          'Nama Kebutuhan Mobil': kebutuhan['Nama Kebutuhan Mobil'],
+          'Masa Kebutuhan Mobil': kebutuhan['Masa Kebutuhan Mobil'],
+          'Waktu Kebutuhan Mobil': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan Mobil': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if(imgMobilController.text.isNotEmpty){
         File gambarMobilBaru = File(imgMobilController.text);
@@ -148,23 +173,26 @@ class _EditMobilState extends State<EditMobil> {
         GambarMobil = oldphotoMobil;
       }
 
-      Map<String, dynamic> DataMobilBaru = {
-        'Merek Mobil' : merekMobilController.text,
-        'ID Mobil' : idMobilCOntroller.text,
-        'Tipe Mesin' : tipemesinController.text,
-        'Sistem Pendingin Mesin' : pendinginController.text,
-        'Tipe Transmisi' : transmisController.text,
-        'Jenis Bahan Bakar' : tipeBahanBakarController.text,
-        'Kapasitas Bahan Bakar' : kapasitasBBController.text,
-        'Ukuran Ban' : ukuranBanController.text,
-        'Aki' : akiController.text,
-        'Masa Servis' : MasaServisMobilController.text,
-        'Kebutuhan Mobil' : ListKebutuhan_Mobil,
-        'Gambar Mobil' : GambarMobil,
-        'Waktu Service Mobil': timeService.millisecondsSinceEpoch,
-        'Hari Service Mobil': daysBetween(DateTime.now(), timeService)
-      };
-      await FirebaseFirestore.instance.collection('Mobil').doc(dokMobil).update(DataMobilBaru);
+      for(var item in ListKebutuhan_Mobil){
+        var waktuKebutuhanMobil = contTimeService(int.parse(item['Masa Kebutuhan Mobil'].toString()));
+        Map<String, dynamic> DataMobilBaru = {
+          'Merek Mobil' : merekMobilController.text,
+          'ID Mobil' : idMobilCOntroller.text,
+          'Tipe Mesin' : tipemesinController.text,
+          'Sistem Pendingin Mesin' : pendinginController.text,
+          'Tipe Transmisi' : transmisController.text,
+          'Jenis Bahan Bakar' : tipeBahanBakarController.text,
+          'Kapasitas Bahan Bakar' : kapasitasBBController.text,
+          'Ukuran Ban' : ukuranBanController.text,
+          'Aki' : akiController.text,
+          'Masa Servis' : MasaServisMobilController.text,
+          'Kebutuhan Mobil' : ListKebutuhan_Mobil,
+          'Gambar Mobil' : GambarMobil,
+          'Waktu Service Mobil': waktuKebutuhanMobil.millisecondsSinceEpoch,
+          'Hari Service Mobil': daysBetween(DateTime.now(), waktuKebutuhanMobil)
+        };
+        await FirebaseFirestore.instance.collection('Mobil').doc(dokMobil).update(DataMobilBaru);
+      }
 
       AwesomeDialog(
         context: context,
@@ -256,7 +284,7 @@ class _EditMobilState extends State<EditMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Tipe Mesin',
+                    'Kapasitas Mesin',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -424,7 +452,8 @@ class _EditMobilState extends State<EditMobil> {
                   itemCount: Kebutuhan_Mobil.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_Mobil[index]['Nama Kebutuhan']),
+                      title: Text(Kebutuhan_Mobil[index]['Nama Kebutuhan Mobil']),
+                      subtitle: Text('${Kebutuhan_Mobil[index]['Masa Kebutuhan Mobil']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {

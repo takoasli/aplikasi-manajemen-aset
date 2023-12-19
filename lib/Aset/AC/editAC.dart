@@ -22,6 +22,20 @@ class UpdateAC extends StatefulWidget {
   State<UpdateAC> createState() => _UpdateACState();
 }
 
+class KebutuhanModelUpdateAC {
+  String namaKebutuhanAC;
+  int masaKebutuhanAC;
+
+  KebutuhanModelUpdateAC(this.namaKebutuhanAC, this.masaKebutuhanAC);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Kebutuhan AC': namaKebutuhanAC,
+      'Masa Kebutuhan AC': masaKebutuhanAC,
+    };
+  }
+}
+
 class _UpdateACState extends State<UpdateAC> {
   final MerekACController = TextEditingController();
   final idACController = TextEditingController();
@@ -35,8 +49,7 @@ class _UpdateACState extends State<UpdateAC> {
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
-  List Kebutuhan_AC = [
-  ];
+  List Kebutuhan_AC = [];
   String oldphotoIndoor = '';
   String oldphotoOutdoor = '';
   Map <String, dynamic> dataAC = {};
@@ -66,8 +79,13 @@ class _UpdateACState extends State<UpdateAC> {
 
   void SimpanKebutuhan_AC(){
     setState(() {
-      Kebutuhan_AC.add({'Nama Kebutuhan': isiKebutuhan_AC.text});
+      KebutuhanModelUpdateAC kebutuhan = KebutuhanModelUpdateAC(
+        isiKebutuhan_AC.text,
+        int.parse(MasaKebutuhanController.text),
+      );
+      Kebutuhan_AC.add(kebutuhan.toMap());
       isiKebutuhan_AC.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -161,10 +179,15 @@ class _UpdateACState extends State<UpdateAC> {
       String GambarACOutdoor;
       var timeService = contTimeService(int.parse(MasaServisACController.text));
 
-      List <Map<String, dynamic>> ListKebutuhan_AC = [];
-      for(var i = 0; i < Kebutuhan_AC.length; i++){
-        ListKebutuhan_AC.add({'Nama Kebutuhan': Kebutuhan_AC[i]['Nama Kebutuhan']});
-      }
+      List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan AC'].toString()));
+        return {
+          'Kebutuhan AC': kebutuhan['Kebutuhan AC'],
+          'Masa Kebutuhan AC': kebutuhan['Masa Kebutuhan AC'],
+          'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if(gambarAcIndoorController.text.isNotEmpty&&gambarAcOutdoorController.text.isNotEmpty
       ||gambarAcIndoorController.text.isNotEmpty&&gambarAcOutdoorController.text.isEmpty){
@@ -177,21 +200,25 @@ class _UpdateACState extends State<UpdateAC> {
         GambarACOutdoor = oldphotoOutdoor;
       }
 
-      Map<String, dynamic> DataACBaru = {
-        'Merek AC': MerekACController.text,
-        'ID AC': idACController.text,
-        'Kapasitas Watt': wattController.text,
-        'Kapasitas PK': PKController.text,
-        'Lokasi Ruangan' : ruanganController.text,
-        'Masa Servis' : MasaServisACController.text,
-        'Kebutuhan AC' : ListKebutuhan_AC,
-        'Foto AC Indoor': GambarACIndoor,
-        'Foto AC Outdoor': GambarACOutdoor,
-        'waktu_service': timeService.millisecondsSinceEpoch,
-        'hari_service': daysBetween(DateTime.now(), timeService)
-      };
-
-      await FirebaseFirestore.instance.collection('Aset').doc(dokAC).update(DataACBaru);
+      for(var item in ListKebutuhan_AC){
+        var waktuKebutuhanAC = contTimeService(int.parse(item['Masa Kebutuhan AC'].toString()));
+        Map<String, dynamic> DataACBaru = {
+          'Merek AC': MerekACController.text,
+          'ID AC': idACController.text,
+          'Kapasitas Watt': wattController.text,
+          'Kapasitas PK': PKController.text,
+          'Lokasi Ruangan' : ruanganController.text,
+          'Masa Servis' : MasaServisACController.text,
+          'Kebutuhan AC' : ListKebutuhan_AC,
+          'Foto AC Indoor': GambarACIndoor,
+          'Foto AC Outdoor': GambarACOutdoor,
+          'waktu_service': timeService.millisecondsSinceEpoch,
+          'hari_service': daysBetween(DateTime.now(), timeService),
+          'Waktu Kebutuhan AC' : waktuKebutuhanAC.millisecondsSinceEpoch,
+          'Hari Kebutuhan AC' : daysBetween(DateTime.now(), waktuKebutuhanAC)
+        };
+        await FirebaseFirestore.instance.collection('Aset').doc(dokAC).update(DataACBaru);
+      }
 
       AwesomeDialog(
         context: context,
@@ -207,8 +234,8 @@ class _UpdateACState extends State<UpdateAC> {
         },
         autoHide: Duration(seconds: 5),
       ).show();
-      print('Data AC Berhasil Diupdate');
 
+      print('Data AC Berhasil Diupdate');
     }catch (e){
       print(e);
     }
@@ -219,28 +246,36 @@ class _UpdateACState extends State<UpdateAC> {
     getData();
   }
 
-  Future<void> getData() async{
-    final DocumentSnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('Aset').doc(widget.dokumenAC).get();
-    final data = snapshot.data();
+  Future<void> getData() async {
+    try {
+      final DocumentSnapshot<Map<String, dynamic>> snapshot =
+      await FirebaseFirestore.instance.collection('Aset').doc(widget.dokumenAC).get();
+      final data = snapshot.data();
 
-    setState(() {
-      MerekACController.text = data?['Merek AC'] ?? '';
-      idACController.text = data?['ID AC'] ?? '';
-      wattController.text = (data?['Kapasitas Watt'] ?? '').toString();
-      PKController.text = (data?['Kapasitas PK'] ?? '').toString();
-      ruanganController.text = data?['Lokasi Ruangan' ?? ''];
-      MasaServisACController.text = (data?['Masa Servis'] ?? '').toString();
-      final UrlIndoor = data?['Foto AC Indoor'] ?? '';
-      oldphotoIndoor = UrlIndoor;
-      final UrlOutdoor = data?['Foto AC Outdoor'] ?? '';
-      oldphotoOutdoor = UrlOutdoor;
-      final List<dynamic> KebutuhanData = data?['Kebutuhan AC'] ?? [];
-      KebutuhanData.forEach((item) {
-        Kebutuhan_AC.add({'Nama Kebutuhan' : item['Nama Kebutuhan']});
+      setState(() {
+        MerekACController.text = data?['Merek AC'] ?? '';
+        idACController.text = data?['ID AC'] ?? '';
+        wattController.text = (data?['Kapasitas Watt'] ?? '').toString();
+        PKController.text = (data?['Kapasitas PK'] ?? '').toString();
+        ruanganController.text = data?['Lokasi Ruangan'] ?? '';
+        MasaServisACController.text = (data?['Masa Servis'] ?? '').toString();
+        final UrlIndoor = data?['Foto AC Indoor'] ?? '';
+        oldphotoIndoor = UrlIndoor;
+        final UrlOutdoor = data?['Foto AC Outdoor'] ?? '';
+        oldphotoOutdoor = UrlOutdoor;
+        final List<dynamic> kebutuhanData = data?['Kebutuhan AC'] ?? [];
+        Kebutuhan_AC = kebutuhanData.map((item) {
+          return {
+            'Kebutuhan AC': item['Kebutuhan AC'],
+            'Masa Kebutuhan AC': item['Masa Kebutuhan AC'],
+          };
+        }).toList();
       });
-    });
+    } catch (e) {
+      print('Terjadi Kesalahan: $e');
+    }
   }
+
 
 
   @override
@@ -426,7 +461,8 @@ class _UpdateACState extends State<UpdateAC> {
                   itemCount: Kebutuhan_AC.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_AC[index]['Nama Kebutuhan']),
+                      title: Text(Kebutuhan_AC[index]['Kebutuhan AC']),
+                      subtitle: Text('${Kebutuhan_AC[index]['Masa Kebutuhan AC']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {

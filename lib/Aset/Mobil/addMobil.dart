@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +18,16 @@ class AddMobil extends StatefulWidget {
 
   @override
   State<AddMobil> createState() => _AddMobilState();
+}
+
+class KebutuhanModelMobil {
+  String namaKebutuhanMobil;
+  int masaKebutuhanMobil;
+
+  KebutuhanModelMobil(
+      this.namaKebutuhanMobil,
+      this.masaKebutuhanMobil,
+      );
 }
 
 class _AddMobilState extends State<AddMobil> {
@@ -72,8 +81,11 @@ class _AddMobilState extends State<AddMobil> {
 
   void SimpanKebutuhan_Mobil(){
     setState(() {
-      Kebutuhan_Mobil.add([isiKebutuhan_Mobil.text, false]);
+      Kebutuhan_Mobil.add(KebutuhanModelMobil(isiKebutuhan_Mobil.text,
+          int.parse(MasaKebutuhanController.text)
+      ));
       isiKebutuhan_Mobil.clear();
+      MasaKebutuhanController.clear();
     });
     Navigator.of(context).pop();
   }
@@ -103,13 +115,15 @@ class _AddMobilState extends State<AddMobil> {
     try{
       String lokasiGambarMobil = imgMobilController.text;
       String fotoMobil = '';
-      List <Map<String, dynamic>> ListKebutuhan_Mobil = [];
-
-      for(var i = 0; i < Kebutuhan_Mobil.length; i++){
-        ListKebutuhan_Mobil.add({
-          'Nama Kebutuhan': Kebutuhan_Mobil[i][0]
-        });
-      }
+      List<Map<String, dynamic>> ListKebutuhan_Mobil = Kebutuhan_Mobil.map((kebutuhan) {
+        var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanMobil);
+        return {
+          'Nama Kebutuhan Mobil': kebutuhan.namaKebutuhanMobil,
+          'Masa Kebutuhan Mobil': kebutuhan.masaKebutuhanMobil,
+          'Waktu Kebutuhan Mobil': timeKebutuhan.millisecondsSinceEpoch,
+          'Hari Kebutuhan Mobil': daysBetween(DateTime.now(), timeKebutuhan)
+        };
+      }).toList();
 
       if (lokasiGambarMobil.isNotEmpty) {
         File imgMobil = File(lokasiGambarMobil);
@@ -119,13 +133,13 @@ class _AddMobilState extends State<AddMobil> {
       await tambahMobil(
         merekMobilController.text.trim(),
         idMobilCOntroller.text.trim(),
-        tipemesinController.text.trim(),
+        int.parse(tipemesinController.text.trim()),
         tipeBahanBakarController.text.trim(),
         pendinginController.text.trim(),
         transmisController.text.trim(),
         int.parse(kapasitasBBController.text.trim()),
         ukuranBanController.text.trim(),
-        akiController.text.trim(),
+        int.parse(akiController.text.trim()),
         int.parse(MasaServisMobilController.text.trim()),
         ListKebutuhan_Mobil,
         fotoMobil,
@@ -152,8 +166,8 @@ class _AddMobilState extends State<AddMobil> {
     }
   }
 
-  Future tambahMobil (String merek, String ID, String tipemesin,
-      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, String Aki, int masaServis,List<Map<String, dynamic>> kebutuhan, String GambarMobil) async{
+  Future tambahMobil (String merek, String ID, int tipemesin,
+      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, int Aki, int masaServis,List<Map<String, dynamic>> kebutuhan, String GambarMobil) async{
     var timeService = contTimeService(masaServis);
     await FirebaseFirestore.instance.collection('Mobil').add({
       'Merek Mobil' : merek,
@@ -244,7 +258,7 @@ class _AddMobilState extends State<AddMobil> {
                 ),
                 SizedBox(height: 10),
                 MyTextField(
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipemesinController),
@@ -334,7 +348,7 @@ class _AddMobilState extends State<AddMobil> {
                 ),
                 SizedBox(height: 10),
                 MyTextField(
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: akiController),
@@ -379,7 +393,8 @@ class _AddMobilState extends State<AddMobil> {
                   itemCount: Kebutuhan_Mobil.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_Mobil[index][0]),
+                      title: Text(Kebutuhan_Mobil[index].namaKebutuhanMobil),
+                      subtitle: Text('${Kebutuhan_Mobil[index].masaKebutuhanMobil} Bulan'),
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {

@@ -25,7 +25,8 @@ class KebutuhanModel {
   String namaKebutuhan;
   int masaKebutuhan;
 
-  KebutuhanModel(this.namaKebutuhan,
+  KebutuhanModel(
+      this.namaKebutuhan,
       this.masaKebutuhan,
       );
 }
@@ -388,7 +389,7 @@ class _AddPCState extends State<AddPC> {
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
-                          ApusKebutuhan(index); // Fungsi untuk menghapus kebutuhan
+                          ApusKebutuhan(index); // Fungsi apus kebutuhan
                         },
                         color: Colors.red,
                       ),

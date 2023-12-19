@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../catatanAset.dart';
+import '../../Catatan/catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -104,9 +104,13 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                           onPressed: (){
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID Laptop'], namaAset: widget.data['Merek Laptop'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "Laptop",
+                                    assetId: widget.data['ID Laptop'],
+                                    assetName: widget.data['Merek Laptop'],
+                                  ),
+                                ));
                           },
                           icon: Icon(Icons.qr_code_2,
                               size: 33),
@@ -205,14 +209,62 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                     shrinkWrap: true,
                                     itemCount: widget.data['Kebutuhan Laptop'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan Laptop'][index]['Nama Kebutuhan'];
-                                      final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
-                                      return Text(
-                                        '- $hasSplit',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          letterSpacing: 1,
+                                      final kebutuhanLaptop = widget.data['Kebutuhan Laptop']
+                                      [index]['Nama Kebutuhan Laptop'];
+                                      final hariKebutuhanLaptop =
+                                      widget.data['Kebutuhan Laptop'][index]
+                                      ['Hari Kebutuhan Laptop'];
+                                      final waktuKebutuhanLaptop =
+                                      widget.data['Kebutuhan Laptop'][index]
+                                      ['Waktu Kebutuhan Laptop'];
+
+                                      final part = kebutuhanLaptop.split(': ');
+                                      final hasSplit =
+                                      part.length > 1 ? part[1] : kebutuhanLaptop;
+
+                                      return SizedBox(
+                                        height: 80,
+                                        child: ListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          title: Text(
+                                            '- $hasSplit',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              showIndicator(
+                                                getValueIndicator(
+                                                    hariKebutuhanLaptop,
+                                                    epochTimeToData(
+                                                        waktuKebutuhanLaptop)),
+                                                getProgressColor(
+                                                    waktuKebutuhanLaptop),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    overflow:
+                                                    TextOverflow.ellipsis,
+                                                    getRemainingTime(
+                                                        waktuKebutuhanLaptop),
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },

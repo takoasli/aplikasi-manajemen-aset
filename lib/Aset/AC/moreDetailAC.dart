@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../catatanAset.dart';
+import '../../Catatan/catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -114,12 +114,15 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                           onPressed: (){
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID AC'], namaAset: widget.data['Merek AC'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "AC",
+                                    assetId: widget.data['ID AC'],
+                                    assetName: widget.data['Merek AC'],
+                                  ),
+                                ));
                           },
-                          icon: Icon(Icons.qr_code_2,
-                              size: 33),
+                          icon: Icon(Icons.qr_code_2, size: 33),
                         ),
                       )
                   ),
@@ -135,20 +138,24 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                         ),
                         child: IconButton(
                           onPressed: (){
-                            List<dynamic> kebutuhanAC = widget.data['Kebutuhan AC'];
-
+                            List<dynamic> kebutuhanAC =
+                            widget.data['Kebutuhan AC'];
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanAC) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
-                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
+                              if (kebutuhan is Map<String, dynamic> &&
+                                  kebutuhan.containsKey('Nama Kebutuhan AC')) {
+                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan AC']);
                               }
                             }
 
-
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
-                              List_Kebutuhan: namaKebutuhan,
-                              ID_Aset: widget.data['ID AC'],
-                              Nama_Aset: widget.data['Merek AC'],)));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Catatan(
+                                      List_Kebutuhan: namaKebutuhan,
+                                      ID_Aset: widget.data['ID AC'],
+                                      Nama_Aset: widget.data['Merek AC'],
+                                    )));
                           },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),
@@ -180,18 +187,18 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                               SizedBox(height: 5),
                               showIndicator(
                                   getValueIndicator(
-                                      widget.data['hari_service'],
+                                      widget.data['Hari Service'],
                                       epochTimeToData(
-                                          widget.data['waktu_service'])),
+                                          widget.data['Waktu Service'])),
                                   getProgressColor(
-                                      widget.data['waktu_service'])),
+                                      widget.data['Waktu Service'])),
                               SizedBox(height: 5),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
                                     getRemainingTime(
-                                        widget.data['waktu_service']),
+                                        widget.data['Waktu Service']),
                                     style: const TextStyle(
                                       fontSize: 15,
                                     ),
@@ -215,14 +222,62 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                                     shrinkWrap: true,
                                     itemCount: widget.data['Kebutuhan AC'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan AC'][index]['Nama Kebutuhan'];
-                                      final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
-                                      return Text(
-                                        '- $hasSplit',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          letterSpacing: 1,
+                                      final kebutuhanAC = widget.data['Kebutuhan AC']
+                                      [index]['Nama Kebutuhan AC'];
+                                      final hariKebutuhanAC =
+                                      widget.data['Kebutuhan AC'][index]
+                                      ['Hari Kebutuhan AC'];
+                                      final waktuKebutuhanAC =
+                                      widget.data['Kebutuhan AC'][index]
+                                      ['Waktu Kebutuhan AC'];
+
+                                      final part = kebutuhanAC.split(': ');
+                                      final hasSplit =
+                                      part.length > 1 ? part[1] : kebutuhanAC;
+
+                                      return SizedBox(
+                                        height: 80,
+                                        child: ListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          title: Text(
+                                            '- $hasSplit',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              showIndicator(
+                                                getValueIndicator(
+                                                    hariKebutuhanAC,
+                                                    epochTimeToData(
+                                                        waktuKebutuhanAC)),
+                                                getProgressColor(
+                                                    waktuKebutuhanAC),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    overflow:
+                                                    TextOverflow.ellipsis,
+                                                    getRemainingTime(
+                                                        waktuKebutuhanAC),
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },

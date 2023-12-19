@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../catatanAset.dart';
+import '../../Catatan/catatanAset.dart';
 import '../../komponen/style.dart';
 import '../../qrView.dart';
 import '../ControllerLogic.dart';
@@ -99,9 +99,13 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                           onPressed: (){
                             Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => QR_View(QR_ID: widget.data['ID Mobil'], namaAset: widget.data['Merek Mobil'],),
-                                )
-                            );
+                                MaterialPageRoute(
+                                  builder: (context) => QRView(
+                                    assetCollection: "Mobil",
+                                    assetId: widget.data['ID Mobil'],
+                                    assetName: widget.data['Merek Mobil'],
+                                  ),
+                                ));
                           },
                           icon: Icon(Icons.qr_code_2,
                               size: 33),
@@ -124,8 +128,8 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
 
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanMobil) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
-                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
+                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan Mobil')) {
+                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan Mobil']);
                               }
                             }
 
@@ -199,14 +203,62 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                     shrinkWrap: true,
                                     itemCount: widget.data['Kebutuhan Mobil'].length,
                                     itemBuilder: (context, index) {
-                                      final kebutuhan = widget.data['Kebutuhan Mobil'][index]['Nama Kebutuhan'];
-                                      final part = kebutuhan.split(': ');
-                                      final hasSplit = part.length > 1 ? part[1] : kebutuhan;
-                                      return Text(
-                                        '- $hasSplit',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          letterSpacing: 1,
+                                      final kebutuhanMobil = widget.data['Kebutuhan Mobil']
+                                      [index]['Nama Kebutuhan Mobil'];
+                                      final hariKebutuhanMobil =
+                                      widget.data['Kebutuhan Mobil'][index]
+                                      ['Hari Kebutuhan Mobil'];
+                                      final waktuKebutuhanMobil =
+                                      widget.data['Kebutuhan Mobil'][index]
+                                      ['Waktu Kebutuhan Mobil'];
+
+                                      final part = kebutuhanMobil.split(': ');
+                                      final hasSplit =
+                                      part.length > 1 ? part[1] : kebutuhanMobil;
+
+                                      return SizedBox(
+                                        height: 80,
+                                        child: ListTile(
+                                          dense: true,
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          title: Text(
+                                            '- $hasSplit',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              showIndicator(
+                                                getValueIndicator(
+                                                    hariKebutuhanMobil,
+                                                    epochTimeToData(
+                                                        waktuKebutuhanMobil)),
+                                                getProgressColor(
+                                                    waktuKebutuhanMobil),
+                                              ),
+                                              const SizedBox(height: 5),
+                                              Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    overflow:
+                                                    TextOverflow.ellipsis,
+                                                    getRemainingTime(
+                                                        waktuKebutuhanMobil),
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     },

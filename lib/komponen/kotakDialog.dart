@@ -14,7 +14,7 @@ class DialogBox extends StatelessWidget {
     required this.onAdd,
     required this.onCancel,
     required this.TextJudul,
-    required this.JangkaKebutuhan});
+    this.JangkaKebutuhan});
 
   @override
   Widget build(BuildContext context) {
