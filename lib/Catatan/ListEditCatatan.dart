@@ -1,7 +1,11 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:projek_skripsi/Catatan/ListCatatan.dart';
+import 'package:projek_skripsi/komponen/kotakDialogKedua.dart';
 import '../Aset/ControllerLogic.dart';
 import '../komponen/checklists.dart';
+import '../komponen/kotakBiaya.dart';
 import '../komponen/style.dart';
 
 class ListEditcatatan extends StatefulWidget {
@@ -17,16 +21,77 @@ class ListEditcatatan extends StatefulWidget {
 class _ListEditcatatanState extends State<ListEditcatatan> {
   final merekAsetCatatan = TextEditingController();
   final idAsetCatatan = TextEditingController();
+  final isiKebutuhan = TextEditingController();
+  final isiBiaya = TextEditingController();
+  final isiHarga = TextEditingController();
   final CatatanLengkapController = TextEditingController();
+  Map <String, dynamic> dataCatatans = {};
   List DokKebutuhan = [];
   List DokBiaya = [];
 
   void checkBoxberubah(bool? value, int index) {
     setState(() {
       if (value != null) {
-        DokKebutuhan[index]['status'] = value ? 'Done' : 'unDone'; // Ubah kembali ke tipe data String
+        DokKebutuhan[index]['status'] = value ? 'Done' : 'unDone'; // Perbaiki cara ini
       }
     });
+  }
+
+
+  void SimpanTask(BuildContext context) {
+    setState(() {
+      DokKebutuhan.add({
+        'Nama Kebutuhan': isiKebutuhan.text,
+        'status': false,
+      });
+      isiKebutuhan.clear();
+    });
+    Navigator.of(context).pop();
+  }
+
+
+  void tambahTugas() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return KotakKedua(
+              controller: isiKebutuhan,
+              TextJudul: 'Tambah Kebutuhan',
+              onAdd: () => SimpanTask(context),
+          onCancel: () => Navigator.of(context).pop()
+          );
+        });
+  }
+
+  void SimpanBiaya(BuildContext context) {
+    setState(() {
+      if (isiBiaya.text.isNotEmpty && isiHarga.text.isNotEmpty) {
+        DokBiaya.add([
+          isiBiaya.text,
+          double.parse(isiHarga.text.replaceAll(".", "")),
+        ]);
+        isiBiaya.clear();
+        isiHarga.clear();
+      } else {
+        print('Tolong tambahkan informasi yang diminta');
+      }
+    });
+    Navigator.of(context).pop();
+  }
+
+
+  void tambahListBiaya() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return DialogBiaya(
+            NamaBiayacontroller: isiBiaya,
+            HargaBiayacontroller: isiHarga,
+            onAdd: () => SimpanBiaya(context),
+            onCancel: () => Navigator.of(context).pop(),
+            TextJudul: 'Tambah Nama Biaya',
+          );
+        });
   }
 
   void ApusTask(int index){
@@ -41,6 +106,12 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
       totalBiaya += DokBiaya[i][1];
     }
     return totalBiaya;
+  }
+
+  void ApusBiaya(int index) {
+    setState(() {
+      DokBiaya.removeAt(index);
+    });
   }
 
 
@@ -72,6 +143,68 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
       }).toList();
     });
   }
+
+  Future<void> UpdateCatatan(String dokCatatan, Map<String, dynamic> DataCatatan) async {
+    try {
+      List<Map<String, dynamic>> DataKebutuhan = [];
+
+      for (int i = 0; i < DokKebutuhan.length; i++) {
+        Map<String, dynamic> kebutuhan = {
+          'Nama Kebutuhan': DokKebutuhan[i][0],
+          'status': DokKebutuhan[i][1] ? 'Done' : 'unDone',
+        };
+
+        DataKebutuhan.add(Map.from(kebutuhan));
+      }
+      for (int i = 0; i < DataKebutuhan.length; i++) {
+        DataKebutuhan[i].update('status', (value) => value == 'Done' ? 'Updated' : value);
+      }
+      for (int i = 0; i < DataKebutuhan.length; i++) {
+        print(DataKebutuhan[i]);
+      }
+
+
+      List<Map<String, dynamic>> CatatanBiaya = [];
+
+      for (int i = 0; i < DokBiaya.length; i++) {
+        CatatanBiaya.add({
+          'Nama Biaya': DokBiaya[i].nama,
+          'Harga Biaya': DokBiaya[i].biaya,
+        });
+      }
+
+      // Mengisi DataCatatan dengan data yang telah Anda susun
+      DataCatatan['List Kebutuhan'] = DataKebutuhan;
+      DataCatatan['Catatan Biaya'] = CatatanBiaya;
+
+      // Lakukan pembaruan pada dokumen Firestore yang diinginkan
+      await FirebaseFirestore.instance
+          .collection('Catatan Servis')
+          .doc(dokCatatan)
+          .update(DataCatatan);
+
+      // Menampilkan dialog sukses setelah update berhasil
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.success,
+        animType: AnimType.bottomSlide,
+        title: 'Berhasil!',
+        desc: 'Data PC Berhasil Diupdate',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const ListCatatan()),
+          );
+        },
+        autoHide: Duration(seconds: 5),
+      ).show();
+
+      print('Data Catatan Berhasil Diupdate');
+    } catch (e) {
+      print(e);
+    }
+  }
+
 
 
   @override
@@ -155,22 +288,46 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
                       color: Warna.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: DokKebutuhan.length,
-                        itemBuilder: (context, index){
-                          final bool isDone = DokKebutuhan[index]['status'] == 'Done';
-                          return Checklist(
+                    child: Column(
+                      children: [
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: DokKebutuhan.length,
+                          itemBuilder: (context, index) {
+                            final bool isDone = DokKebutuhan[index]['status'] == 'Done';
+                            return Checklist(
                               namaTask: DokKebutuhan[index]['Nama Kebutuhan'],
                               TaskKelar: isDone,
                               onChanged: (value) {
                                 checkBoxberubah(value, index);
-                          },
+                              },
                               Hapus: (context) => ApusTask(index),
-                          );
-                        }),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: tambahTugas,
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.add),
+                                SizedBox(width: 5),
+                                Text('Tambah Kebutuhan Lainnya...'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
                   const SizedBox(height: 20),
                   Align(
                     alignment: Alignment.centerLeft,
@@ -189,16 +346,46 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
                       color: Warna.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: DokBiaya.length,
-                        itemBuilder: (context, index){
-                          return ListTile(
-                            title: Text(DokBiaya[index][0]), // Nama Biaya
-                            subtitle: Text('${convertToRupiah(DokBiaya[index][1])}'),
-                          );
-                        }),
+                    child: Column(
+                      children: [
+                        ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: DokBiaya.length,
+                            itemBuilder: (context, index){
+                              return ListTile(
+                                title: Text(DokBiaya[index][0]), // Nama Biaya
+                                subtitle: Text('${convertToRupiah(DokBiaya[index][1])}'),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.delete),
+                                  onPressed: () {
+                                    ApusBiaya(index);
+                                  },
+                                  color: Colors.red,
+                                ),
+                              );
+                            }
+                            ),
+                        SizedBox(height: 15),
+                        InkWell(
+                          onTap: tambahListBiaya,
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.add),
+                                SizedBox(width: 5),
+                                Text('Tambah Kebutuhan Lainnya...'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
 
                   ),
                   const SizedBox(height: 15),
@@ -274,7 +461,9 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
                   Align(
                     alignment: Alignment.center,
                     child: ElevatedButton(
-                      onPressed: (){},
+                      onPressed:(){
+                        UpdateCatatan(widget.dokumenCatatan, dataCatatans);
+                      },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Warna.white,
                           minimumSize: const Size(200, 50),
