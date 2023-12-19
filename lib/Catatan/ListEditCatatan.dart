@@ -24,10 +24,11 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
   void checkBoxberubah(bool? value, int index) {
     setState(() {
       if (value != null) {
-        DokKebutuhan[index][1] = value;
+        DokKebutuhan[index]['status'] = value ? 'Done' : 'unDone'; // Ubah kembali ke tipe data String
       }
     });
   }
+
   void ApusTask(int index){
     setState(() {
       DokKebutuhan.removeAt(index);
@@ -62,7 +63,7 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
       DokKebutuhan = KebutuhanData.map((item) {
         return {
           'Nama Kebutuhan': item['Nama Kebutuhan'],
-          'status': item['status'],
+          'status': item['status'] == 'Done',
         };
       }).toList();
       final List<dynamic> BiayaData = dataCatat?['Catatan Biaya'] ?? [];
@@ -150,39 +151,25 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
                   const SizedBox(height: 15),
                   Container(
                     width: 350,
-                    height: 350,
                     decoration: BoxDecoration(
                       color: Warna.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 350,
-                          height: 350,
-                          decoration: BoxDecoration(
-                            color: Warna.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: ListView.builder(
-                            itemCount: DokKebutuhan.length,
-                            itemBuilder: (context, index) {
-                              final bool isDone = DokKebutuhan[index]['status'] == 'Done';
-                              return Checklist(
-                                namaTask: DokKebutuhan[index]['Nama Kebutuhan'],
-                                TaskKelar: isDone,
-                                onChanged: (value) {
-                                  // Jika ditekan, ubah status kebutuhan
-                                  checkBoxberubah(value, index);
-                                },
-                                Hapus: (context) => ApusTask(index),
-                              );
-                            },
-                          ),
-                        ),
-
-                      ],
-                    ),
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: DokKebutuhan.length,
+                        itemBuilder: (context, index){
+                          final bool isDone = DokKebutuhan[index]['status'] == 'Done';
+                          return Checklist(
+                              namaTask: DokKebutuhan[index]['Nama Kebutuhan'],
+                              TaskKelar: isDone,
+                              onChanged: (value) {
+                                checkBoxberubah(value, index);
+                          },
+                              Hapus: (context) => ApusTask(index),
+                          );
+                        }),
                   ),
                   const SizedBox(height: 20),
                   Align(
@@ -198,33 +185,21 @@ class _ListEditcatatanState extends State<ListEditcatatan> {
 
                   Container(
                     width: 350,
-                    height: 300,
                     decoration: BoxDecoration(
                       color: Warna.white,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: ListView(
-                      children: [
-                        Container(
-                          width: 350,
-                          height: 300,
-                          decoration: BoxDecoration(
-                            color: Warna.white,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: ListView.builder(
-                            itemCount: DokBiaya.length,
-                            itemBuilder: (context, index) {
-                              return ListTile(
-                                title: Text(DokBiaya[index][0]), // Nama Biaya
-                                subtitle: Text('${convertToRupiah(DokBiaya[index][1])}'), //harga biaya
-                              );
-                            },
-                          ),
-                        ),
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: DokBiaya.length,
+                        itemBuilder: (context, index){
+                          return ListTile(
+                            title: Text(DokBiaya[index][0]), // Nama Biaya
+                            subtitle: Text('${convertToRupiah(DokBiaya[index][1])}'),
+                          );
+                        }),
 
-                      ],
-                    ),
                   ),
                   const SizedBox(height: 15),
 

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/Catatan/ListEditCatatan.dart';
 import 'package:projek_skripsi/Catatan/bacaCatatan.dart';
+import 'package:projek_skripsi/Catatan/moreDetailCatatan.dart';
 import '../komponen/style.dart';
 
 class ListCatatan extends StatefulWidget {
@@ -113,9 +114,29 @@ class _ListCatatanState extends State<ListCatatan> {
                       elevation: 5,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(10),
-                        onTap: () {
-                          // Action when tapped
+                        onTap: () async {
+                          DocumentSnapshot<Map<String, dynamic>> catatanDoc = await FirebaseFirestore.instance
+                              .collection('Catatan Servis')
+                              .doc(DokCatatan[index])
+                              .get();
+
+                          if (catatanDoc.exists) {
+                            Map<String, dynamic> catatanData = catatanDoc.data() ?? {}; // Ambil data dari dokumen
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailCatatan(
+                                  data: catatanData,
+                                ),
+                              ),
+                            );
+                          } else {
+                            // Dokumen tidak ditemukan atau kosong, handle kasus ini jika diperlukan
+                            print('Dokumen tidak ditemukan');
+                          }
                         },
+
                         child: Container(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
