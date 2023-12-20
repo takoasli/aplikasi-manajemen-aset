@@ -12,11 +12,13 @@ class Catatan extends StatefulWidget {
   const Catatan({Key? key,
     required this.List_Kebutuhan,
     required this.ID_Aset,
-    required this.Nama_Aset,}) : super(key: key);
+    required this.Nama_Aset,
+    required this.Jenis_Aset,}) : super(key: key);
 
   final List<dynamic> List_Kebutuhan;
   final String ID_Aset;
   final String Nama_Aset;
+  final String Jenis_Aset;
 
   @override
   State<Catatan> createState() => _CatatanState();
@@ -30,6 +32,7 @@ class _CatatanState extends State<Catatan> {
   final hargaIsiBiaya = TextEditingController(text: '');
   late String idAset;
   late String merekAset;
+  late String jenisAset;
   List<List<dynamic>> List_Kebutuhan = [];
   List biayaKebutuhans = [];
 
@@ -141,7 +144,8 @@ class _CatatanState extends State<Catatan> {
           DataKebutuhan,
           CatatanBiaya,
           CatatanLengkapController.text,
-          hitungTotalBiaya()
+          hitungTotalBiaya(),
+          jenisAset
       );
 
       AwesomeDialog(
@@ -153,7 +157,6 @@ class _CatatanState extends State<Catatan> {
         btnOkOnPress: () {
           Navigator.of(context).pop();
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data Catatan Berhasil Disimpan!');
 
@@ -167,7 +170,8 @@ class _CatatanState extends State<Catatan> {
       List<Map<String, dynamic>> ListButuh,
       List<Map<String, dynamic>> CatatanBiaya,
       String CatatanLengkap,
-      double totalBiaya,) async{
+      double totalBiaya,
+      String jenisAset) async{
     await FirebaseFirestore.instance.collection('Catatan Servis').add({
       'Nama Aset': merekAset,
       'ID Aset': idAset,
@@ -175,6 +179,7 @@ class _CatatanState extends State<Catatan> {
       'Catatan Biaya' : CatatanBiaya,
       'Catatan Tambahan' : CatatanLengkap,
       'Total Biaya' : totalBiaya,
+      'Jenis Aset' : jenisAset,
       'Tanggal Dilakukan Servis': FieldValue.serverTimestamp(),
     });
   }
@@ -187,6 +192,7 @@ class _CatatanState extends State<Catatan> {
     super.initState();
     idAset = '${widget.ID_Aset}';
     merekAset = '${widget.Nama_Aset}';
+    jenisAset = '${widget.Jenis_Aset}';
     List_Kebutuhan = List<List<dynamic>>.from(widget.List_Kebutuhan.map((item) => [item, false]));
   }
 
@@ -244,6 +250,7 @@ class _CatatanState extends State<Catatan> {
                           size: 40
                           ),
                           ),
+                          const SizedBox(width: 10),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,8 +258,12 @@ class _CatatanState extends State<Catatan> {
                               Text(merekAset,
                               style: TextStyles.title.copyWith(fontSize: 20)
                               ),
+                              SizedBox(height: 5.0),
                               Text(idAset,
                               style: TextStyles.body.copyWith(fontSize: 17),
+                              ),
+                              Text(jenisAset,
+                                style: TextStyles.body.copyWith(fontSize: 17),
                               )
                             ],
                           )

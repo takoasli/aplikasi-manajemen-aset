@@ -152,7 +152,7 @@ class _AddPCState extends State<AddPC> {
         title: 'Berhasil!',
         desc: 'Data PC Berhasil Ditambahkan',
         btnOkOnPress: () {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => ManajemenPC()),
           );
@@ -181,6 +181,7 @@ class _AddPCState extends State<AddPC> {
         'Masa Servis' : masaServis,
         'kebutuhan' : kebutuhan,
         'Gambar PC' : gambarPC,
+        'Jenis Aset' : 'PC',
         'Waktu Service PC': timeService.millisecondsSinceEpoch,
         'Hari Service PC': daysBetween(DateTime.now(), timeService),
       });

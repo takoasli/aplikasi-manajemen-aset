@@ -156,7 +156,6 @@ class _AddMotorState extends State<AddMotor> {
               context, MaterialPageRoute(builder: (context) => ManajemenMotor()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data Motor Berhasil Ditambahkan');
 
@@ -182,6 +181,7 @@ class _AddMotorState extends State<AddMotor> {
       'Masa Servis' : masaServis,
       'Kebutuhan Motor' : kebutuhan,
       'Gambar Motor' : gambarMotor,
+      'Jenis Aset' : 'Motor',
       'Waktu Service Motor': timeService.millisecondsSinceEpoch,
       'Hari Service Motor': daysBetween(DateTime.now(), timeService)
     });

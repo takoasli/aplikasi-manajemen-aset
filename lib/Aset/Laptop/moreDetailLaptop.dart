@@ -133,15 +133,18 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
 
                             List<String> namaKebutuhan = [];
                             for (var kebutuhan in kebutuhanLaptop) {
-                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan')) {
-                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan']);
+                              if (kebutuhan is Map<String, dynamic> && kebutuhan.containsKey('Nama Kebutuhan Laptop')) {
+                                namaKebutuhan.add(kebutuhan['Nama Kebutuhan Laptop']);
                               }
                             }
 
                             Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
                               List_Kebutuhan: namaKebutuhan,
                               ID_Aset: widget.data['ID Laptop'],
-                              Nama_Aset: widget.data['Merek Laptop'],)));
+                              Nama_Aset: widget.data['Merek Laptop'],
+                              Jenis_Aset: widget.data['Jenis Aset'],)
+                            )
+                            );
                           },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),

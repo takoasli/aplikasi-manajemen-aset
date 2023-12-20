@@ -188,6 +188,7 @@ class _EditMobilState extends State<EditMobil> {
           'Masa Servis' : MasaServisMobilController.text,
           'Kebutuhan Mobil' : ListKebutuhan_Mobil,
           'Gambar Mobil' : GambarMobil,
+          'Jenis Aset' : 'Mobil',
           'Waktu Service Mobil': waktuKebutuhanMobil.millisecondsSinceEpoch,
           'Hari Service Mobil': daysBetween(DateTime.now(), waktuKebutuhanMobil)
         };

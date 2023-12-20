@@ -155,7 +155,6 @@ class _AddLaptopState extends State<AddLaptop> {
             MaterialPageRoute(builder: (context) => ManajemenLaptop()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data Laptop Berhasil Ditambahkan');
 
@@ -179,6 +178,7 @@ class _AddLaptopState extends State<AddLaptop> {
       'Masa Servis' : masaServis,
       'Kebutuhan Laptop' : kebutuhan,
       'Gambar Laptop' : gambarLaptop,
+      'Jenis Aset' : 'Laptop',
       'Waktu Service Laptop': timeService.millisecondsSinceEpoch,
       'Hari Service Laptop': daysBetween(DateTime.now(), timeService)
     });

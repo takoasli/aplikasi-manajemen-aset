@@ -155,6 +155,7 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                                       List_Kebutuhan: namaKebutuhan,
                                       ID_Aset: widget.data['ID AC'],
                                       Nama_Aset: widget.data['Merek AC'],
+                                      Jenis_Aset: widget.data['Jenis Aset'],
                                     )));
                           },
                           icon: Icon(Icons.border_color_outlined,
@@ -291,7 +292,7 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                                       fontSize: 18,
                                       color: Warna.darkgrey,
                                       fontWeight: FontWeight.w500)),
-                              SizedBox(height: 5),
+                              SizedBox(height: 10),
                               Text(
                                 '${widget.data['Merek AC']}',
                                 style: const TextStyle(

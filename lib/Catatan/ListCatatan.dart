@@ -2,7 +2,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:projek_skripsi/Catatan/ListEditCatatan.dart';
 import 'package:projek_skripsi/Catatan/bacaCatatan.dart';
 import 'package:projek_skripsi/Catatan/moreDetailCatatan.dart';
 import '../komponen/style.dart';
@@ -16,6 +15,16 @@ class ListCatatan extends StatefulWidget {
 
 class _ListCatatanState extends State<ListCatatan> {
   late List<String> DokCatatan = [];
+  List<Map<String, dynamic>> filteredCatatan = [];
+  final List<String> kategoriHari = [
+    'AC',
+    'PC',
+    'Laptop',
+    'Motor',
+    'Mobil'
+  ];
+  List<String> selectedCategories = [];
+
   final berhasil = SnackBar(
     elevation: 0,
     behavior: SnackBarBehavior.floating,
@@ -26,13 +35,22 @@ class _ListCatatanState extends State<ListCatatan> {
       contentType: ContentType.success,
     ),
   );
-  Future<void> getCatatan() async {
-    final QuerySnapshot<Map<String, dynamic>> snapshot =
-    await FirebaseFirestore.instance.collection('Catatan Servis').get();
+
+  Future<void> getCatatan(List<String> selectedCategories) async {
+    Query<Map<String, dynamic>> query =
+    FirebaseFirestore.instance.collection('Catatan Servis');
+
+    if (selectedCategories.isNotEmpty) {
+      query = query.where('Jenis Aset', whereIn: selectedCategories);
+    }
+
+    final QuerySnapshot<Map<String, dynamic>> snapshot = await query.get();
+
     setState(() {
       DokCatatan = snapshot.docs.map((doc) => doc.id).toList();
     });
   }
+
 
   Future<void> hapusCatatan(String docServis) async {
     AwesomeDialog dialog = AwesomeDialog(
@@ -43,7 +61,7 @@ class _ListCatatanState extends State<ListCatatan> {
       desc: 'Data yang dihapus tidak dapat dikembalikan.',
       btnOkOnPress: () async {
         await FirebaseFirestore.instance.collection('Catatan Servis').doc(docServis).delete();
-        getCatatan();
+        getCatatan(selectedCategories);
         ScaffoldMessenger.of(context).showSnackBar(berhasil);
       },
       btnCancelOnPress: () {},
@@ -54,7 +72,7 @@ class _ListCatatanState extends State<ListCatatan> {
   @override
   void initState(){
     super.initState();
-    getCatatan();
+    getCatatan(selectedCategories);
   }
 
   @override
@@ -77,29 +95,52 @@ class _ListCatatanState extends State<ListCatatan> {
 
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: TextField(
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Warna.white,
-                hintText: 'Cari Mobil...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(40),
-                    borderSide: BorderSide.none
-                ),
-              ),
-
-              // onChanged: (value) {
-              //   performSearch(value);
-              // },
+      Container(
+      padding: const EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
+      child: Wrap(
+        alignment: WrapAlignment.start,
+        spacing: 8.0,
+        runSpacing: 8.0,
+        children: List.generate(kategoriHari.length, (index) {
+          return FilterChip(
+            selected: selectedCategories.contains(kategoriHari[index]),
+            showCheckmark: false,
+            label: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Text(kategoriHari[index],
+                style: TextStyle(
+                  color: selectedCategories.contains(kategoriHari[index])
+                      ? Warna.white
+                      : Colors.black,
+                ),),
             ),
-          ),
-          SizedBox(height: 10),
+            backgroundColor: selectedCategories.contains(kategoriHari[index])
+                ? Warna.lightgreen // Warna kalo dipilih
+                : Warna.white, // Warna kalo tidak dipilih
+            selectedColor: Warna.lightgreen, // Warna latar bela
+            onSelected: (selected) {
+              setState(() {
+                if (selected) {
+                  selectedCategories.clear();
+                  selectedCategories.add(kategoriHari[index]);
+                } else {
+                  selectedCategories.remove(kategoriHari[index]);
+                }
+                getCatatan(selectedCategories);
+              });
+            },
+
+          );
+        }).toList(),
+      ),
+    ),
+
+
+    const SizedBox(height: 10),
           Expanded(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Warna.white,
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
               ),
@@ -121,7 +162,7 @@ class _ListCatatanState extends State<ListCatatan> {
                               .get();
 
                           if (catatanDoc.exists) {
-                            Map<String, dynamic> catatanData = catatanDoc.data() ?? {}; // Ambil data dari dokumen
+                            Map<String, dynamic> catatanData = catatanDoc.data() ?? {};
 
                             Navigator.push(
                               context,
@@ -145,22 +186,6 @@ class _ListCatatanState extends State<ListCatatan> {
                                 child: BacaCatatan(
                                   dokumenCatatan: DokCatatan[index],
 
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ListEditcatatan(
-                                          dokumenCatatan: DokCatatan[index])
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.lightBlue,
                                 ),
                               ),
                             ],

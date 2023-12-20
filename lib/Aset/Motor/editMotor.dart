@@ -157,6 +157,7 @@ class _EditMotorState extends State<EditMotor> {
           'Masa Servis' : MasaServisMotorController.text,
           'Kebutuhan Motor' : ListKebutuhan_Motor,
           'Gambar Motor' : GambarMotor,
+          'Jenis Aset' : 'Motor',
           'Waktu Service Motor': waktuKebutuhanMotor.millisecondsSinceEpoch,
           'Hari Service Motor': daysBetween(DateTime.now(), waktuKebutuhanMotor)
         };

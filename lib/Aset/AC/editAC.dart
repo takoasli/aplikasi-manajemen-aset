@@ -214,6 +214,7 @@ class _UpdateACState extends State<UpdateAC> {
           'Foto AC Outdoor': GambarACOutdoor,
           'waktu_service': timeService.millisecondsSinceEpoch,
           'hari_service': daysBetween(DateTime.now(), timeService),
+          'Jenis Aset' : 'AC',
           'Waktu Kebutuhan AC' : waktuKebutuhanAC.millisecondsSinceEpoch,
           'Hari Kebutuhan AC' : daysBetween(DateTime.now(), waktuKebutuhanAC)
         };

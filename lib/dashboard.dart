@@ -7,6 +7,7 @@ import 'package:projek_skripsi/komponen/bottomNavigation.dart';
 import 'package:projek_skripsi/komponen/box.dart';
 import 'package:projek_skripsi/komponen/style.dart';
 import 'package:projek_skripsi/manajemenUser.dart';
+import 'komponen/scanQR.dart';
 import 'pilihInfoAset.dart';
 
 void main() {
@@ -108,53 +109,7 @@ class _DashboardState extends State<Dashboard> {
         ),
         backgroundColor: Colors.white,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: SizedBox(
-          width: 75,
-          height: 75,
-          child: FloatingActionButton(
-            onPressed: () async {
-              String barcode = await FlutterBarcodeScanner.scanBarcode(
-                "#FF0000",
-                "Cancel",
-                true,
-                ScanMode.QR,
-              );
-              if (barcode != '-1') {
-                AwesomeDialog(
-                  context: context,
-                  dialogType: DialogType.success,
-                  animType: AnimType.bottomSlide,
-                  title: 'Berhasil!',
-                  desc: barcode,
-                  btnOkOnPress: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Dashboard()),
-                    );
-                  },
-                  autoHide: Duration(seconds: 5),
-                ).show();
-              }
-
-              print(barcode);
-
-            },
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-              side: const BorderSide(
-                color: Colors.green,
-                width: 6.0,
-                style: BorderStyle.solid,
-              ),
-            ),
-            child: Image.asset(
-              "gambar/qr_code.png",
-              height: 50,
-              width: 50,
-            ),
-          ),
-        ),
+        floatingActionButton: ScanQR(),
         bottomNavigationBar: BottomNav(),
       ),
     );

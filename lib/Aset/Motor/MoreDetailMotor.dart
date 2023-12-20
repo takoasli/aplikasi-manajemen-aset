@@ -135,7 +135,10 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
                               List_Kebutuhan: namaKebutuhan,
                               ID_Aset: widget.data['ID Motor'],
-                              Nama_Aset: widget.data['Merek Motor'],)));
+                              Nama_Aset: widget.data['Merek Motor'],
+                              Jenis_Aset: widget.data['Jenis Aset'],)
+                            )
+                            );
                           },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),

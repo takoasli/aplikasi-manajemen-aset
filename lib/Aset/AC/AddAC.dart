@@ -190,7 +190,6 @@ class _AddACState extends State<AddAC> {
             MaterialPageRoute(builder: (context) => ManajemenAC()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data AC Berhasil Ditambahkan');
     }catch(e){
@@ -210,6 +209,7 @@ class _AddACState extends State<AddAC> {
       'Kebutuhan AC' : kebutuhan,
       'Foto AC Indoor' : UrlIndoor,
       'Foto AC Outdoor' : UrlOutdoor,
+      'Jenis Aset' : 'AC',
       'Waktu Service': timeService.millisecondsSinceEpoch,
       'Hari Service': daysBetween(DateTime.now(), timeService)
     });

@@ -23,13 +23,13 @@ class BacaCatatan extends StatelessWidget {
           }
           Map<String, dynamic> dataCatatan = snapshot.data!.data() as Map<String, dynamic>;
 
-          // Mendapatkan Timestamp dari Firestore
+          // dapet Timestamp dari Firestore
           Timestamp timestamp = dataCatatan['Tanggal Dilakukan Servis'];
 
-          // Mengonversi Timestamp menjadi objek DateTime
+          // Mengonversi Timestamp jadi objek DateTime
           DateTime dateTime = timestamp.toDate();
 
-          // Mengonversi objek DateTime ke format tanggal yang diinginkan (18/19/2023)
+          // Mengonversi objek DateTime ke format tanggal
           String formattedDate = DateFormat('EEEE, dd MMMM y', 'id_ID').format(dateTime);
 
 
@@ -43,9 +43,13 @@ class BacaCatatan extends StatelessWidget {
                     '${dataCatatan['Nama Aset']}',
                     style: TextStyles.title.copyWith(fontSize: 20, color: Warna.darkgrey),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 10),
                   Text(
                     '${dataCatatan['ID Aset']}',
+                    style: TextStyles.body.copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                  Text(
+                    '${dataCatatan['Jenis Aset']}',
                     style: TextStyles.body.copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                   Text(

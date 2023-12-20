@@ -153,6 +153,7 @@ class _editLaptopState extends State<editLaptop> {
           'Masa Servis' : MasaServisLaptopController.text,
           'Kebutuhan Laptop' : ListKebutuhan_Laptop,
           'Gambar Laptop' : GambarLaptop,
+          'Jenis Aset' : 'Laptop',
           'Waktu Service Laptop': waktuKebutuhanLaptop.millisecondsSinceEpoch,
           'Hari Service Laptop': daysBetween(DateTime.now(), waktuKebutuhanLaptop)
         };

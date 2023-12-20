@@ -156,6 +156,7 @@ class _EditPCState extends State<EditPC> {
           'Masa Servis': MasaServisController.text,
           'kebutuhan': listKebutuhan,
           'Gambar PC': GambarPC,
+          'Jenis Aset' : 'PC',
           'Waktu Service PC': timeService.millisecondsSinceEpoch,
           'Hari Service PC': daysBetween(DateTime.now(), timeService),
           'Waktu Kebutuhan PC': waktuKebutuhan.millisecondsSinceEpoch,

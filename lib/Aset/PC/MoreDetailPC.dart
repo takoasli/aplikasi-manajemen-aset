@@ -147,6 +147,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                       List_Kebutuhan: namaKebutuhan,
                                       ID_Aset: widget.data['ID PC'],
                                       Nama_Aset: widget.data['Merek PC'],
+                                      Jenis_Aset: widget.data['Jenis Aset'],
                                     )));
                           },
                           icon:
@@ -278,7 +279,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 30),
+                              const SizedBox(height: 20),
                               Text(
                                   'Merek PC',
                                   style: TextStyles.title.copyWith(
@@ -295,7 +296,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'ID PC',
@@ -313,7 +314,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'Lokasi Ruangan',
@@ -331,7 +332,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'CPU',
@@ -349,7 +350,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'RAM',
@@ -367,7 +368,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'Kapasitas Penyimpanan',
@@ -385,7 +386,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'VGA',
@@ -403,7 +404,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'Power Supply',
@@ -421,7 +422,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 20),
 
                               Text(
                                   'Tempo Maintenance',
@@ -439,7 +440,6 @@ class _MoreDetailState extends State<MoreDetail> {
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 10),
 
                             ],
                           ),

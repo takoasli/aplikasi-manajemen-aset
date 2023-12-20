@@ -136,7 +136,10 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                             Navigator.push(context, MaterialPageRoute(builder: (context) => Catatan(
                               List_Kebutuhan: namaKebutuhan,
                               ID_Aset: widget.data['ID Mobil'],
-                              Nama_Aset: widget.data['Merek Mobil'],)));
+                              Nama_Aset: widget.data['Merek Mobil'],
+                              Jenis_Aset: widget.data['Jenis Aset'],)
+                            )
+                            );
                           },
                           icon: Icon(Icons.border_color_outlined,
                               size: 33),

@@ -157,7 +157,6 @@ class _AddMobilState extends State<AddMobil> {
             MaterialPageRoute(builder: (context) => ManajemenMobil()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data Mobil Berhasil Ditambahkan');
 
@@ -182,6 +181,7 @@ class _AddMobilState extends State<AddMobil> {
       'Masa Servis' : masaServis,
       'Kebutuhan Mobil' : kebutuhan,
       'Gambar Mobil' : GambarMobil,
+      'Jenis Aset' : 'Mobil',
       'Waktu Service Mobil': timeService.millisecondsSinceEpoch,
       'Hari Service Mobil': daysBetween(DateTime.now(), timeService)
     });
