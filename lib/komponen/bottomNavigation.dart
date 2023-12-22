@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projek_skripsi/Notification.dart';
+import 'package:projek_skripsi/Notif/Notification.dart';
 
 import '../dashboard.dart';
 import '../profile.dart';

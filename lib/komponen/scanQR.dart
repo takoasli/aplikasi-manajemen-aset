@@ -12,22 +12,41 @@ import '../Aset/PC/MoreDetailPC.dart';
 
 class ScanQR extends StatelessWidget {
 
-  Future<Map<String, dynamic>?> fetchDataFromFirestore(String assetType, String assetId) async {
-    CollectionReference collection =
-    FirebaseFirestore.instance.collection(assetType);
+  Future<Map<String, dynamic>?> fetchDataFromFirestore(String assetCollection, String assetId) async {
+    CollectionReference collection = FirebaseFirestore.instance.collection(assetCollection);
+    QuerySnapshot querySnapshot;
 
-    DocumentSnapshot documentSnapshot = await collection.doc(assetId).get();
+    switch (assetCollection) {
+      case 'Aset':
+        querySnapshot = await collection.where('ID AC', isEqualTo: assetId).get();
+        break;
+      case 'PC':
+        querySnapshot = await collection.where('ID PC', isEqualTo: assetId).get();
+        break;
+      case 'Laptop':
+        querySnapshot = await collection.where('ID Laptop', isEqualTo: assetId).get();
+        break;
+      case 'Motor':
+        querySnapshot = await collection.where('ID Motor', isEqualTo: assetId).get();
+        break;
+      case 'Mobil':
+        querySnapshot = await collection.where('ID Mobil', isEqualTo: assetId).get();
+        break;
+      default:
+        return null;
+    }
 
-    if (documentSnapshot.exists) {
-      return documentSnapshot.data() as Map<String, dynamic>;
+    if (querySnapshot.docs.isNotEmpty) {
+      // Jika data ditemukan, mengembalikan data pertama yang cocok
+      return querySnapshot.docs.first.data() as Map<String, dynamic>;
     } else {
       return null;
     }
   }
 
-  String determineAssetCollection(String barcode) {
+  String determineAssetType(String barcode) {
     if (barcode.toLowerCase().contains('ac')) {
-      return 'AC';
+      return 'Aset';
     } else if (barcode.toLowerCase().contains('pc')) {
       return 'PC';
     } else if (barcode.toLowerCase().contains('laptop')) {
@@ -41,9 +60,19 @@ class ScanQR extends StatelessWidget {
     }
   }
 
+  String extractAssetId(String barcode) {
+    List<String> parts = barcode.split(',');
+    if (parts.length == 2) {
+      return parts[1]; // Mengembalikan bagian kedua sebagai ID
+    } else {
+      return ''; // Mengembalikan string kosong jika format tidak sesuai
+    }
+  }
+
+
   void navigateToSpecificAsset(BuildContext context, String assetCollection, Map<String, dynamic> data) {
     switch (assetCollection) {
-      case 'AC':
+      case 'Aset':
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MoreDetailAC(data: data)),
@@ -111,11 +140,12 @@ class ScanQR extends StatelessWidget {
             ScanMode.QR,
           );
           if (barcode != '-1') {
-            String assetCollection = determineAssetCollection(barcode);
-            if (assetCollection.isNotEmpty) {
-              Map<String, dynamic>? assetData = await fetchDataFromFirestore(assetCollection, barcode);
+            String assetType = determineAssetType(barcode);
+            String assetId = extractAssetId(barcode);
+            if (assetType.isNotEmpty && assetId.isNotEmpty) {
+              Map<String, dynamic>? assetData = await fetchDataFromFirestore(assetType, assetId);
               if (assetData != null) {
-                navigateToSpecificAsset(context, assetCollection, assetData);
+                navigateToSpecificAsset(context, assetType, assetData);
               } else {
                 showNotFoundDialog(context, barcode);
               }

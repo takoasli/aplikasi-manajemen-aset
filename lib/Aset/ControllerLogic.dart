@@ -1,6 +1,8 @@
 // Hitung hari antara 2 tangal
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:projek_skripsi/main.dart';
 
 // Hitung perbandingan tanggal berupa hari
 int daysBetween(DateTime from, DateTime to) {
@@ -97,5 +99,39 @@ class CatatanBiaya {
   CatatanBiaya(this.nama, this.biaya);
   late String nama;
   late double biaya;
+}
+
+class Notif {
+  //bikin instansi buat firebase notif
+  final pesanNotif = FirebaseMessaging.instance;
+
+  //method inisialisasi notif
+  Future<void> initNotif() async {
+    //permission buat user
+    await pesanNotif.requestPermission();
+    //fetch data
+    final TokenNotif = await pesanNotif.getToken();
+    //print tokennya
+    print('Token: $TokenNotif');
+    initPushNotif();
+  }
+  void aturMessage(RemoteMessage? pesan) {
+    //kalo pesannya kosong, dia ga ngapa-ngapain
+    if (pesan == null) return;
+
+    //kalo ada pesan, maka akan kearah halaman nnotif pas dipencet
+    navigatorKey.currentState?.pushNamed(
+        '/halaman_notif',
+      arguments: pesan,
+    );
+  }
+
+  //function buat inisialisasi background settings
+  Future initPushNotif() async{
+    FirebaseMessaging.instance.getInitialMessage().then(aturMessage);
+
+  //pake event listener
+  FirebaseMessaging.onMessageOpenedApp.listen(aturMessage);
+}
 }
 

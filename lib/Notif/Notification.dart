@@ -1,6 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-import 'komponen/style.dart';
+import '../komponen/style.dart';
 
 class Notifikasi extends StatefulWidget {
   const Notifikasi({super.key});
@@ -8,10 +9,12 @@ class Notifikasi extends StatefulWidget {
   @override
   State<Notifikasi> createState() => _NotifikasiState();
 }
-
 class _NotifikasiState extends State<Notifikasi> {
   @override
   Widget build(BuildContext context) {
+
+    final pesan = ModalRoute.of(context)!.settings.arguments as RemoteMessage;
+
     return Scaffold(
       backgroundColor: Warna.green,
       appBar: AppBar(
@@ -42,6 +45,14 @@ class _NotifikasiState extends State<Notifikasi> {
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Text(pesan.notification!.title.toString()),
+              Text(pesan.notification!.body.toString()),
+              Text(pesan.notification!.body.toString()),
+              Text(pesan.data.toString()),
+            ],
+          ),
 
         ),
       ),

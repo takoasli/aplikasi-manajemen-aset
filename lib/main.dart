@@ -3,17 +3,20 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:projek_skripsi/Aset/ControllerLogic.dart';
+import 'package:projek_skripsi/Notif/Notification.dart';
 import 'package:projek_skripsi/auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
 import 'firebase_options.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+    options: DefaultFirebaseOptions.currentPlatform);
+  await Notif().initNotif();
   // Initialize locale data
   Intl.defaultLocale = 'id_ID';
   await initializeDateFormatting('id_ID', null);
@@ -29,6 +32,7 @@ Future<FirebaseApp> _initializedFirebase() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Notif().initNotif();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -72,6 +76,10 @@ class MyApp extends StatelessWidget {
           }
         },
       ),
+      navigatorKey: navigatorKey,
+      routes: {
+        '/halaman_notif':(context) => const Notifikasi(),
+      },
     );
   }
 }

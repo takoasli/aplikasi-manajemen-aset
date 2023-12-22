@@ -1,7 +1,5 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:projek_skripsi/Catatan/ListCatatan.dart';
 import 'package:projek_skripsi/komponen/bottomNavigation.dart';
 import 'package:projek_skripsi/komponen/box.dart';
