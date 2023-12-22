@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/Notif/Notification.dart';
 
@@ -55,10 +56,7 @@ class _BottomNavState extends State<BottomNav> {
               padding: const EdgeInsets.only(right: 45.0),
               child: GestureDetector(
                 onTap: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Notifikasi()),
-                  );
+                  Navigator.pushNamed(context, '/halaman_notif');
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

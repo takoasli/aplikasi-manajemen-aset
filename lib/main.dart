@@ -32,7 +32,6 @@ Future<FirebaseApp> _initializedFirebase() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    Notif().initNotif();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       localizationsDelegates: [
@@ -76,10 +75,6 @@ class MyApp extends StatelessWidget {
           }
         },
       ),
-      navigatorKey: navigatorKey,
-      routes: {
-        '/halaman_notif':(context) => const Notifikasi(),
-      },
     );
   }
 }

@@ -1,4 +1,5 @@
 // Hitung hari antara 2 tangal
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -105,6 +106,32 @@ class Notif {
   //bikin instansi buat firebase notif
   final pesanNotif = FirebaseMessaging.instance;
 
+  //simpen notif ke firestore
+  Future<void> simpanNotifikasi(String judul, String isi) async {
+    try {
+      // Cek apakah notifikasi dengan judul dan isi yang sama sudah ada
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('List Notif')
+          .where('judul', isEqualTo: judul)
+          .where('isi', isEqualTo: isi)
+          .get();
+
+      // Jika tidak ada notifikasi yang sama, simpan notifikasi
+      if (querySnapshot.docs.isEmpty) {
+        await FirebaseFirestore.instance.collection('List Notif').add({
+          'judul': judul,
+          'isi': isi,
+          'timestamp': FieldValue.serverTimestamp(), // Timestamp otomatis
+        });
+        print('Notifikasi disimpan di Firestore');
+      } else {
+        print('Notifikasi dengan judul dan isi yang sama sudah ada');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   //method inisialisasi notif
   Future<void> initNotif() async {
     //permission buat user
@@ -115,15 +142,13 @@ class Notif {
     print('Token: $TokenNotif');
     initPushNotif();
   }
+
   void aturMessage(RemoteMessage? pesan) {
-    //kalo pesannya kosong, dia ga ngapa-ngapain
     if (pesan == null) return;
 
-    //kalo ada pesan, maka akan kearah halaman nnotif pas dipencet
-    navigatorKey.currentState?.pushNamed(
-        '/halaman_notif',
-      arguments: pesan,
-    );
+    // Menyimpan notifikasi ke Firestore saat pesan diterima
+    simpanNotifikasi(pesan.notification?.title ?? 'Judul Kosong', pesan.notification?.body ?? 'Isi Kosong');
+
   }
 
   //function buat inisialisasi background settings

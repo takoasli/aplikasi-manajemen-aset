@@ -137,29 +137,29 @@ class _ListCatatanState extends State<ListCatatan> {
     ),
 
 
-    const SizedBox(height: 10),
-          Expanded(
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Warna.white,
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-              ),
-              padding: const EdgeInsets.all(20),
-              child: ListView.builder(
-                itemCount: DokCatatan.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Material(
-                      borderRadius: BorderRadius.circular(10),
-                      elevation: 5,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(10),
-                        onTap: () async {
-                          DocumentSnapshot<Map<String, dynamic>> catatanDoc = await FirebaseFirestore.instance
-                              .collection('Catatan Servis')
-                              .doc(DokCatatan[index])
-                              .get();
+        const SizedBox(height: 10),
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Warna.white,
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: ListView.builder(
+                    itemCount: DokCatatan.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Material(
+                          borderRadius: BorderRadius.circular(10),
+                          elevation: 5,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(10),
+                            onTap: () async {
+                              DocumentSnapshot<Map<String, dynamic>> catatanDoc = await FirebaseFirestore.instance
+                                  .collection('Catatan Servis')
+                                  .doc(DokCatatan[index])
+                                  .get();
 
                           if (catatanDoc.exists) {
                             Map<String, dynamic> catatanData = catatanDoc.data() ?? {};
