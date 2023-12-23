@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -48,7 +49,6 @@ class _EditMobilState extends State<EditMobil> {
   final ukuranBanController = TextEditingController();
   final akiController = TextEditingController();
   final masaKebutuhanController = TextEditingController();
-  final MasaServisMobilController = TextEditingController();
   final imgMobilController = TextEditingController();
   final ImagePicker _gambarMobil = ImagePicker();
   String oldphotoMobil = '';
@@ -85,18 +85,47 @@ class _EditMobilState extends State<EditMobil> {
     }
   }
 
-  void SimpanKebutuhan_Mobil(){
-    setState(() {
-      KebutuhanModelUpdateMobil kebutuhan = KebutuhanModelUpdateMobil(
-        isiKebutuhan_Mobil.text,
-        int.parse(masaKebutuhanController.text),
-      );
-      Kebutuhan_Mobil.add(kebutuhan.toMap());
-      isiKebutuhan_Mobil.clear();
-      masaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_Mobil() async {
+    String masaKebutuhanText = masaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_Mobil.add({
+          'Nama Kebutuhan Mobil': isiKebutuhan_Mobil.text,
+          'Masa Kebutuhan Mobil': masaKebutuhan,
+        });
+
+        isiKebutuhan_Mobil.clear();
+        masaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionMobil,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
   }
+
+  void myAlarmFunctionMobil() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Mobil!');
+  }
+
+
   void tambahKebutuhan_Mobil(){
     showDialog(
         context: context,
@@ -139,16 +168,9 @@ class _EditMobilState extends State<EditMobil> {
       ukuranBanController.text = data?['Ukuran Ban' ?? ''];
       akiController.text = (data?['Aki' ?? '']).toString();
       ukuranBanController.text = data?['Ukuran Ban' ?? ''];
-      MasaServisMobilController.text = (data?['Masa Servis' ?? '']).toString();
       final UrlMobil = data?['Gambar Mobil'] ?? '';
       oldphotoMobil = UrlMobil;
-      final List<dynamic> KebutuhanData = data?['Kebutuhan Mobil'] ?? [];
-      Kebutuhan_Mobil = KebutuhanData.map((item) {
-        return {
-          'Nama Kebutuhan Mobil': item['Nama Kebutuhan Mobil'],
-          'Masa Kebutuhan Mobil': item['Masa Kebutuhan Mobil'],
-        };
-      }).toList();
+      Kebutuhan_Mobil = List<Map<String, dynamic>>.from(data?['Kebutuhan Mobil'] ?? []);
     });
   }
 
@@ -185,7 +207,6 @@ class _EditMobilState extends State<EditMobil> {
           'Kapasitas Bahan Bakar' : kapasitasBBController.text,
           'Ukuran Ban' : ukuranBanController.text,
           'Aki' : akiController.text,
-          'Masa Servis' : MasaServisMobilController.text,
           'Kebutuhan Mobil' : ListKebutuhan_Mobil,
           'Gambar Mobil' : GambarMobil,
           'Jenis Aset' : 'Mobil',
@@ -400,24 +421,6 @@ class _EditMobilState extends State<EditMobil> {
                     textInputAction: TextInputAction.next,
                     controller: akiController),
                 SizedBox(height: 10),
-
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisMobilController,
-                ),
-                SizedBox(height: 10),
-
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),

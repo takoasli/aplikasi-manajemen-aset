@@ -5,7 +5,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 import '../../komponen/kotakDialog.dart';
@@ -20,6 +20,7 @@ class AddPC extends StatefulWidget {
   @override
   State<AddPC> createState() => _AddPCState();
 }
+
 
 class KebutuhanModel {
   String namaKebutuhan;
@@ -42,7 +43,6 @@ class _AddPCState extends State<AddPC> {
   final MasaKebutuhan = TextEditingController();
   final ImgPCController = TextEditingController();
   final StorageController = TextEditingController();
-  final MasaServisController = TextEditingController();
   final PSUController = TextEditingController();
   final ImagePicker _gambarPC = ImagePicker();
   List Kebutuhan = [];
@@ -57,15 +57,40 @@ class _AddPCState extends State<AddPC> {
     }
   }
 
-  void SimpanKebutuhan(){
-    setState(() {
-      Kebutuhan.add(KebutuhanModel(isiKebutuhan.text,
-          int.parse(MasaKebutuhan.text)
-      ));
-      isiKebutuhan.clear();
-      MasaKebutuhan.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_PC() async {
+    String masaKebutuhanText = MasaKebutuhan.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan.add(KebutuhanModel(
+          isiKebutuhan.text,
+          masaKebutuhan,
+        ));
+
+        isiKebutuhan.clear();
+        MasaKebutuhan.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionLaptop,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+        // SetAlarmLaptop(Kebutuhan_Laptop.last);
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
   }
 
   void tambahKebutuhan(){
@@ -74,12 +99,17 @@ class _AddPCState extends State<AddPC> {
         builder: (context){
           return DialogBox(
             controller: isiKebutuhan,
-            onAdd: SimpanKebutuhan,
+            onAdd: SimpanKebutuhan_PC,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan PC',
             JangkaKebutuhan: MasaKebutuhan,
           );
         });
+  }
+
+  void myAlarmFunctionLaptop() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Laptop!');
   }
 
   void ApusKebutuhan(int index) {
@@ -119,7 +149,8 @@ class _AddPCState extends State<AddPC> {
           'Kebutuhan PC': kebutuhan.namaKebutuhan,
           'Masa Kebutuhan': kebutuhan.masaKebutuhan,
           'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID': timeKebutuhan
         };
       }).toList();
 
@@ -140,7 +171,6 @@ class _AddPCState extends State<AddPC> {
           int.parse(StorageController.text.trim()),
           VGAController.text.trim(),
           int.parse(PSUController.text.trim()),
-          int.parse(MasaServisController.text.trim()),
           listKebutuhan,
           fotoPC,
         );
@@ -167,8 +197,7 @@ class _AddPCState extends State<AddPC> {
   }
 
   Future tambahPC (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, int psu, int masaServis, List<Map<String, dynamic>> kebutuhan, String gambarPC) async{
-    var timeService = contTimeService(masaServis);
+      String CPU, int ram, int storage, String vga, int psu, List<Map<String, dynamic>> kebutuhan, String gambarPC) async{
       await FirebaseFirestore.instance.collection('PC').add({
         'Merek PC' : merek,
         'ID PC' : ID,
@@ -178,12 +207,9 @@ class _AddPCState extends State<AddPC> {
         'Kapasitas Penyimpanan' : storage,
         'VGA' : vga,
         'Kapasitas Power Supply' : psu,
-        'Masa Servis' : masaServis,
         'kebutuhan' : kebutuhan,
         'Gambar PC' : gambarPC,
         'Jenis Aset' : 'PC',
-        'Waktu Service PC': timeService.millisecondsSinceEpoch,
-        'Hari Service PC': daysBetween(DateTime.now(), timeService),
       });
   }
 
@@ -336,22 +362,6 @@ class _AddPCState extends State<AddPC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: PSUController),
-                SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title
-                        .copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisController,
-                ),
                 SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),

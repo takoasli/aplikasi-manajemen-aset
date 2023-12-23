@@ -2,6 +2,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:projek_skripsi/main.dart';
 
@@ -102,61 +103,24 @@ class CatatanBiaya {
   late double biaya;
 }
 
-class Notif {
-  //bikin instansi buat firebase notif
-  final pesanNotif = FirebaseMessaging.instance;
-
-  //simpen notif ke firestore
-  Future<void> simpanNotifikasi(String judul, String isi) async {
-    try {
-      // Cek apakah notifikasi dengan judul dan isi yang sama sudah ada
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('List Notif')
-          .where('judul', isEqualTo: judul)
-          .where('isi', isEqualTo: isi)
-          .get();
-
-      // Jika tidak ada notifikasi yang sama, simpan notifikasi
-      if (querySnapshot.docs.isEmpty) {
-        await FirebaseFirestore.instance.collection('List Notif').add({
-          'judul': judul,
-          'isi': isi,
-          'timestamp': FieldValue.serverTimestamp(), // Timestamp otomatis
-        });
-        print('Notifikasi disimpan di Firestore');
-      } else {
-        print('Notifikasi dengan judul dan isi yang sama sudah ada');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+class Notif{
+  static Future initialize(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async{
+    var androidInitialize = new AndroidInitializationSettings('mipmap/ic_launcher');
+    var initializationsSettings = new InitializationSettings(android: androidInitialize);
+    await flutterLocalNotificationsPlugin.initialize(initializationsSettings);
   }
 
-  //method inisialisasi notif
-  Future<void> initNotif() async {
-    //permission buat user
-    await pesanNotif.requestPermission();
-    //fetch data
-    final TokenNotif = await pesanNotif.getToken();
-    //print tokennya
-    print('Token: $TokenNotif');
-    initPushNotif();
+  static Future showTextNotif({var id=0, required String judul, required String body, var payload, required FlutterLocalNotificationsPlugin fln}) async{
+    AndroidNotificationDetails androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+        'Channel ID',
+        'Nama Channel',
+        playSound: true,
+      importance: Importance.high
+    );
+
+    var noti = NotificationDetails(android: androidPlatformChannelSpecifics);
+    await fln.show(
+        0, judul, body, noti);
   }
-
-  void aturMessage(RemoteMessage? pesan) {
-    if (pesan == null) return;
-
-    // Menyimpan notifikasi ke Firestore saat pesan diterima
-    simpanNotifikasi(pesan.notification?.title ?? 'Judul Kosong', pesan.notification?.body ?? 'Isi Kosong');
-
-  }
-
-  //function buat inisialisasi background settings
-  Future initPushNotif() async{
-    FirebaseMessaging.instance.getInitialMessage().then(aturMessage);
-
-  //pake event listener
-  FirebaseMessaging.onMessageOpenedApp.listen(aturMessage);
-}
 }
 

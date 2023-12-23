@@ -161,35 +161,6 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Sisa waktu Maintenance',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              showIndicator(
-                                  getValueIndicator(
-                                      widget.data['Hari Service Mobil'],
-                                      epochTimeToData(
-                                          widget.data['Waktu Service Mobil'])),
-                                  getProgressColor(
-                                      widget.data['Waktu Service Mobil'])),
-                              SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    getRemainingTime(
-                                        widget.data['Waktu Service Mobil']),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-
                               Text(
                                   'Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(
@@ -198,7 +169,7 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                       fontWeight: FontWeight.w500
                                   )
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 15),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -225,11 +196,14 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                                           dense: true,
                                           contentPadding: EdgeInsets.symmetric(
                                               horizontal: 8),
-                                          title: Text(
-                                            '- $hasSplit',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              letterSpacing: 1,
+                                          title: Padding(
+                                            padding: const EdgeInsets.only(bottom: 8.0),
+                                            child: Text(
+                                              '- $hasSplit',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                letterSpacing: 1,
+                                              ),
                                             ),
                                           ),
                                           subtitle: Column(

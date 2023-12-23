@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -51,7 +52,6 @@ class _EditMotorState extends State<EditMotor> {
   final banBelakangController = TextEditingController();
   final isiKebutuhan_Motor = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisMotorController = TextEditingController();
   final ImgMotorController = TextEditingController();
   String oldphotoMotor = '';
   Map <String, dynamic> datamotor = {};
@@ -88,17 +88,44 @@ class _EditMotorState extends State<EditMotor> {
     }
   }
 
-  void SimpanKebutuhan_Motor(){
-    setState(() {
-      KebutuhanModelUpdateMotor kebutuhan = KebutuhanModelUpdateMotor(
-        isiKebutuhan_Motor.text,
-        int.parse(MasaKebutuhanController.text),
-      );
-      Kebutuhan_Motor.add(kebutuhan.toMap());
-      isiKebutuhan_Motor.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_Motor() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_Motor.add({
+          'Nama Kebutuhan Motor': isiKebutuhan_Motor.text,
+          'Masa Kebutuhan Motor': masaKebutuhan,
+        });
+
+        isiKebutuhan_Motor.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionMotor,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
+  }
+
+  void myAlarmFunctionMotor() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Mobil!');
   }
 
   void tambahKebutuhan_Motor(){
@@ -154,7 +181,6 @@ class _EditMotorState extends State<EditMotor> {
           'Tipe Aki' : tipeAkiController.text,
           'Ban Depan' : banDepanController.text,
           'Ban Belakang' : banBelakangController.text,
-          'Masa Servis' : MasaServisMotorController.text,
           'Kebutuhan Motor' : ListKebutuhan_Motor,
           'Gambar Motor' : GambarMotor,
           'Jenis Aset' : 'Motor',
@@ -175,7 +201,6 @@ class _EditMotorState extends State<EditMotor> {
             context, MaterialPageRoute(builder: (context) => ManajemenMotor()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data Motor Berhasil Diupdate');
 
@@ -206,16 +231,9 @@ class _EditMotorState extends State<EditMotor> {
       tipeAkiController.text = (data?['Tipe Aki' ?? '']).toString();
       banDepanController.text = data?['Ban Depan' ?? ''];
       banBelakangController.text = data?['Ban Belakang' ?? ''];
-      MasaServisMotorController.text = (data?['Masa Servis' ?? '']).toString();
       final UrlMotor = data?['Gambar Motor'] ?? '';
       oldphotoMotor = UrlMotor;
-      final List<dynamic> KebutuhanData = data?['Kebutuhan Motor'] ?? [];
-      Kebutuhan_Motor = KebutuhanData.map((item) {
-        return {
-          'Nama Kebutuhan Motor': item['Nama Kebutuhan Motor'],
-          'Masa Kebutuhan Motor': item['Masa Kebutuhan Motor'],
-        };
-      }).toList();
+      Kebutuhan_Motor = List<Map<String, dynamic>>.from(data?['Kebutuhan Motor'] ?? []);
     });
   }
 
@@ -419,24 +437,6 @@ class _EditMotorState extends State<EditMotor> {
                     textInputAction: TextInputAction.next,
                     controller: banBelakangController),
                 const SizedBox(height: 10),
-
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisMotorController,
-                ),
-                SizedBox(height: 10),
-
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),

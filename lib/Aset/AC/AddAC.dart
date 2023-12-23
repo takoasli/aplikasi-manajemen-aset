@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 
@@ -37,13 +39,14 @@ class _AddACState extends State<AddAC> {
   final PKController = TextEditingController();
   final ruanganController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisACController = TextEditingController();
   final isiKebutuhanAC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
   List Kebutuhan_AC = [];
+
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   void PilihIndoor() async {
     final pilihIndoor =
@@ -109,15 +112,48 @@ class _AddACState extends State<AddAC> {
     }
   }
 
-  void SimpanKebutuhan_AC(){
-    setState(() {
-      Kebutuhan_AC.add(KebutuhanModelAC(isiKebutuhanAC.text,
-          int.parse(MasaKebutuhanController.text)
-      ));
-      isiKebutuhanAC.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void AlarmFunctionAC() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    Notif.showTextNotif(
+        judul: 'PT Dami Sariwana',
+        body: 'Ada Aset PC yang jatuh tempo!',
+        fln: flutterLocalNotificationsPlugin);
+  }
+
+  void SimpanKebutuhan_AC() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_AC.add(KebutuhanModelAC(
+          isiKebutuhanAC.text,
+          masaKebutuhan,
+        ));
+
+        isiKebutuhanAC.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          AlarmFunctionAC,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+        // SetAlarmLaptop(Kebutuhan_Laptop.last);
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
   }
 
 
@@ -153,7 +189,8 @@ class _AddACState extends State<AddAC> {
           'Nama Kebutuhan AC': kebutuhan.namaKebutuhanAC,
           'Masa Kebutuhan AC': kebutuhan.masaKebutuhanAC,
           'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : timeKebutuhan
         };
       }).toList();
 
@@ -172,7 +209,6 @@ class _AddACState extends State<AddAC> {
         int.parse(wattController.text.trim()),
         int.parse(PKController.text.trim()),
         ruanganController.text.trim(),
-        int.parse(MasaServisACController.text.trim()),
         ListKebutuhan_AC,
         fotoIndoor,
         fotoOutdoor,
@@ -197,21 +233,17 @@ class _AddACState extends State<AddAC> {
     }
   }
 
-  Future tambahAC(String merek, String ID, int watt, int pk, String ruangan,int masaServis,List<Map<String, dynamic>> kebutuhan, String UrlIndoor, String UrlOutdoor) async{
-    var timeService = contTimeService(masaServis);
+  Future tambahAC(String merek, String ID, int watt, int pk, String ruangan,List<Map<String, dynamic>> kebutuhan, String UrlIndoor, String UrlOutdoor) async{
     await FirebaseFirestore.instance.collection('Aset').add({
       'Merek AC' : merek,
       'ID AC' : ID,
       'Kapasitas Watt' : watt,
       'Kapasitas PK' : pk,
       'Lokasi Ruangan' : ruangan,
-      'Masa Servis' : masaServis,
       'Kebutuhan AC' : kebutuhan,
       'Foto AC Indoor' : UrlIndoor,
       'Foto AC Outdoor' : UrlOutdoor,
       'Jenis Aset' : 'AC',
-      'Waktu Service': timeService.millisecondsSinceEpoch,
-      'Hari Service': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -317,22 +349,6 @@ class _AddACState extends State<AddAC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: ruanganController),
-                SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title
-                        .copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisACController,
-                ),
                 SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),

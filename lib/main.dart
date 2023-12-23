@@ -1,27 +1,29 @@
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:projek_skripsi/Aset/ControllerLogic.dart';
-import 'package:projek_skripsi/Notif/Notification.dart';
 import 'package:projek_skripsi/auth.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'firebase_options.dart';
 
-final navigatorKey = GlobalKey<NavigatorState>();
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform);
-  await Notif().initNotif();
+
+  Notif.initialize(flutterLocalNotificationsPlugin);
   // Initialize locale data
   Intl.defaultLocale = 'id_ID';
   await initializeDateFormatting('id_ID', null);
-
   runApp(MyApp());
+  await AndroidAlarmManager.initialize();
 }
 
 Future<FirebaseApp> _initializedFirebase() async {

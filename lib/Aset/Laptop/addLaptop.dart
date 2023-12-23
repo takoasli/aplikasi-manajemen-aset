@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -42,7 +43,6 @@ class _AddLaptopState extends State<AddLaptop> {
   final isiKebutuhan_Laptop = TextEditingController();
   final MonitorController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisLaptopController = TextEditingController();
   final ImagePicker _gambarLaptop = ImagePicker();
   List Kebutuhan_Laptop = [
   ];
@@ -78,15 +78,45 @@ class _AddLaptopState extends State<AddLaptop> {
     }
   }
 
-  void SimpanKebutuhan_Laptop(){
-    setState(() {
-      Kebutuhan_Laptop.add(KebutuhanModelLaptop(isiKebutuhan_Laptop.text,
-          int.parse(MasaKebutuhanController.text)
-      ));
-      isiKebutuhan_Laptop.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void myAlarmFunctionLaptop() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Laptop!');
+  }
+
+  void SimpanKebutuhan_Laptop() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_Laptop.add(KebutuhanModelLaptop(
+          isiKebutuhan_Laptop.text,
+          masaKebutuhan,
+        ));
+
+        isiKebutuhan_Laptop.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionLaptop,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+        // SetAlarmLaptop(Kebutuhan_Laptop.last);
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
   }
 
   void tambahKebutuhan_Laptop(){
@@ -119,7 +149,8 @@ class _AddLaptopState extends State<AddLaptop> {
           'Nama Kebutuhan Laptop': kebutuhan.namaKebutuhanLaptop,
           'Masa Kebutuhan Laptop': kebutuhan.masaKebutuhanLaptop,
           'Waktu Kebutuhan Laptop': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan Laptop': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan Laptop': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID': timeKebutuhan
         };
       }).toList();
 
@@ -128,6 +159,10 @@ class _AddLaptopState extends State<AddLaptop> {
         File imgLaptop = File(lokasiGambarPC);
         fotoLaptop = await unggahGambarLaptop(imgLaptop);
       }
+
+      // Kebutuhan_Laptop.forEach((kebutuhan) {
+      //   SetAlarmLaptop(kebutuhan);
+      // });
 
       await tambahLaptop(
         merekLaptopController.text.trim(),
@@ -138,7 +173,6 @@ class _AddLaptopState extends State<AddLaptop> {
         int.parse(StorageController.text.trim()),
         VGAController.text.trim(),
         MonitorController.text.trim(),
-        int.parse(MasaServisLaptopController.text.trim()),
         ListKebutuhan_Laptop,
         fotoLaptop,
       );
@@ -157,6 +191,7 @@ class _AddLaptopState extends State<AddLaptop> {
         },
       ).show();
       print('Data Laptop Berhasil Ditambahkan');
+      // myAlarmFunctionLaptop();
 
     } catch (e) {
       print("Error : $e");
@@ -164,8 +199,7 @@ class _AddLaptopState extends State<AddLaptop> {
   }
 
   Future tambahLaptop (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, String monitor,int masaServis,List<Map<String, dynamic>> kebutuhan, String gambarLaptop) async{
-    var timeService = contTimeService(masaServis);
+      String CPU, int ram, int storage, String vga, String monitor,List<Map<String, dynamic>> kebutuhan, String gambarLaptop) async{
     await FirebaseFirestore.instance.collection('Laptop').add({
       'Merek Laptop' : merek,
       'ID Laptop' : ID,
@@ -175,12 +209,9 @@ class _AddLaptopState extends State<AddLaptop> {
       'Kapasitas Penyimpanan' : storage,
       'VGA' : vga,
       'Ukuran Monitor' : monitor,
-      'Masa Servis' : masaServis,
       'Kebutuhan Laptop' : kebutuhan,
       'Gambar Laptop' : gambarLaptop,
       'Jenis Aset' : 'Laptop',
-      'Waktu Service Laptop': timeService.millisecondsSinceEpoch,
-      'Hari Service Laptop': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -347,24 +378,6 @@ class _AddLaptopState extends State<AddLaptop> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: MonitorController),
-                const SizedBox(height: 10),
-
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title
-                        .copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisLaptopController,
-                ),
                 const SizedBox(height: 10),
 
                 Padding(

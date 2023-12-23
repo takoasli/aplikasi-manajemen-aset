@@ -166,36 +166,6 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Sisa waktu Maintenance',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              SizedBox(height: 5),
-                              showIndicator(
-                                  getValueIndicator(
-                                      widget.data['Hari Service Laptop'],
-                                      epochTimeToData(
-                                          widget.data['Waktu Service Laptop'])),
-                                  getProgressColor(
-                                      widget.data['Waktu Service Laptop'])),
-                              SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    getRemainingTime(
-                                        widget.data['Waktu Service Laptop']),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-
                               Text(
                                   'Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(
@@ -231,11 +201,14 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                                           dense: true,
                                           contentPadding: EdgeInsets.symmetric(
                                               horizontal: 8),
-                                          title: Text(
-                                            '- $hasSplit',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              letterSpacing: 1,
+                                          title: Padding(
+                                            padding: const EdgeInsets.only(bottom: 8.0),
+                                            child: Text(
+                                              '- $hasSplit',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                letterSpacing: 1,
+                                              ),
                                             ),
                                           ),
                                           subtitle: Column(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -49,7 +50,6 @@ class _EditPCState extends State<EditPC> {
   final isiKebutuhan = TextEditingController();
   final PSUController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisController = TextEditingController();
   String oldphotoPC = '';
   Map <String, dynamic> dataPC = {};
   final ImagePicker _gambarPC = ImagePicker();
@@ -64,17 +64,44 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
-  void SimpanKebutuhan() {
-    setState(() {
-      KebutuhanModelUpdate kebutuhan = KebutuhanModelUpdate(
-        isiKebutuhan.text,
-        int.parse(MasaKebutuhanController.text),
-      );
-      Kebutuhan.add(kebutuhan.toMap());
-      isiKebutuhan.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_PC() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan.add({
+          'Kebutuhan PC': isiKebutuhan.text,
+          'Masa Kebutuhan': masaKebutuhan,
+        });
+
+        isiKebutuhan.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionPC,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
+  }
+
+  void myAlarmFunctionPC() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan PC!');
   }
 
 
@@ -84,7 +111,7 @@ class _EditPCState extends State<EditPC> {
         builder: (context){
           return DialogBox(
             controller: isiKebutuhan,
-            onAdd: SimpanKebutuhan,
+            onAdd: SimpanKebutuhan_PC,
             onCancel: () => Navigator.of(context).pop(),
             TextJudul: 'Tambah Kebutuhan PC',
             JangkaKebutuhan: MasaKebutuhanController,
@@ -96,6 +123,11 @@ class _EditPCState extends State<EditPC> {
     setState(() {
       Kebutuhan.removeAt(index);
     });
+  }
+
+  void myAlarmFunction() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan PC!');
   }
 
   Future<String> unggahGambarPC(File gambarPC) async {
@@ -122,7 +154,6 @@ class _EditPCState extends State<EditPC> {
   Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async {
     try {
       String GambarPC;
-      var timeService = contTimeService(int.parse(MasaServisController.text));
 
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan'].toString()));
@@ -153,12 +184,9 @@ class _EditPCState extends State<EditPC> {
           'Kapasitas Penyimpanan': StorageController.text,
           'VGA': VGAController.text,
           'Kapasitas Power Supply': PSUController.text,
-          'Masa Servis': MasaServisController.text,
           'kebutuhan': listKebutuhan,
           'Gambar PC': GambarPC,
           'Jenis Aset' : 'PC',
-          'Waktu Service PC': timeService.millisecondsSinceEpoch,
-          'Hari Service PC': daysBetween(DateTime.now(), timeService),
           'Waktu Kebutuhan PC': waktuKebutuhan.millisecondsSinceEpoch,
           'Hari Kebutuhan PC': daysBetween(DateTime.now(), waktuKebutuhan)
         };
@@ -211,16 +239,9 @@ class _EditPCState extends State<EditPC> {
         StorageController.text = (data?['Kapasitas Penyimpanan'] ?? '').toString();
         VGAController.text = data?['VGA'] ?? '';
         PSUController.text = (data?['Kapasitas Power Supply'] ?? '').toString();
-        MasaServisController.text = (data?['Masa Servis'] ?? '').toString();
         final UrlPC = data?['Gambar PC'] ?? '';
         oldphotoPC = UrlPC;
-        final List<dynamic> kebutuhanData = data?['kebutuhan'] ?? [];
-        Kebutuhan = kebutuhanData.map((item) {
-          return {
-            'Kebutuhan PC': item['Kebutuhan PC'],
-            'Masa Kebutuhan': item['Masa Kebutuhan'],
-          };
-        }).toList();
+        Kebutuhan = List<Map<String, dynamic>>.from(data?['kebutuhan'] ?? []);
       });
     }catch(e){
       print('Terjadi kesalahan: $e');
@@ -393,23 +414,6 @@ class _EditPCState extends State<EditPC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: PSUController),
-                const SizedBox(height: 10),
-
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisController,
-                ),
                 const SizedBox(height: 10),
 
                 Padding(

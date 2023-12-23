@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -47,25 +48,51 @@ class _editLaptopState extends State<editLaptop> {
   final StorageController = TextEditingController();
   final MonitorController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisLaptopController = TextEditingController();
   final isiKebutuhan_Laptop = TextEditingController();
   final ImagePicker _gambarLaptop = ImagePicker();
   String oldphotoLaptop = '';
-  List Kebutuhan_Laptop = [
-  ];
+  List Kebutuhan_Laptop = [];
   Map <String, dynamic> dataLaptop = {};
 
-  void SimpanKebutuhan_Laptop(){
-    setState(() {
-      KebutuhanModelUpdateLaptop kebutuhan = KebutuhanModelUpdateLaptop(
-        isiKebutuhan_Laptop.text,
-        int.parse(MasaKebutuhanController.text),
-      );
-      Kebutuhan_Laptop.add(kebutuhan.toMap());
-      isiKebutuhan_Laptop.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_Laptop() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_Laptop.add({
+          'Nama Kebutuhan Laptop': isiKebutuhan_Laptop.text,
+          'Masa Kebutuhan Laptop': masaKebutuhan,
+        });
+
+        isiKebutuhan_Laptop.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionLaptop,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+        // SetAlarmLaptop(Kebutuhan_Laptop.last);
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
+  }
+
+  void myAlarmFunctionLaptop() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Laptop!');
   }
 
   void tambahKebutuhan_Laptop(){
@@ -150,7 +177,6 @@ class _editLaptopState extends State<editLaptop> {
           'Kapasitas Penyimpanan' : StorageController.text,
           'VGA' : VGAController.text,
           'Ukuran Monitor' : MonitorController.text,
-          'Masa Servis' : MasaServisLaptopController.text,
           'Kebutuhan Laptop' : ListKebutuhan_Laptop,
           'Gambar Laptop' : GambarLaptop,
           'Jenis Aset' : 'Laptop',
@@ -171,7 +197,6 @@ class _editLaptopState extends State<editLaptop> {
             context, MaterialPageRoute(builder: (context) => ManajemenLaptop()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
       print('Data Laptop Berhasil Diupdate');
 
@@ -199,16 +224,9 @@ class _editLaptopState extends State<editLaptop> {
       StorageController.text = (data?['Kapasitas Penyimpanan'] ?? '').toString();
       VGAController.text = data?['VGA'] ?? '';
       MonitorController.text = data?['Ukuran Monitor'] ?? '';
-      MasaServisLaptopController.text = (data?['Masa Servis'] ?? '').toString();
       final Urllaptop = data?['Gambar Laptop'] ?? '';
       oldphotoLaptop = Urllaptop;
-      final List<dynamic> KebutuhanData = data?['Kebutuhan Laptop'] ?? [];
-      Kebutuhan_Laptop = KebutuhanData.map((item) {
-        return {
-          'Nama Kebutuhan Laptop': item['Nama Kebutuhan Laptop'],
-          'Masa Kebutuhan Laptop': item['Masa Kebutuhan Laptop'],
-        };
-      }).toList();
+      Kebutuhan_Laptop = List<Map<String, dynamic>>.from(data?['Kebutuhan Laptop'] ?? []);
     });
   }
 
@@ -379,23 +397,6 @@ class _editLaptopState extends State<editLaptop> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: MonitorController),
-                SizedBox(height: 10),
-
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisLaptopController,
-                ),
                 SizedBox(height: 10),
 
                 Padding(

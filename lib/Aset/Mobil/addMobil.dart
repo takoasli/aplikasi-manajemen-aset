@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -41,7 +42,6 @@ class _AddMobilState extends State<AddMobil> {
   final ukuranBanController = TextEditingController();
   final akiController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisMobilController = TextEditingController();
   final isiKebutuhan_Mobil = TextEditingController();
   final imgMobilController = TextEditingController();
   final ImagePicker _gambarMobil = ImagePicker();
@@ -79,15 +79,40 @@ class _AddMobilState extends State<AddMobil> {
     }
   }
 
-  void SimpanKebutuhan_Mobil(){
-    setState(() {
-      Kebutuhan_Mobil.add(KebutuhanModelMobil(isiKebutuhan_Mobil.text,
-          int.parse(MasaKebutuhanController.text)
-      ));
-      isiKebutuhan_Mobil.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_Mobil() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_Mobil.add(KebutuhanModelMobil(
+          isiKebutuhan_Mobil.text,
+          masaKebutuhan,
+        ));
+
+        isiKebutuhan_Mobil.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionMobil,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+        // SetAlarmLaptop(Kebutuhan_Laptop.last);
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
   }
 
   void tambahKebutuhan(){
@@ -102,6 +127,11 @@ class _AddMobilState extends State<AddMobil> {
             JangkaKebutuhan: MasaKebutuhanController,
           );
         });
+  }
+
+  void myAlarmFunctionMobil() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Mobil!');
   }
 
   void ApusKebutuhan(int index) {
@@ -140,7 +170,6 @@ class _AddMobilState extends State<AddMobil> {
         int.parse(kapasitasBBController.text.trim()),
         ukuranBanController.text.trim(),
         int.parse(akiController.text.trim()),
-        int.parse(MasaServisMobilController.text.trim()),
         ListKebutuhan_Mobil,
         fotoMobil,
       );
@@ -166,8 +195,7 @@ class _AddMobilState extends State<AddMobil> {
   }
 
   Future tambahMobil (String merek, String ID, int tipemesin,
-      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, int Aki, int masaServis,List<Map<String, dynamic>> kebutuhan, String GambarMobil) async{
-    var timeService = contTimeService(masaServis);
+      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, int Aki,List<Map<String, dynamic>> kebutuhan, String GambarMobil) async{
     await FirebaseFirestore.instance.collection('Mobil').add({
       'Merek Mobil' : merek,
       'ID Mobil' : ID,
@@ -178,12 +206,9 @@ class _AddMobilState extends State<AddMobil> {
       'Kapasitas Bahan Bakar' : kapasitasBB,
       'Ukuran Ban' : ban,
       'Aki' : Aki,
-      'Masa Servis' : masaServis,
       'Kebutuhan Mobil' : kebutuhan,
       'Gambar Mobil' : GambarMobil,
       'Jenis Aset' : 'Mobil',
-      'Waktu Service Mobil': timeService.millisecondsSinceEpoch,
-      'Hari Service Mobil': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -273,7 +298,7 @@ class _AddMobilState extends State<AddMobil> {
                 ),
                 SizedBox(height: 10),
                 MyTextField(
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipeBahanBakarController),
@@ -352,22 +377,6 @@ class _AddMobilState extends State<AddMobil> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: akiController),
-                SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title
-                        .copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisMobilController,
-                ),
                 SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),

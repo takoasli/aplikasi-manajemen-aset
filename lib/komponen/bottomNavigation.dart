@@ -1,5 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:projek_skripsi/Aset/ControllerLogic.dart';
 import 'package:projek_skripsi/Notif/Notification.dart';
 
 import '../dashboard.dart';
@@ -13,6 +15,7 @@ class BottomNav extends StatefulWidget {
 }
 
 class _BottomNavState extends State<BottomNav> {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -76,6 +79,7 @@ class _BottomNavState extends State<BottomNav> {
               padding: const EdgeInsets.only(left: 45.0),
               child: GestureDetector(
                 onTap: (){
+                  Notif.showTextNotif(judul: 'tes aja', body: 'tes juga coy', fln: flutterLocalNotificationsPlugin);
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

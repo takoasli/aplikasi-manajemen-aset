@@ -170,34 +170,6 @@ class _MoreDetailState extends State<MoreDetail> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Sisa waktu Maintenance',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              showIndicator(
-                                  getValueIndicator(
-                                      widget.data['Hari Service PC'],
-                                      epochTimeToData(
-                                          widget.data['Waktu Service PC'])),
-                                  getProgressColor(
-                                      widget.data['Waktu Service PC'])),
-                              SizedBox(height: 5),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    getRemainingTime(
-                                        widget.data['Waktu Service PC']),
-                                    style: const TextStyle(
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
                               Text(
                                   'Kebutuhan Servis',
                                   style: TextStyles.title.copyWith(

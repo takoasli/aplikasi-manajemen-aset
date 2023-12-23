@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +31,7 @@ class KebutuhanModelUpdateAC {
 
   Map<String, dynamic> toMap() {
     return {
-      'Kebutuhan AC': namaKebutuhanAC,
+      'Nama Kebutuhan AC': namaKebutuhanAC,
       'Masa Kebutuhan AC': masaKebutuhanAC,
     };
   }
@@ -43,7 +44,6 @@ class _UpdateACState extends State<UpdateAC> {
   final PKController = TextEditingController();
   final ruanganController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisACController = TextEditingController();
   final isiKebutuhan_AC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
@@ -77,18 +77,47 @@ class _UpdateACState extends State<UpdateAC> {
     ),
   );
 
-  void SimpanKebutuhan_AC(){
-    setState(() {
-      KebutuhanModelUpdateAC kebutuhan = KebutuhanModelUpdateAC(
-        isiKebutuhan_AC.text,
-        int.parse(MasaKebutuhanController.text),
-      );
-      Kebutuhan_AC.add(kebutuhan.toMap());
-      isiKebutuhan_AC.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_AC() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_AC.add({
+          'Nama Kebutuhan AC': isiKebutuhan_AC.text,
+          'Masa Kebutuhan AC': masaKebutuhan,
+        });
+
+        isiKebutuhan_AC.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionAC,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
   }
+
+  void myAlarmFunctionAC() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan AC!');
+  }
+
   void tambahKebutuhan_AC(){
     showDialog(
         context: context,
@@ -108,7 +137,6 @@ class _UpdateACState extends State<UpdateAC> {
       Kebutuhan_AC.removeAt(index);
     });
   }
-
 
   void PilihUpdateIndoor() async {
     final pilihIndoor = await _gambarACIndoor.pickImage(source: ImageSource.gallery);
@@ -177,15 +205,15 @@ class _UpdateACState extends State<UpdateAC> {
     try{
       String GambarACIndoor;
       String GambarACOutdoor;
-      var timeService = contTimeService(int.parse(MasaServisACController.text));
 
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan AC'].toString()));
         return {
-          'Kebutuhan AC': kebutuhan['Kebutuhan AC'],
+          'Nama Kebutuhan AC': kebutuhan['Nama Kebutuhan AC'],
           'Masa Kebutuhan AC': kebutuhan['Masa Kebutuhan AC'],
           'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : timeKebutuhan
         };
       }).toList();
 
@@ -208,12 +236,9 @@ class _UpdateACState extends State<UpdateAC> {
           'Kapasitas Watt': wattController.text,
           'Kapasitas PK': PKController.text,
           'Lokasi Ruangan' : ruanganController.text,
-          'Masa Servis' : MasaServisACController.text,
           'Kebutuhan AC' : ListKebutuhan_AC,
           'Foto AC Indoor': GambarACIndoor,
           'Foto AC Outdoor': GambarACOutdoor,
-          'waktu_service': timeService.millisecondsSinceEpoch,
-          'hari_service': daysBetween(DateTime.now(), timeService),
           'Jenis Aset' : 'AC',
           'Waktu Kebutuhan AC' : waktuKebutuhanAC.millisecondsSinceEpoch,
           'Hari Kebutuhan AC' : daysBetween(DateTime.now(), waktuKebutuhanAC)
@@ -233,7 +258,6 @@ class _UpdateACState extends State<UpdateAC> {
             MaterialPageRoute(builder: (context) => ManajemenAC()),
           );
         },
-        autoHide: Duration(seconds: 5),
       ).show();
 
       print('Data AC Berhasil Diupdate');
@@ -259,18 +283,11 @@ class _UpdateACState extends State<UpdateAC> {
         wattController.text = (data?['Kapasitas Watt'] ?? '').toString();
         PKController.text = (data?['Kapasitas PK'] ?? '').toString();
         ruanganController.text = data?['Lokasi Ruangan'] ?? '';
-        MasaServisACController.text = (data?['Masa Servis'] ?? '').toString();
         final UrlIndoor = data?['Foto AC Indoor'] ?? '';
         oldphotoIndoor = UrlIndoor;
         final UrlOutdoor = data?['Foto AC Outdoor'] ?? '';
         oldphotoOutdoor = UrlOutdoor;
-        final List<dynamic> kebutuhanData = data?['Kebutuhan AC'] ?? [];
-        Kebutuhan_AC = kebutuhanData.map((item) {
-          return {
-            'Kebutuhan AC': item['Kebutuhan AC'],
-            'Masa Kebutuhan AC': item['Masa Kebutuhan AC'],
-          };
-        }).toList();
+        Kebutuhan_AC = List<Map<String, dynamic>>.from(data?['Kebutuhan AC'] ?? []);
       });
     } catch (e) {
       print('Terjadi Kesalahan: $e');
@@ -379,23 +396,6 @@ class _UpdateACState extends State<UpdateAC> {
                 SizedBox(height: 10),
 
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisACController,
-                ),
-                SizedBox(height: 10),
-
-                Padding(
                   padding: EdgeInsets.only(bottom: 3),
                   child: Text('Ruangan',
                     style: TextStyles.title
@@ -462,7 +462,7 @@ class _UpdateACState extends State<UpdateAC> {
                   itemCount: Kebutuhan_AC.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(Kebutuhan_AC[index]['Kebutuhan AC']),
+                      title: Text(Kebutuhan_AC[index]['Nama Kebutuhan AC']),
                       subtitle: Text('${Kebutuhan_AC[index]['Masa Kebutuhan AC']} Bulan'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -43,7 +44,6 @@ class _AddMotorState extends State<AddMotor> {
   final banBelakangController = TextEditingController();
   final isiKebutuhan_Motor = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
-  final MasaServisMotorController = TextEditingController();
   final ImgMotorController = TextEditingController();
   List Kebutuhan_Motor = [];
 
@@ -78,15 +78,44 @@ class _AddMotorState extends State<AddMotor> {
     }
   }
 
-  void SimpanKebutuhan_Motor(){
-    setState(() {
-      Kebutuhan_Motor.add(KebutuhanModelMotor(isiKebutuhan_Motor.text,
-          int.parse(MasaKebutuhanController.text)
-      ));
-      isiKebutuhan_Motor.clear();
-      MasaKebutuhanController.clear();
-    });
-    Navigator.of(context).pop();
+  void SimpanKebutuhan_Motor() async {
+    String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    if (masaKebutuhanText.isNotEmpty) {
+      try {
+        int masaKebutuhan = int.parse(masaKebutuhanText);
+
+        Kebutuhan_Motor.add(KebutuhanModelMotor(
+          isiKebutuhan_Motor.text,
+          masaKebutuhan,
+        ));
+
+        isiKebutuhan_Motor.clear();
+        MasaKebutuhanController.clear();
+
+        setState(() {});
+        await AndroidAlarmManager.oneShot(
+          Duration(days: masaKebutuhan),
+          masaKebutuhan.hashCode,
+          myAlarmFunctionMotor,
+          exact: true,
+          wakeup: true,
+        );
+
+        print('Alarm berhasil diset');
+        Navigator.of(context).pop();
+      } catch (error) {
+        print('Error saat mengatur alarm: $error');
+        // Lakukan penanganan kesalahan jika parsing gagal
+      }
+    } else {
+      print('Input Masa Kebutuhan tidak boleh kosong');
+      // Tindakan jika input kosong
+    }
+  }
+
+  void myAlarmFunctionMotor() {
+    // Lakukan tugas yang diperlukan saat alarm terpicu
+    print('Alarm terpicu untuk kebutuhan Motor!');
   }
 
   void tambahKebutuhan(){
@@ -140,7 +169,6 @@ class _AddMotorState extends State<AddMotor> {
         int.parse(tipeAkiController.text.trim()),
         banDepanController.text.trim(),
         banBelakangController.text.trim(),
-        int.parse(MasaServisMotorController.text.trim()),
         ListKebutuhan_Motor,
         fotoMotor,
       );
@@ -165,8 +193,7 @@ class _AddMotorState extends State<AddMotor> {
   }
 
   Future tambahMotor (String merek, String id, int kapsMesin, String pendingin,String transmisi, int kapsBB, int kapsMinyak,
-      int aki, String banDpn, String banBlkng,int masaServis,List<Map<String, dynamic>> kebutuhan, String gambarMotor) async{
-    var timeService = contTimeService(masaServis);
+      int aki, String banDpn, String banBlkng,List<Map<String, dynamic>> kebutuhan, String gambarMotor) async{
     await FirebaseFirestore.instance.collection('Motor').add({
       'Merek Motor' : merek,
       'ID Motor' : id,
@@ -178,12 +205,9 @@ class _AddMotorState extends State<AddMotor> {
       'Tipe Aki' : aki,
       'Ban Depan' : banDpn,
       'Ban Belakang' : banBlkng,
-      'Masa Servis' : masaServis,
       'Kebutuhan Motor' : kebutuhan,
       'Gambar Motor' : gambarMotor,
       'Jenis Aset' : 'Motor',
-      'Waktu Service Motor': timeService.millisecondsSinceEpoch,
-      'Hari Service Motor': daysBetween(DateTime.now(), timeService)
     });
   }
 
@@ -365,22 +389,6 @@ class _AddMotorState extends State<AddMotor> {
                     textInputAction: TextInputAction.next,
                     controller: banBelakangController),
                 const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    'Jangka Waktu Servis (Perbulan)',
-                    style: TextStyles.title
-                        .copyWith(fontSize: 15, color: Warna.darkgrey),
-                  ),
-                ),
-                SizedBox(height: 10),
-                MyTextField(
-                  textInputType: TextInputType.number,
-                  hint: '',
-                  textInputAction: TextInputAction.next,
-                  controller: MasaServisMotorController,
-                ),
-                SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
