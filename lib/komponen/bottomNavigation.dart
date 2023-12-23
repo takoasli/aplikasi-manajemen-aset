@@ -79,7 +79,7 @@ class _BottomNavState extends State<BottomNav> {
               padding: const EdgeInsets.only(left: 45.0),
               child: GestureDetector(
                 onTap: (){
-                  Notif.showTextNotif(judul: 'tes aja', body: 'tes juga coy', fln: flutterLocalNotificationsPlugin);
+                  // Notif.showTextNotif(judul: 'tes aja', body: 'tes juga coy', fln: flutterLocalNotificationsPlugin);
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

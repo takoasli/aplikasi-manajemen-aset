@@ -11,6 +11,7 @@ import 'package:projek_skripsi/Aset/AC/ManajemenAC.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -47,6 +48,7 @@ class _UpdateACState extends State<UpdateAC> {
   final isiKebutuhan_AC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
+  late int idAlarm;
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
   List Kebutuhan_AC = [];
@@ -79,6 +81,7 @@ class _UpdateACState extends State<UpdateAC> {
 
   void SimpanKebutuhan_AC() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    idAlarm = MasaKebutuhanController.text.hashCode;
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -94,8 +97,8 @@ class _UpdateACState extends State<UpdateAC> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionAC,
+          idAlarm,
+              () => AlarmFunctionAC(idAlarm),
           exact: true,
           wakeup: true,
         );
@@ -113,9 +116,14 @@ class _UpdateACState extends State<UpdateAC> {
     }
   }
 
-  void myAlarmFunctionAC() {
+  void AlarmFunctionAC(int id) {
     // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan AC!');
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Aset PC yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id, // Menggunakan ID yang diberikan sebagai parameter
+    );
   }
 
   void tambahKebutuhan_AC(){
@@ -208,12 +216,13 @@ class _UpdateACState extends State<UpdateAC> {
 
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan AC'].toString()));
+        var idAlarem = MasaKebutuhanController.hashCode;
         return {
           'Nama Kebutuhan AC': kebutuhan['Nama Kebutuhan AC'],
           'Masa Kebutuhan AC': kebutuhan['Masa Kebutuhan AC'],
           'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
           'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan),
-          'ID' : timeKebutuhan
+          'ID' : idAlarem,
         };
       }).toList();
 

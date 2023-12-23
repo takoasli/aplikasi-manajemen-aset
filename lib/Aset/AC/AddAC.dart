@@ -44,6 +44,7 @@ class _AddACState extends State<AddAC> {
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
+  late int idAlarm;
   List Kebutuhan_AC = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -112,16 +113,19 @@ class _AddACState extends State<AddAC> {
     }
   }
 
-  void AlarmFunctionAC() {
+  void AlarmFunctionAC(int id) {
     // Lakukan tugas yang diperlukan saat alarm terpicu
     Notif.showTextNotif(
-        judul: 'PT Dami Sariwana',
-        body: 'Ada Aset PC yang jatuh tempo!',
-        fln: flutterLocalNotificationsPlugin);
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Aset PC yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id, // Menggunakan ID yang diberikan sebagai parameter
+    );
   }
 
   void SimpanKebutuhan_AC() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    idAlarm = MasaKebutuhanController.text.hashCode;
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -137,11 +141,12 @@ class _AddACState extends State<AddAC> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          AlarmFunctionAC,
+          idAlarm,
+              () => AlarmFunctionAC(idAlarm),
           exact: true,
           wakeup: true,
         );
+
 
         print('Alarm berhasil diset');
         Navigator.of(context).pop();
@@ -185,12 +190,13 @@ class _AddACState extends State<AddAC> {
       String fotoOutdoor = '';
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanAC);
+        var idAlarem = MasaKebutuhanController.text.hashCode;
         return {
           'Nama Kebutuhan AC': kebutuhan.namaKebutuhanAC,
           'Masa Kebutuhan AC': kebutuhan.masaKebutuhanAC,
           'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
           'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan),
-          'ID' : timeKebutuhan
+          'ID' : idAlarem
         };
       }).toList();
 

@@ -110,7 +110,7 @@ class Notif{
     await flutterLocalNotificationsPlugin.initialize(initializationsSettings);
   }
 
-  static Future showTextNotif({var id=0, required String judul, required String body, var payload, required FlutterLocalNotificationsPlugin fln}) async{
+  static Future showTextNotif({required int id, required String judul, required String body, var payload, required FlutterLocalNotificationsPlugin fln}) async{
     AndroidNotificationDetails androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         'Channel ID',
         'Nama Channel',
