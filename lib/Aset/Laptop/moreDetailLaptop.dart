@@ -142,7 +142,8 @@ class _MoreDetailLaptopState extends State<MoreDetailLaptop> {
                               List_Kebutuhan: namaKebutuhan,
                               ID_Aset: widget.data['ID Laptop'],
                               Nama_Aset: widget.data['Merek Laptop'],
-                              Jenis_Aset: widget.data['Jenis Aset'],)
+                              Jenis_Aset: widget.data['Jenis Aset'],
+                              lokasiAset: widget.data['Lokasi Ruangan'],)
                             )
                             );
                           },

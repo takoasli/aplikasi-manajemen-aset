@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:projek_skripsi/Aset/Mobil/manajemenMobil.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -24,10 +26,12 @@ class AddMobil extends StatefulWidget {
 class KebutuhanModelMobil {
   String namaKebutuhanMobil;
   int masaKebutuhanMobil;
+  int randomID;
 
   KebutuhanModelMobil(
       this.namaKebutuhanMobil,
       this.masaKebutuhanMobil,
+      this.randomID
       );
 }
 
@@ -81,6 +85,8 @@ class _AddMobilState extends State<AddMobil> {
 
   void SimpanKebutuhan_Mobil() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -88,6 +94,7 @@ class _AddMobilState extends State<AddMobil> {
         Kebutuhan_Mobil.add(KebutuhanModelMobil(
           isiKebutuhan_Mobil.text,
           masaKebutuhan,
+          randomId
         ));
 
         isiKebutuhan_Mobil.clear();
@@ -96,8 +103,8 @@ class _AddMobilState extends State<AddMobil> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionMobil,
+          randomId,
+              () => myAlarmFunctionMobil(randomId),
           exact: true,
           wakeup: true,
         );
@@ -129,15 +136,24 @@ class _AddMobilState extends State<AddMobil> {
         });
   }
 
-  void myAlarmFunctionMobil() {
-    // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan Mobil!');
+  void myAlarmFunctionMobil(int id) {
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Mobil yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
   }
 
   void ApusKebutuhan(int index) {
     setState(() {
       Kebutuhan_Mobil.removeAt(index);
     });
+  }
+
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
   }
 
 
@@ -151,7 +167,8 @@ class _AddMobilState extends State<AddMobil> {
           'Nama Kebutuhan Mobil': kebutuhan.namaKebutuhanMobil,
           'Masa Kebutuhan Mobil': kebutuhan.masaKebutuhanMobil,
           'Waktu Kebutuhan Mobil': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan Mobil': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan Mobil': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : kebutuhan.randomID
         };
       }).toList();
 
@@ -298,7 +315,7 @@ class _AddMobilState extends State<AddMobil> {
                 ),
                 SizedBox(height: 10),
                 MyTextField(
-                    textInputType: TextInputType.number,
+                    textInputType: TextInputType.text,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipeBahanBakarController),

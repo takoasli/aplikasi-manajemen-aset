@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -27,13 +28,18 @@ class UpdateAC extends StatefulWidget {
 class KebutuhanModelUpdateAC {
   String namaKebutuhanAC;
   int masaKebutuhanAC;
+  int RandomID;
 
-  KebutuhanModelUpdateAC(this.namaKebutuhanAC, this.masaKebutuhanAC);
+  KebutuhanModelUpdateAC(
+      this.namaKebutuhanAC,
+      this.masaKebutuhanAC,
+      this.RandomID);
 
   Map<String, dynamic> toMap() {
     return {
       'Nama Kebutuhan AC': namaKebutuhanAC,
       'Masa Kebutuhan AC': masaKebutuhanAC,
+      'ID' : RandomID,
     };
   }
 }
@@ -48,7 +54,6 @@ class _UpdateACState extends State<UpdateAC> {
   final isiKebutuhan_AC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
   final ImagePicker _gambarACOutdoor = ImagePicker();
-  late int idAlarm;
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
   List Kebutuhan_AC = [];
@@ -81,7 +86,7 @@ class _UpdateACState extends State<UpdateAC> {
 
   void SimpanKebutuhan_AC() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
-    idAlarm = MasaKebutuhanController.text.hashCode;
+    int randomId = generateRandomId();
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -89,6 +94,7 @@ class _UpdateACState extends State<UpdateAC> {
         Kebutuhan_AC.add({
           'Nama Kebutuhan AC': isiKebutuhan_AC.text,
           'Masa Kebutuhan AC': masaKebutuhan,
+          'ID' : randomId,
         });
 
         isiKebutuhan_AC.clear();
@@ -97,8 +103,8 @@ class _UpdateACState extends State<UpdateAC> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          idAlarm,
-              () => AlarmFunctionAC(idAlarm),
+          randomId,
+              () => AlarmFunctionAC(randomId),
           exact: true,
           wakeup: true,
         );
@@ -122,7 +128,7 @@ class _UpdateACState extends State<UpdateAC> {
       judul: 'PT Dami Sariwana',
       body: 'Ada Aset PC yang jatuh tempo!',
       fln: flutterLocalNotificationsPlugin,
-      id: id, // Menggunakan ID yang diberikan sebagai parameter
+      id: id,
     );
   }
 
@@ -209,6 +215,11 @@ class _UpdateACState extends State<UpdateAC> {
     }
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
   Future<void> UpdateAC(String dokAC, Map<String, dynamic> DataAC) async{
     try{
       String GambarACIndoor;
@@ -216,13 +227,12 @@ class _UpdateACState extends State<UpdateAC> {
 
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan AC'].toString()));
-        var idAlarem = MasaKebutuhanController.hashCode;
         return {
           'Nama Kebutuhan AC': kebutuhan['Nama Kebutuhan AC'],
           'Masa Kebutuhan AC': kebutuhan['Masa Kebutuhan AC'],
           'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
           'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan),
-          'ID' : idAlarem,
+          'ID' : kebutuhan['ID'],
         };
       }).toList();
 

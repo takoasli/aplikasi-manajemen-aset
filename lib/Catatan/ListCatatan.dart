@@ -113,7 +113,8 @@ class _ListCatatanState extends State<ListCatatan> {
                   color: selectedCategories.contains(kategoriHari[index])
                       ? Warna.white
                       : Colors.black,
-                ),),
+                ),
+              ),
             ),
             backgroundColor: selectedCategories.contains(kategoriHari[index])
                 ? Warna.lightgreen // Warna kalo dipilih
@@ -178,13 +179,13 @@ class _ListCatatanState extends State<ListCatatan> {
                           }
                         },
 
-                        child: Container(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: BacaCatatan(
-                                  dokumenCatatan: DokCatatan[index],
+                            child: Container(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: BacaCatatan(
+                                      dokumenCatatan: DokCatatan[index],
 
                                 ),
                               ),

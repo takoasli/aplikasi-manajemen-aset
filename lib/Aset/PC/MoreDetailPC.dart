@@ -148,6 +148,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                       ID_Aset: widget.data['ID PC'],
                                       Nama_Aset: widget.data['Merek PC'],
                                       Jenis_Aset: widget.data['Jenis Aset'],
+                                      lokasiAset: widget.data['Lokasi Ruangan'],
                                     )));
                           },
                           icon:
@@ -188,8 +189,6 @@ class _MoreDetailState extends State<MoreDetail> {
                                     itemBuilder: (context, index) {
                                       final kebutuhan = widget.data['kebutuhan']
                                       [index]['Kebutuhan PC'];
-                                      final masaKebutuhan =
-                                      widget.data['kebutuhan'][index]
                                       ['Masa Kebutuhan'];
                                       final hariKebutuhan =
                                       widget.data['kebutuhan'][index]

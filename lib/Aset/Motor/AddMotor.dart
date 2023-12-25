@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:projek_skripsi/Aset/Motor/ManajemenMotor.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -23,10 +25,12 @@ class AddMotor extends StatefulWidget {
 class KebutuhanModelMotor {
   String namaKebutuhanMotor;
   int masaKebutuhanMotor;
+  int randomID;
 
   KebutuhanModelMotor(
       this.namaKebutuhanMotor,
       this.masaKebutuhanMotor,
+      this.randomID
       );
 }
 
@@ -78,8 +82,15 @@ class _AddMotorState extends State<AddMotor> {
     }
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
   void SimpanKebutuhan_Motor() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -87,6 +98,7 @@ class _AddMotorState extends State<AddMotor> {
         Kebutuhan_Motor.add(KebutuhanModelMotor(
           isiKebutuhan_Motor.text,
           masaKebutuhan,
+          randomId
         ));
 
         isiKebutuhan_Motor.clear();
@@ -95,8 +107,8 @@ class _AddMotorState extends State<AddMotor> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionMotor,
+          randomId,
+              () => myAlarmFunctionMotor(randomId),
           exact: true,
           wakeup: true,
         );
@@ -113,9 +125,13 @@ class _AddMotorState extends State<AddMotor> {
     }
   }
 
-  void myAlarmFunctionMotor() {
-    // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan Motor!');
+  void myAlarmFunctionMotor(int id) {
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Motor yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
   }
 
   void tambahKebutuhan(){
@@ -149,7 +165,8 @@ class _AddMotorState extends State<AddMotor> {
           'Nama Kebutuhan Motor': kebutuhan.namaKebutuhanMotor,
           'Masa Kebutuhan Motor': kebutuhan.masaKebutuhanMotor,
           'Waktu Kebutuhan Motor': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan Motor': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan Motor': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : kebutuhan.randomID
         };
       }).toList();
 

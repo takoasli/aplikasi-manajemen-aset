@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -25,10 +26,12 @@ class AddAC extends StatefulWidget {
 class KebutuhanModelAC {
   String namaKebutuhanAC;
   int masaKebutuhanAC;
+  int randomID;
 
   KebutuhanModelAC(
       this.namaKebutuhanAC,
       this.masaKebutuhanAC,
+      this.randomID
       );
 }
 
@@ -44,7 +47,6 @@ class _AddACState extends State<AddAC> {
   final ImagePicker _gambarACOutdoor = ImagePicker();
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
-  late int idAlarm;
   List Kebutuhan_AC = [];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -125,7 +127,8 @@ class _AddACState extends State<AddAC> {
 
   void SimpanKebutuhan_AC() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
-    idAlarm = MasaKebutuhanController.text.hashCode;
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -133,6 +136,7 @@ class _AddACState extends State<AddAC> {
         Kebutuhan_AC.add(KebutuhanModelAC(
           isiKebutuhanAC.text,
           masaKebutuhan,
+          randomId,
         ));
 
         isiKebutuhanAC.clear();
@@ -141,8 +145,8 @@ class _AddACState extends State<AddAC> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          idAlarm,
-              () => AlarmFunctionAC(idAlarm),
+          randomId,
+              () => AlarmFunctionAC(randomId),
           exact: true,
           wakeup: true,
         );
@@ -176,6 +180,12 @@ class _AddACState extends State<AddAC> {
         });
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
+
   void ApusKebutuhan(int index) {
     setState(() {
       Kebutuhan_AC.removeAt(index);
@@ -190,13 +200,13 @@ class _AddACState extends State<AddAC> {
       String fotoOutdoor = '';
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanAC);
-        var idAlarem = MasaKebutuhanController.text.hashCode;
+
         return {
           'Nama Kebutuhan AC': kebutuhan.namaKebutuhanAC,
           'Masa Kebutuhan AC': kebutuhan.masaKebutuhanAC,
           'Waktu Kebutuhan AC': timeKebutuhan.millisecondsSinceEpoch,
           'Hari Kebutuhan AC': daysBetween(DateTime.now(), timeKebutuhan),
-          'ID' : idAlarem
+          'ID' : kebutuhan.randomID
         };
       }).toList();
 

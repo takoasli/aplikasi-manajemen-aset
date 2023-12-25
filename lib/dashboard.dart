@@ -22,7 +22,6 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  late List<String> docPenggunas = [];
 
   @override
   Widget build(BuildContext context) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:projek_skripsi/Aset/ControllerLogic.dart';
 import 'package:projek_skripsi/Notif/Notification.dart';
+import 'package:projek_skripsi/settings/settings.dart';
 
 import '../dashboard.dart';
 import '../profile.dart';
@@ -79,7 +80,10 @@ class _BottomNavState extends State<BottomNav> {
               padding: const EdgeInsets.only(left: 45.0),
               child: GestureDetector(
                 onTap: (){
-                  // Notif.showTextNotif(judul: 'tes aja', body: 'tes juga coy', fln: flutterLocalNotificationsPlugin);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Settings()),
+                  );
                 },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

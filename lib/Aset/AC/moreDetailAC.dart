@@ -156,6 +156,7 @@ class _MoreDetailACState extends State<MoreDetailAC> {
                                       ID_Aset: widget.data['ID AC'],
                                       Nama_Aset: widget.data['Merek AC'],
                                       Jenis_Aset: widget.data['Jenis Aset'],
+                                      lokasiAset: widget.data['Lokasi Ruangan'],
                                     )));
                           },
                           icon: Icon(Icons.border_color_outlined,

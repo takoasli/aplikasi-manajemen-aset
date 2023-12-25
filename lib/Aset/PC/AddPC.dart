@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:projek_skripsi/textfield/textfields.dart';
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../ControllerLogic.dart';
 import 'ManajemenPC.dart';
@@ -25,10 +27,12 @@ class AddPC extends StatefulWidget {
 class KebutuhanModel {
   String namaKebutuhan;
   int masaKebutuhan;
+  int randomID;
 
   KebutuhanModel(
       this.namaKebutuhan,
       this.masaKebutuhan,
+      this.randomID,
       );
 }
 
@@ -57,8 +61,15 @@ class _AddPCState extends State<AddPC> {
     }
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
   void SimpanKebutuhan_PC() async {
     String masaKebutuhanText = MasaKebutuhan.text.trim();
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -66,6 +77,7 @@ class _AddPCState extends State<AddPC> {
         Kebutuhan.add(KebutuhanModel(
           isiKebutuhan.text,
           masaKebutuhan,
+          randomId
         ));
 
         isiKebutuhan.clear();
@@ -74,8 +86,8 @@ class _AddPCState extends State<AddPC> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionLaptop,
+          randomId,
+              () => myAlarmFunctionPC(randomId),
           exact: true,
           wakeup: true,
         );
@@ -91,6 +103,15 @@ class _AddPCState extends State<AddPC> {
       print('Input Masa Kebutuhan tidak boleh kosong');
       // Tindakan jika input kosong
     }
+  }
+
+  void myAlarmFunctionPC(int id) {
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada PC yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
   }
 
   void tambahKebutuhan(){
@@ -150,7 +171,7 @@ class _AddPCState extends State<AddPC> {
           'Masa Kebutuhan': kebutuhan.masaKebutuhan,
           'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
           'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan),
-          'ID': timeKebutuhan
+          'ID' : kebutuhan.randomID
         };
       }).toList();
 

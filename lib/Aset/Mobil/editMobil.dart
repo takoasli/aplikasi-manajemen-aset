@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -9,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -26,13 +28,18 @@ class EditMobil extends StatefulWidget {
 class KebutuhanModelUpdateMobil {
   String namaKebutuhanMobil;
   int masaKebutuhanMobil;
+  int randomID;
 
-  KebutuhanModelUpdateMobil(this.namaKebutuhanMobil, this.masaKebutuhanMobil);
+  KebutuhanModelUpdateMobil(
+      this.namaKebutuhanMobil,
+      this.masaKebutuhanMobil,
+      this.randomID);
 
   Map<String, dynamic> toMap() {
     return {
       'Nama Kebutuhan Mobil': namaKebutuhanMobil,
       'Masa Kebutuhan Mobil': masaKebutuhanMobil,
+      'ID' : randomID
     };
   }
 }
@@ -85,8 +92,15 @@ class _EditMobilState extends State<EditMobil> {
     }
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
   void SimpanKebutuhan_Mobil() async {
     String masaKebutuhanText = masaKebutuhanController.text.trim();
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -94,6 +108,7 @@ class _EditMobilState extends State<EditMobil> {
         Kebutuhan_Mobil.add({
           'Nama Kebutuhan Mobil': isiKebutuhan_Mobil.text,
           'Masa Kebutuhan Mobil': masaKebutuhan,
+          'ID' : randomId,
         });
 
         isiKebutuhan_Mobil.clear();
@@ -102,8 +117,8 @@ class _EditMobilState extends State<EditMobil> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionMobil,
+          randomId,
+              () => myAlarmFunctionMobil(randomId),
           exact: true,
           wakeup: true,
         );
@@ -120,9 +135,13 @@ class _EditMobilState extends State<EditMobil> {
     }
   }
 
-  void myAlarmFunctionMobil() {
-    // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan Mobil!');
+  void myAlarmFunctionMobil(int id) {
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Mobil yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
   }
 
 
@@ -184,7 +203,8 @@ class _EditMobilState extends State<EditMobil> {
           'Nama Kebutuhan Mobil': kebutuhan['Nama Kebutuhan Mobil'],
           'Masa Kebutuhan Mobil': kebutuhan['Masa Kebutuhan Mobil'],
           'Waktu Kebutuhan Mobil': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan Mobil': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan Mobil': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : kebutuhan['ID'],
         };
       }).toList();
 
@@ -314,7 +334,7 @@ class _EditMobilState extends State<EditMobil> {
                 SizedBox(height: 10),
 
                 MyTextField(
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: tipemesinController),

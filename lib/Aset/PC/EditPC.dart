@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:projek_skripsi/Aset/PC/ManajemenPC.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -26,13 +28,18 @@ class EditPC extends StatefulWidget {
 class KebutuhanModelUpdate {
   String namaKebutuhan;
   int masaKebutuhan;
+  int randomID;
 
-  KebutuhanModelUpdate(this.namaKebutuhan, this.masaKebutuhan);
+  KebutuhanModelUpdate(
+      this.namaKebutuhan,
+      this.masaKebutuhan,
+      this.randomID);
 
   Map<String, dynamic> toMap() {
     return {
       'Kebutuhan PC': namaKebutuhan,
       'Masa Kebutuhan': masaKebutuhan,
+      'ID' : randomID
     };
   }
 }
@@ -64,8 +71,15 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
   void SimpanKebutuhan_PC() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -73,6 +87,7 @@ class _EditPCState extends State<EditPC> {
         Kebutuhan.add({
           'Kebutuhan PC': isiKebutuhan.text,
           'Masa Kebutuhan': masaKebutuhan,
+          'ID' : randomId,
         });
 
         isiKebutuhan.clear();
@@ -81,8 +96,8 @@ class _EditPCState extends State<EditPC> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionPC,
+          randomId,
+              () => myAlarmFunctionMotor(randomId),
           exact: true,
           wakeup: true,
         );
@@ -99,9 +114,13 @@ class _EditPCState extends State<EditPC> {
     }
   }
 
-  void myAlarmFunctionPC() {
-    // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan PC!');
+  void myAlarmFunctionMotor(int id) {
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada PC yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
   }
 
 
@@ -161,7 +180,8 @@ class _EditPCState extends State<EditPC> {
           'Kebutuhan PC': kebutuhan['Kebutuhan PC'],
           'Masa Kebutuhan': kebutuhan['Masa Kebutuhan'],
           'Waktu Kebutuhan PC': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : kebutuhan['ID'],
         };
       }).toList();
 

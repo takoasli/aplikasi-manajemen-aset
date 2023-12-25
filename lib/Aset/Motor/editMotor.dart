@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -11,6 +12,7 @@ import 'package:projek_skripsi/Aset/Motor/ManajemenMotor.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -28,13 +30,18 @@ class EditMotor extends StatefulWidget {
 class KebutuhanModelUpdateMotor {
   String namaKebutuhanMotor;
   int masaKebutuhanMotor;
+  int randomID;
 
-  KebutuhanModelUpdateMotor(this.namaKebutuhanMotor, this.masaKebutuhanMotor);
+  KebutuhanModelUpdateMotor(
+      this.namaKebutuhanMotor,
+      this.masaKebutuhanMotor,
+      this.randomID);
 
   Map<String, dynamic> toMap() {
     return {
       'Nama Kebutuhan Motor': namaKebutuhanMotor,
       'Masa Kebutuhan Motor': masaKebutuhanMotor,
+      'ID' : randomID
     };
   }
 }
@@ -88,8 +95,15 @@ class _EditMotorState extends State<EditMotor> {
     }
   }
 
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
+  }
+
   void SimpanKebutuhan_Motor() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    int randomId = generateRandomId();
+    print('Random ID: $randomId');
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -97,6 +111,7 @@ class _EditMotorState extends State<EditMotor> {
         Kebutuhan_Motor.add({
           'Nama Kebutuhan Motor': isiKebutuhan_Motor.text,
           'Masa Kebutuhan Motor': masaKebutuhan,
+          'ID' : randomId,
         });
 
         isiKebutuhan_Motor.clear();
@@ -105,8 +120,8 @@ class _EditMotorState extends State<EditMotor> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionMotor,
+          randomId,
+              () => myAlarmFunctionMotor(randomId),
           exact: true,
           wakeup: true,
         );
@@ -123,9 +138,13 @@ class _EditMotorState extends State<EditMotor> {
     }
   }
 
-  void myAlarmFunctionMotor() {
-    // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan Mobil!');
+  void myAlarmFunctionMotor(int id) {
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Motor yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
   }
 
   void tambahKebutuhan_Motor(){
@@ -157,7 +176,8 @@ class _EditMotorState extends State<EditMotor> {
           'Nama Kebutuhan Motor': kebutuhan['Nama Kebutuhan Motor'],
           'Masa Kebutuhan Motor': kebutuhan['Masa Kebutuhan Motor'],
           'Waktu Kebutuhan Motor': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan Motor': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan Motor': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : kebutuhan['ID'],
         };
       }).toList();
 

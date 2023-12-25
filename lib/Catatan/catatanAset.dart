@@ -13,12 +13,14 @@ class Catatan extends StatefulWidget {
     required this.List_Kebutuhan,
     required this.ID_Aset,
     required this.Nama_Aset,
-    required this.Jenis_Aset,}) : super(key: key);
+    required this.Jenis_Aset,
+    this.lokasiAset,}) : super(key: key);
 
   final List<dynamic> List_Kebutuhan;
   final String ID_Aset;
   final String Nama_Aset;
   final String Jenis_Aset;
+  final String? lokasiAset;
 
   @override
   State<Catatan> createState() => _CatatanState();
@@ -33,6 +35,7 @@ class _CatatanState extends State<Catatan> {
   late String idAset;
   late String merekAset;
   late String jenisAset;
+  late String lokasi;
   List<List<dynamic>> List_Kebutuhan = [];
   List biayaKebutuhans = [];
 
@@ -141,6 +144,7 @@ class _CatatanState extends State<Catatan> {
       await tambahCatatan(
           merekAset,
           idAset,
+          lokasi,
           DataKebutuhan,
           CatatanBiaya,
           CatatanLengkapController.text,
@@ -165,8 +169,10 @@ class _CatatanState extends State<Catatan> {
     }
   }
 
-  Future tambahCatatan (String merekAset,
+  Future tambahCatatan (
+      String merekAset,
       String idAset,
+      String lokasi,
       List<Map<String, dynamic>> ListButuh,
       List<Map<String, dynamic>> CatatanBiaya,
       String CatatanLengkap,
@@ -175,6 +181,7 @@ class _CatatanState extends State<Catatan> {
     await FirebaseFirestore.instance.collection('Catatan Servis').add({
       'Nama Aset': merekAset,
       'ID Aset': idAset,
+      'Lokasi Aset' : lokasi,
       'List Kebutuhan' : ListButuh,
       'Catatan Biaya' : CatatanBiaya,
       'Catatan Tambahan' : CatatanLengkap,
@@ -193,6 +200,7 @@ class _CatatanState extends State<Catatan> {
     idAset = '${widget.ID_Aset}';
     merekAset = '${widget.Nama_Aset}';
     jenisAset = '${widget.Jenis_Aset}';
+    lokasi = '${widget.lokasiAset}';
     List_Kebutuhan = List<List<dynamic>>.from(widget.List_Kebutuhan.map((item) => [item, false]));
   }
 

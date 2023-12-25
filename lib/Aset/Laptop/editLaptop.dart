@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -10,6 +11,7 @@ import 'package:projek_skripsi/Aset/Laptop/manajemenLaptop.dart';
 
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
+import '../../main.dart';
 import '../../textfield/imageField.dart';
 import '../../textfield/textfields.dart';
 import '../ControllerLogic.dart';
@@ -26,13 +28,18 @@ class editLaptop extends StatefulWidget {
 class KebutuhanModelUpdateLaptop {
   String namaKebutuhanLaptop;
   int masaKebutuhanLaptop;
+  int randomID;
 
-  KebutuhanModelUpdateLaptop(this.namaKebutuhanLaptop, this.masaKebutuhanLaptop);
+  KebutuhanModelUpdateLaptop(
+      this.namaKebutuhanLaptop,
+      this.masaKebutuhanLaptop,
+      this.randomID);
 
   Map<String, dynamic> toMap() {
     return {
       'Nama Kebutuhan Laptop': namaKebutuhanLaptop,
       'Masa Kebutuhan Laptop': masaKebutuhanLaptop,
+      'ID' : randomID
     };
   }
 }
@@ -56,6 +63,7 @@ class _editLaptopState extends State<editLaptop> {
 
   void SimpanKebutuhan_Laptop() async {
     String masaKebutuhanText = MasaKebutuhanController.text.trim();
+    int randomId = generateRandomId();
     if (masaKebutuhanText.isNotEmpty) {
       try {
         int masaKebutuhan = int.parse(masaKebutuhanText);
@@ -63,6 +71,7 @@ class _editLaptopState extends State<editLaptop> {
         Kebutuhan_Laptop.add({
           'Nama Kebutuhan Laptop': isiKebutuhan_Laptop.text,
           'Masa Kebutuhan Laptop': masaKebutuhan,
+          'ID' : randomId,
         });
 
         isiKebutuhan_Laptop.clear();
@@ -71,8 +80,8 @@ class _editLaptopState extends State<editLaptop> {
         setState(() {});
         await AndroidAlarmManager.oneShot(
           Duration(days: masaKebutuhan),
-          masaKebutuhan.hashCode,
-          myAlarmFunctionLaptop,
+          randomId,
+              () => myAlarmFunctionLaptop(randomId),
           exact: true,
           wakeup: true,
         );
@@ -90,9 +99,19 @@ class _editLaptopState extends State<editLaptop> {
     }
   }
 
-  void myAlarmFunctionLaptop() {
+  void myAlarmFunctionLaptop(int id) {
     // Lakukan tugas yang diperlukan saat alarm terpicu
-    print('Alarm terpicu untuk kebutuhan Laptop!');
+    Notif.showTextNotif(
+      judul: 'PT Dami Sariwana',
+      body: 'Ada Aset Laptop yang jatuh tempo!',
+      fln: flutterLocalNotificationsPlugin,
+      id: id,
+    );
+  }
+
+  int generateRandomId() {
+    Random random = Random();
+    return random.nextInt(400) + 1;
   }
 
   void tambahKebutuhan_Laptop(){
@@ -155,7 +174,8 @@ class _editLaptopState extends State<editLaptop> {
           'Nama Kebutuhan Laptop': kebutuhan['Nama Kebutuhan Laptop'],
           'Masa Kebutuhan Laptop': kebutuhan['Masa Kebutuhan Laptop'],
           'Waktu Kebutuhan Laptop': timeKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan Laptop': daysBetween(DateTime.now(), timeKebutuhan)
+          'Hari Kebutuhan Laptop': daysBetween(DateTime.now(), timeKebutuhan),
+          'ID' : kebutuhan['ID'],
         };
       }).toList();
 
