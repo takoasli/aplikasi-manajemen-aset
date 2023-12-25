@@ -22,13 +22,12 @@ late List<String> DokCatatanEX = [];
 
 class _ExportCatatanState extends State<ExportCatatan> {
 
-
   Future <void> exportExcel() async{
     Excel eksel = Excel.createExcel();
     print('Tombol Export Ditekan!');
     eksel.rename(eksel.getDefaultSheet()!, 'Catatan Servis');
     Sheet sheet = eksel['Catatan Servis'];
-    sheet.setColumnWidth(4, 100); // Mengubah lebar kolom ke-5 menjadi 100
+    sheet.setColumnWidth(4, 50); // Mengubah lebar kolom ke-5 menjadi 100
     sheet.setColumnAutoFit(2); // Mengaktifkan autofit pada kolom ke-3 (index 2)
 
 
@@ -122,6 +121,51 @@ class _ExportCatatanState extends State<ExportCatatan> {
     cellK5.value = TextCellValue('Harga');
     cellK5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
         horizontalAlign: HorizontalAlign.Center);
+
+    int rowIndex = 6; // Mulai dari baris ke-7 untuk data dari Firebase
+    for (int i = 0; i < DokCatatanEX.length; i++) {
+      var docId = DokCatatanEX[i];
+      // Ambil data dari Firebase berdasarkan ID dokumen
+      DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+          .instance
+          .collection('Catatan Servis')
+          .doc(docId)
+          .get();
+
+      sheet.
+      cell(CellIndex.indexByString("C$rowIndex"))
+          .value = TextCellValue(snapshot['Nama Aset'].toString());
+      sheet
+          .cell(CellIndex.indexByString("D$rowIndex"))
+          .value = TextCellValue(snapshot['ID Aset'].toString()); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("E$rowIndex"))
+          .value = TextCellValue(snapshot['Jenis Aset'].toString()); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("F$rowIndex"))
+          .value = TextCellValue(snapshot['Lokasi Aset'].toString()); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("G$rowIndex"))
+          .value = TextCellValue(snapshot['Keterangan'].toString()); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("H$rowIndex"))
+          .value =
+      TextCellValue(snapshot['Kebutuhan']['Nama Kebutuhan'].toString()); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("I$rowIndex"))
+          .value =
+      TextCellValue(snapshot['Kebutuhan']['Status'].toString()); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("J$rowIndex"))
+          .value =
+      TextCellValue(snapshot['Catatan Biaya']['Nama Biaya']); // Ganti dengan field yang sesuai
+      sheet
+          .cell(CellIndex.indexByString("K$rowIndex"))
+          .value =
+      TextCellValue(snapshot['Catatan Biaya']['Harga'].toString()); // Ganti dengan field yang sesuai
+
+      rowIndex++;
+    }
 
     Directory? downloadsDirectory = await getDownloadsDirectory();
     if (downloadsDirectory != null) {
