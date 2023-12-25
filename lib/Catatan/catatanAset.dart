@@ -2,6 +2,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../Aset/ControllerLogic.dart';
+import '../Dashboard.dart';
 import '../komponen/checklists.dart';
 import '../komponen/kotakBiaya.dart';
 import '../komponen/kotakDialog.dart';
@@ -161,9 +162,32 @@ class _CatatanState extends State<Catatan> {
         btnOkOnPress: () {
           Navigator.of(context).pop();
         },
+        btnOkText: 'Ok',
+        btnCancelOnPress: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Dashboard()),
+          );
+        },
+        btnCancelText: 'Dashboard',
+        btnCancel: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Warna.green,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25),
+            ),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Dashboard()),
+            );
+          },
+          child: Text('Dashboard'),
+        ),
       ).show();
-      print('Data Catatan Berhasil Disimpan!');
 
+      print('Data Catatan Berhasil Disimpan!');
     } catch (e) {
       print("Error: $e");
     }
@@ -474,7 +498,8 @@ class _CatatanState extends State<Catatan> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(25),
                               side: const BorderSide(color: Warna.lightgreen, width: 5),
-                              )),
+                              )
+                          ),
                           child: Container(
                             width: 200,
                             child: Center(

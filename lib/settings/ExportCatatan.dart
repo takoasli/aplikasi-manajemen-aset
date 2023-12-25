@@ -27,8 +27,19 @@ class _ExportCatatanState extends State<ExportCatatan> {
     print('Tombol Export Ditekan!');
     eksel.rename(eksel.getDefaultSheet()!, 'Catatan Servis');
     Sheet sheet = eksel['Catatan Servis'];
-    sheet.setColumnWidth(4, 50); // Mengubah lebar kolom ke-5 menjadi 100
-    sheet.setColumnAutoFit(2); // Mengaktifkan autofit pada kolom ke-3 (index 2)
+    sheet.setColumnAutoFit(1); // No
+    sheet.setColumnAutoFit(2); // Tanggal Dibuat
+    sheet.setColumnAutoFit(3); // Nama Aset
+    sheet.setColumnAutoFit(4); // ID Aset
+    sheet.setColumnAutoFit(5); // Jenis Aset
+    sheet.setColumnAutoFit(6); // Lokasi Aset
+    sheet.setColumnAutoFit(7); // Keterangan
+    sheet.setColumnAutoFit(8); // Kebutuhan
+    sheet.setColumnAutoFit(9); // Nama Kebutuhan
+    sheet.setColumnAutoFit(10); // Status
+    sheet.setColumnAutoFit(11); // Catatan Biaya
+    sheet.setColumnAutoFit(12); // Harga
+    sheet.setColumnAutoFit(13); // Nama Biaya
 
 
     //isi tiap judul excell
@@ -36,134 +47,155 @@ class _ExportCatatanState extends State<ExportCatatan> {
     var cellD1 = sheet.cell(CellIndex.indexByString("D1"));
     cellD1.value = TextCellValue('Catatan Servis');
     sheet.merge(CellIndex.indexByString("D1"), CellIndex.indexByString("H2"));
-    cellD1.cellStyle = CellStyle(backgroundColorHex: "#C6E0B4", fontSize: 20,
+    cellD1.cellStyle = CellStyle(backgroundColorHex: "#C6E0B4", fontSize: 12,
     verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //nomor
     var cellA4 = sheet.cell(CellIndex.indexByString("A4"));
     cellA4.value = TextCellValue('No');
     sheet.merge(CellIndex.indexByString("A4"), CellIndex.indexByString("A5"));
-    cellA4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellA4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //tanggal
     var cellB4 = sheet.cell(CellIndex.indexByString("B4"));
     cellB4.value = TextCellValue('Tanggal Dibuat');
     sheet.merge(CellIndex.indexByString("B4"), CellIndex.indexByString("B5"));
-    cellB4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellB4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //nama aset
     var cellC4 = sheet.cell(CellIndex.indexByString("C4"));
     cellC4.value = TextCellValue('Nama Aset');
     sheet.merge(CellIndex.indexByString("C4"), CellIndex.indexByString("C5"));
-    cellC4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellC4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //ID Aset
     var cellD4 = sheet.cell(CellIndex.indexByString("D4"));
     cellD4.value = TextCellValue('ID Aset');
     sheet.merge(CellIndex.indexByString("D4"), CellIndex.indexByString("D5"));
-    cellD4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellD4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //jenis aset
     var cellE4 = sheet.cell(CellIndex.indexByString("E4"));
     cellE4.value = TextCellValue('Jenis Aset');
     sheet.merge(CellIndex.indexByString("E4"), CellIndex.indexByString("E5"));
-    cellE4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellE4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //lokasi
     var cellF4 = sheet.cell(CellIndex.indexByString("F4"));
     cellF4.value = TextCellValue('Lokasi Aset');
     sheet.merge(CellIndex.indexByString("F4"), CellIndex.indexByString("F5"));
-    cellF4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellF4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //keterangan
     var cellG4 = sheet.cell(CellIndex.indexByString("G4"));
     cellG4.value = TextCellValue('Keterangan');
     sheet.merge(CellIndex.indexByString("G4"), CellIndex.indexByString("G5"));
-    cellG4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellG4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         verticalAlign: VerticalAlign.Center, horizontalAlign: HorizontalAlign.Center);
 
     //kebutuhan
     var cellH4 = sheet.cell(CellIndex.indexByString("H4"));
     cellH4.value = TextCellValue('Kebutuhan');
     sheet.merge(CellIndex.indexByString("H4"), CellIndex.indexByString("I4"));
-    cellH4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8", fontSize: 20,
+    cellH4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8", fontSize: 12,
     horizontalAlign: HorizontalAlign.Center);
 
     var cellH5 = sheet.cell(CellIndex.indexByString("H5"));
     cellH5.value = TextCellValue('Nama Kebutuhan');
-    cellH5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellH5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         horizontalAlign: HorizontalAlign.Center);
 
     var cellI5 = sheet.cell(CellIndex.indexByString("I5"));
     cellI5.value = TextCellValue('Status');
-    cellI5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellI5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         horizontalAlign: HorizontalAlign.Center);
 
     //Catatan biaya
     var cellJ4 = sheet.cell(CellIndex.indexByString("J4"));
     cellJ4.value = TextCellValue('Catatan Biaya');
     sheet.merge(CellIndex.indexByString("J4"), CellIndex.indexByString("K4"));
-    cellJ4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellJ4.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         horizontalAlign: HorizontalAlign.Center);
 
     var cellJ5 = sheet.cell(CellIndex.indexByString("J5"));
     cellJ5.value = TextCellValue('Nama Biaya');
-    cellJ5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellJ5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         horizontalAlign: HorizontalAlign.Center);
 
     var cellK5 = sheet.cell(CellIndex.indexByString("K5"));
     cellK5.value = TextCellValue('Harga');
-    cellK5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 20,
+    cellK5.cellStyle = CellStyle(backgroundColorHex: "#B4C3E8",fontSize: 12,
         horizontalAlign: HorizontalAlign.Center);
 
     int rowIndex = 6; // Mulai dari baris ke-7 untuk data dari Firebase
     for (int i = 0; i < DokCatatanEX.length; i++) {
       var docId = DokCatatanEX[i];
-      // Ambil data dari Firebase berdasarkan ID dokumen
       DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
           .instance
           .collection('Catatan Servis')
           .doc(docId)
           .get();
 
+      String namaAset = snapshot['Nama Aset'];
+      String idAset = snapshot['ID Aset'];
+      String jenisAset = snapshot['Jenis Aset'];
+      String lokasiAset = snapshot['Lokasi Aset'];
+      String keterangan = snapshot['Catatan Tambahan'];
+
+      // List Kebutuhan
+      List<Map<String, dynamic>> kebutuhanList = List<Map<String, dynamic>>.from(snapshot['List Kebutuhan'] ?? []);
+      if (kebutuhanList != null && kebutuhanList.isNotEmpty) {
+        String kebutuhanText = '';
+        String statusText = '';
+        for (var kebutuhan in kebutuhanList) {
+          String namaKebutuhan = kebutuhan['Nama Kebutuhan'];
+          String status = kebutuhan['status'];
+
+          kebutuhanText += '$namaKebutuhan\n';
+          statusText += '$status\n';
+    }
+        sheet.cell(CellIndex.indexByString("H$rowIndex")).value = TextCellValue(kebutuhanText);
+      }
+
+      List<Map<String, dynamic>> biayaList = List<Map<String, dynamic>>.from(snapshot['Catatan Biaya'] ?? []);
+      if (biayaList != null && biayaList.isNotEmpty) {
+        String biayaText = '';
+        String hargaText = '';
+        for (var biaya in biayaList) {
+          String namaBiaya = biaya['Nama Biaya'];
+          String harga = biaya['Harga Biaya'].toString();
+
+          biayaText += '$namaBiaya\n';
+          hargaText +='$harga\n';
+        }
+        sheet.cell(CellIndex.indexByString("J$rowIndex")).value = TextCellValue(biayaText.trim());
+        sheet.cell(CellIndex.indexByString("K$rowIndex")).value = TextCellValue(hargaText.trim());
+      } else {
+
+        sheet.cell(CellIndex.indexByString("J$rowIndex")).value = TextCellValue('Tidak ada tambahan biaya');
+      }
+
       sheet.
       cell(CellIndex.indexByString("C$rowIndex"))
-          .value = TextCellValue(snapshot['Nama Aset'].toString());
+          .value = TextCellValue(namaAset);
       sheet
           .cell(CellIndex.indexByString("D$rowIndex"))
-          .value = TextCellValue(snapshot['ID Aset'].toString()); // Ganti dengan field yang sesuai
+          .value = TextCellValue(idAset); // Ganti dengan field yang sesuai
       sheet
           .cell(CellIndex.indexByString("E$rowIndex"))
-          .value = TextCellValue(snapshot['Jenis Aset'].toString()); // Ganti dengan field yang sesuai
+          .value = TextCellValue(jenisAset); // Ganti dengan field yang sesuai
       sheet
           .cell(CellIndex.indexByString("F$rowIndex"))
-          .value = TextCellValue(snapshot['Lokasi Aset'].toString()); // Ganti dengan field yang sesuai
+          .value = TextCellValue(lokasiAset); // Ganti dengan field yang sesuai
       sheet
           .cell(CellIndex.indexByString("G$rowIndex"))
-          .value = TextCellValue(snapshot['Keterangan'].toString()); // Ganti dengan field yang sesuai
-      sheet
-          .cell(CellIndex.indexByString("H$rowIndex"))
-          .value =
-      TextCellValue(snapshot['Kebutuhan']['Nama Kebutuhan'].toString()); // Ganti dengan field yang sesuai
-      sheet
-          .cell(CellIndex.indexByString("I$rowIndex"))
-          .value =
-      TextCellValue(snapshot['Kebutuhan']['Status'].toString()); // Ganti dengan field yang sesuai
-      sheet
-          .cell(CellIndex.indexByString("J$rowIndex"))
-          .value =
-      TextCellValue(snapshot['Catatan Biaya']['Nama Biaya']); // Ganti dengan field yang sesuai
-      sheet
-          .cell(CellIndex.indexByString("K$rowIndex"))
-          .value =
-      TextCellValue(snapshot['Catatan Biaya']['Harga'].toString()); // Ganti dengan field yang sesuai
-
+          .value = TextCellValue(keterangan);
       rowIndex++;
     }
 

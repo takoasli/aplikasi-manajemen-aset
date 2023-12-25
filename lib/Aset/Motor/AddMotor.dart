@@ -225,6 +225,7 @@ class _AddMotorState extends State<AddMotor> {
       'Kebutuhan Motor' : kebutuhan,
       'Gambar Motor' : gambarMotor,
       'Jenis Aset' : 'Motor',
+      'Lokasi' : 'Parkiran'
     });
   }
 

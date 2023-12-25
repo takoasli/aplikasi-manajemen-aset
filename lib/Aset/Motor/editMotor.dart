@@ -205,7 +205,8 @@ class _EditMotorState extends State<EditMotor> {
           'Gambar Motor' : GambarMotor,
           'Jenis Aset' : 'Motor',
           'Waktu Service Motor': waktuKebutuhanMotor.millisecondsSinceEpoch,
-          'Hari Service Motor': daysBetween(DateTime.now(), waktuKebutuhanMotor)
+          'Hari Service Motor': daysBetween(DateTime.now(), waktuKebutuhanMotor),
+          'Lokasi' : 'Parkiran'
         };
         await FirebaseFirestore.instance.collection('Motor').doc(dokMotor).update(DataMotorBaru);
       }

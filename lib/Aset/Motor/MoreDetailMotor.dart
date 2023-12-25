@@ -136,7 +136,8 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                               List_Kebutuhan: namaKebutuhan,
                               ID_Aset: widget.data['ID Motor'],
                               Nama_Aset: widget.data['Merek Motor'],
-                              Jenis_Aset: widget.data['Jenis Aset'],)
+                              Jenis_Aset: widget.data['Jenis Aset'],
+                              lokasiAset: widget.data['Lokasi'],)
                             )
                             );
                           },

@@ -137,7 +137,8 @@ class _MoreDetailmobilState extends State<MoreDetailmobil> {
                               List_Kebutuhan: namaKebutuhan,
                               ID_Aset: widget.data['ID Mobil'],
                               Nama_Aset: widget.data['Merek Mobil'],
-                              Jenis_Aset: widget.data['Jenis Aset'],)
+                              Jenis_Aset: widget.data['Jenis Aset'],
+                                lokasiAset: widget.data['Lokasi'])
                             )
                             );
                           },

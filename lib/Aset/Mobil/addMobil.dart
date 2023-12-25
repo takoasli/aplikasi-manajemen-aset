@@ -226,6 +226,7 @@ class _AddMobilState extends State<AddMobil> {
       'Kebutuhan Mobil' : kebutuhan,
       'Gambar Mobil' : GambarMobil,
       'Jenis Aset' : 'Mobil',
+      'Lokasi' : 'Parkiran'
     });
   }
 

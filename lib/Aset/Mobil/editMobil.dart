@@ -231,7 +231,8 @@ class _EditMobilState extends State<EditMobil> {
           'Gambar Mobil' : GambarMobil,
           'Jenis Aset' : 'Mobil',
           'Waktu Service Mobil': waktuKebutuhanMobil.millisecondsSinceEpoch,
-          'Hari Service Mobil': daysBetween(DateTime.now(), waktuKebutuhanMobil)
+          'Hari Service Mobil': daysBetween(DateTime.now(), waktuKebutuhanMobil),
+          'Lokasi' : 'Parkiran'
         };
         await FirebaseFirestore.instance.collection('Mobil').doc(dokMobil).update(DataMobilBaru);
       }
