@@ -1,11 +1,11 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:projek_skripsi/komponen/kotakDialogCatatan.dart';
 import '../Aset/ControllerLogic.dart';
 import '../Dashboard.dart';
 import '../komponen/checklists.dart';
 import '../komponen/kotakBiaya.dart';
-import '../komponen/kotakDialog.dart';
 import '../komponen/style.dart';
 
 
@@ -62,12 +62,11 @@ class _CatatanState extends State<Catatan> {
     showDialog(
         context: context,
         builder: (context) {
-          return DialogBox(
-            controller: isiDialog,
-            onAdd: () => SimpanTask(context),
-            onCancel: () => Navigator.of(context).pop(),
-            TextJudul: 'Kebutuhan Tambahan',
-          );
+          return KotakCatatanKebutuhan(
+              controller: isiDialog,
+              TextJudul: 'Kebutuhan Tambahan',
+              onAdd: () => SimpanTask(context),
+              onCancel: () => Navigator.of(context).pop());
         });
   }
 

@@ -139,28 +139,39 @@ class _ListCatatanState extends State<ListCatatan> {
 
 
         const SizedBox(height: 10),
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: Warna.white,
-                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+          Expanded(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Warna.white,
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+              ),
+              padding: const EdgeInsets.all(20),
+              child: DokCatatan.isEmpty // Periksa jika setelah filter tidak ada catatan yang ditemukan
+                  ? Center(
+                child: Text(
+                  'Tidak ada catatan terkait aset yang dipilih',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Warna.black,
+                    // Sesuaikan gaya teks sesuai kebutuhan
                   ),
-                  padding: const EdgeInsets.all(20),
-                  child: ListView.builder(
-                    itemCount: DokCatatan.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Material(
-                          borderRadius: BorderRadius.circular(10),
-                          elevation: 5,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            onTap: () async {
-                              DocumentSnapshot<Map<String, dynamic>> catatanDoc = await FirebaseFirestore.instance
-                                  .collection('Catatan Servis')
-                                  .doc(DokCatatan[index])
-                                  .get();
+                ),
+              )
+                  : ListView.builder(
+                itemCount: DokCatatan.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Material(
+                      borderRadius: BorderRadius.circular(10),
+                      elevation: 5,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () async {
+                          DocumentSnapshot<Map<String, dynamic>> catatanDoc = await FirebaseFirestore.instance
+                              .collection('Catatan Servis')
+                              .doc(DokCatatan[index])
+                              .get();
 
                           if (catatanDoc.exists) {
                             Map<String, dynamic> catatanData = catatanDoc.data() ?? {};
@@ -178,15 +189,13 @@ class _ListCatatanState extends State<ListCatatan> {
                             print('Dokumen tidak ditemukan');
                           }
                         },
-
-                            child: Container(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: BacaCatatan(
-                                      dokumenCatatan: DokCatatan[index],
-
+                        child: Container(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: BacaCatatan(
+                                  dokumenCatatan: DokCatatan[index],
                                 ),
                               ),
                             ],

@@ -53,7 +53,7 @@ class BacaCatatan extends StatelessWidget {
                     style: TextStyles.body.copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                   Text(
-                    formattedDate, // Menampilkan tanggal dalam format yang diinginkan
+                    formattedDate,
                     style: TextStyles.body.copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ],

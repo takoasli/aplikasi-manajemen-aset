@@ -73,6 +73,36 @@ class _DetailCatatanState extends State<DetailCatatan> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 25),
                   child: Text(
+                    'Lokasi',
+                    style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Container(
+                width: 350,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Warna.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                    padding: EdgeInsets.only(left: 10, top: 10),
+                    child: Text(
+                      '${widget.data['Lokasi Aset']}',
+                      style: TextStyles.body.copyWith(fontSize: 17),
+                    )
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Text(
                     'List Kebutuhan',
                     style: TextStyles.title.copyWith(fontSize: 20, color: Warna.white),
                   ),
@@ -119,7 +149,21 @@ class _DetailCatatanState extends State<DetailCatatan> {
                   color: Warna.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: ListView.builder(
+                child: widget.data['Catatan Biaya'].isEmpty // Periksa jika daftar biaya kosong
+                    ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      'Tidak ada Biaya apapun',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Warna.black,
+                        // Sesuaikan gaya teks sesuai kebutuhan
+                      ),
+                    ),
+                  ),
+                )
+                    : ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: widget.data['Catatan Biaya'].length,
