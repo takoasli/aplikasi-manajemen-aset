@@ -6,7 +6,7 @@ import 'package:projek_skripsi/Aset/AC/moreDetailAC.dart';
 import 'package:projek_skripsi/Aset/Laptop/moreDetailLaptop.dart';
 import 'package:projek_skripsi/Aset/Mobil/MoreDetailMobil.dart';
 import 'package:projek_skripsi/Aset/Motor/MoreDetailMotor.dart';
-import 'package:projek_skripsi/Dashboard.dart';
+import 'package:projek_skripsi/dashboard.dart';
 
 import '../Aset/PC/MoreDetailPC.dart';
 

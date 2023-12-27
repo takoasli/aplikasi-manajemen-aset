@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_skripsi/komponen/kotakDialogCatatan.dart';
 import '../Aset/ControllerLogic.dart';
-import '../Dashboard.dart';
+import '../dashboard.dart';
 import '../komponen/checklists.dart';
 import '../komponen/kotakBiaya.dart';
 import '../komponen/style.dart';
