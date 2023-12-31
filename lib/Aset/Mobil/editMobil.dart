@@ -327,7 +327,7 @@ class _EditMobilState extends State<EditMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Mesin',
+                    'Kapasitas Mesin(cc)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),

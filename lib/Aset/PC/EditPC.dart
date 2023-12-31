@@ -106,7 +106,6 @@ class _EditPCState extends State<EditPC> {
         Navigator.of(context).pop();
       } catch (error) {
         print('Error saat mengatur alarm: $error');
-        // Lakukan penanganan kesalahan jika parsing gagal
       }
     } else {
       print('Input Masa Kebutuhan tidak boleh kosong');
@@ -371,7 +370,7 @@ class _EditPCState extends State<EditPC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'RAM',
+                    'RAM (GB)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -388,7 +387,7 @@ class _EditPCState extends State<EditPC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Storage',
+                    'Storage (GB)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -422,7 +421,7 @@ class _EditPCState extends State<EditPC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'PSU',
+                    'Kapasitas PSU (watt)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),

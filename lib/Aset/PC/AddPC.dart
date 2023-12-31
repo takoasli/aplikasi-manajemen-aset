@@ -327,7 +327,7 @@ class _AddPCState extends State<AddPC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'RAM',
+                    'RAM (GB)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -342,7 +342,7 @@ class _AddPCState extends State<AddPC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Storage',
+                    'Storage (GB)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -372,7 +372,7 @@ class _AddPCState extends State<AddPC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'PSU',
+                    'Kapasitas PSU (watt)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),

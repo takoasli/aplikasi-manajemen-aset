@@ -116,7 +116,7 @@ class ScanQR extends StatelessWidget {
       dialogType: DialogType.error,
       animType: AnimType.bottomSlide,
       title: 'Gagal!',
-      desc: 'Aset dengan ID: $barcode tidak ditemukan.',
+      desc: 'Aset Tidak Ditemukan!',
       btnOkOnPress: () {
         Navigator.push(
           context,

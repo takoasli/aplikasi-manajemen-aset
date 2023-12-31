@@ -294,7 +294,7 @@ class _AddMobilState extends State<AddMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Mesin',
+                    'Kapasitas Mesin (cc)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -354,7 +354,7 @@ class _AddMobilState extends State<AddMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Bahan Bakar',
+                    'Kapasitas Bahan Bakar (perliter)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -384,7 +384,7 @@ class _AddMobilState extends State<AddMobil> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Aki',
+                    'Kapasitas Aki (Ah)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),

@@ -45,7 +45,7 @@ class DialogBox extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Text('Masa Kebutuhan',
+              Text('Masa Kebutuhan (perbulan)',
                 style: TextStyles.body.copyWith(fontSize: 17, color: Warna.white),
                 textAlign: TextAlign.left,),
               const SizedBox(height: 10),

@@ -292,7 +292,7 @@ class _AddMotorState extends State<AddMotor> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Mesin',
+                    'Kapasitas Mesin (cc)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -337,7 +337,7 @@ class _AddMotorState extends State<AddMotor> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Bahan Bakar',
+                    'Kapasitas Bahan Bakar (perliter)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -352,7 +352,7 @@ class _AddMotorState extends State<AddMotor> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Minyak Pelumas',
+                    'Kapasitas Minyak Pelumas (perliter)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
@@ -367,7 +367,7 @@ class _AddMotorState extends State<AddMotor> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
-                    'Kapasitas Aki',
+                    'Kapasitas Aki (V)',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),

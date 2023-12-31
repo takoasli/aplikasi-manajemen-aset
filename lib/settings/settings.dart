@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projek_skripsi/settings/ExportAset.dart';
 import 'package:projek_skripsi/settings/ExportCatatan.dart';
 import 'package:projek_skripsi/settings/GantiPassword.dart';
 
@@ -43,8 +44,10 @@ class _SettingsState extends State<Settings> {
                   title: Text('Export Aset'),
                   subtitle: Text('Akan mengeksport Aset Yang telah dibuat'),
                   onTap: () {
-                    // Action when 'Export Aset' is tapped
-                    // Add your logic here
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ExportAset()),
+                    );
                   },
                 ),
               ),
