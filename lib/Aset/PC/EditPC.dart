@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,12 +44,13 @@ class KebutuhanModelUpdate {
     };
   }
 }
-
+enum PCStatus { aktif, rusak, hilang }
+PCStatus selectedStatus = PCStatus.aktif;
 
 class _EditPCState extends State<EditPC> {
+  String selectedRuangan = "";
   final merekPCController = TextEditingController();
   final IdPCController = TextEditingController();
-  final lokasiRuanganController = TextEditingController();
   final CPUController = TextEditingController();
   final RamController = TextEditingController();
   final VGAController = TextEditingController();
@@ -61,6 +63,26 @@ class _EditPCState extends State<EditPC> {
   Map <String, dynamic> dataPC = {};
   final ImagePicker _gambarPC = ImagePicker();
   List Kebutuhan = [];
+  List<String> Ruangan = [
+    "ADM FAKTURIS",
+    "ADM INKASO",
+    "ADM SALES",
+    "ADM PRODUKSI",
+    "LAB",
+    "APJ",
+    "DIGITAL MARKETING",
+    "Ruangan EKSPOR",
+    "KASIR",
+    "HRD",
+    "KEPALA GUDANG",
+    "MANAGER MARKETING",
+    "MANAGER PRODUKSI",
+    "MANAGER QC-R&D",
+    "MEETING",
+    "STUDIO",
+    "TELE SALES",
+    "MANAGER EKSPORT"
+  ];
 
   void PilihGambarPC() async{
     final pilihPC = await _gambarPC.pickImage(source: ImageSource.gallery);
@@ -110,6 +132,19 @@ class _EditPCState extends State<EditPC> {
     } else {
       print('Input Masa Kebutuhan tidak boleh kosong');
       // Tindakan jika input kosong
+    }
+  }
+
+  String getStatusPC(PCStatus status) {
+    switch (status) {
+      case PCStatus.aktif:
+        return 'Aktif';
+      case PCStatus.rusak:
+        return 'Rusak';
+      case PCStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -172,7 +207,7 @@ class _EditPCState extends State<EditPC> {
   Future<void> UpdatePC(String dokPC, Map<String, dynamic> DataPC) async {
     try {
       String GambarPC;
-
+      String status = getStatusPC(selectedStatus);
       List<Map<String, dynamic>> listKebutuhan = Kebutuhan.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan'].toString()));
         return {
@@ -197,7 +232,7 @@ class _EditPCState extends State<EditPC> {
         Map<String, dynamic> DataPCBaru = {
           'Merek PC': merekPCController.text,
           'ID PC': IdPCController.text,
-          'Lokasi Ruangan': lokasiRuanganController.text,
+          'Ruangan' : selectedRuangan,
           'CPU': CPUController.text,
           'RAM': RamController.text,
           'Kapasitas Penyimpanan': StorageController.text,
@@ -207,7 +242,8 @@ class _EditPCState extends State<EditPC> {
           'Gambar PC': GambarPC,
           'Jenis Aset' : 'PC',
           'Waktu Kebutuhan PC': waktuKebutuhan.millisecondsSinceEpoch,
-          'Hari Kebutuhan PC': daysBetween(DateTime.now(), waktuKebutuhan)
+          'Hari Kebutuhan PC': daysBetween(DateTime.now(), waktuKebutuhan),
+          'Status' : status
         };
 
         // Update dokumen Firestore sesuai dengan dokPC
@@ -252,7 +288,7 @@ class _EditPCState extends State<EditPC> {
       setState(() {
         merekPCController.text = data?['Merek PC'] ?? '';
         IdPCController.text = data?['ID PC'] ?? '';
-        lokasiRuanganController.text = data?['Lokasi Ruangan'] ?? '';
+        selectedRuangan = data?['Ruangan'] ?? '';
         CPUController.text = data?['CPU'] ?? '';
         RamController.text = (data?['RAM'] ?? '').toString();
         StorageController.text = (data?['Kapasitas Penyimpanan'] ?? '').toString();
@@ -332,6 +368,49 @@ class _EditPCState extends State<EditPC> {
                     textInputAction: TextInputAction.next,
                     controller: IdPCController),
                 const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<PCStatus>(
+                      title: Text('Aktif'),
+                      value: PCStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (PCStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? PCStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<PCStatus>(
+                      title: Text('Rusak'),
+                      value: PCStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (PCStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? PCStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<PCStatus>(
+                      title: Text('Hilang'),
+                      value: PCStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (PCStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? PCStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
@@ -343,11 +422,27 @@ class _EditPCState extends State<EditPC> {
                 ),
                 const SizedBox(height: 10),
 
-                MyTextField(
-                    textInputType: TextInputType.text,
-                    hint: '',
-                    textInputAction: TextInputAction.next,
-                    controller: lokasiRuanganController),
+                DropdownSearch<String>(
+                  popupProps: PopupProps.menu(
+                    showSelectedItems: true,
+                  ),
+                  items: Ruangan,
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        hintText: "Pilih Ruangan...",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30)
+                        )
+                    ),
+                  ),
+                  onChanged: (selectedValue){
+                    print(selectedValue);
+                    setState(() {
+                      selectedRuangan = selectedValue ?? "";
+                    });
+                  },
+                ),
                 const SizedBox(height: 10),
 
                 Padding(

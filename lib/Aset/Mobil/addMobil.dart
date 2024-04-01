@@ -35,6 +35,9 @@ class KebutuhanModelMobil {
       );
 }
 
+enum MobilStatus { aktif, rusak, hilang }
+MobilStatus selectedStatus = MobilStatus.aktif;
+
 class _AddMobilState extends State<AddMobil> {
   final merekMobilController = TextEditingController();
   final idMobilCOntroller = TextEditingController();
@@ -59,6 +62,19 @@ class _AddMobilState extends State<AddMobil> {
       setState(() {
         imgMobilController.text = pilihMobil.path;
       });
+    }
+  }
+
+  String getStatusMobil(MobilStatus status) {
+    switch (status) {
+      case MobilStatus.aktif:
+        return 'Aktif';
+      case MobilStatus.rusak:
+        return 'Rusak';
+      case MobilStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -161,6 +177,7 @@ class _AddMobilState extends State<AddMobil> {
     try{
       String lokasiGambarMobil = imgMobilController.text;
       String fotoMobil = '';
+      String status = getStatusMobil(selectedStatus);
       List<Map<String, dynamic>> ListKebutuhan_Mobil = Kebutuhan_Mobil.map((kebutuhan) {
         var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanMobil);
         return {
@@ -189,6 +206,7 @@ class _AddMobilState extends State<AddMobil> {
         int.parse(akiController.text.trim()),
         ListKebutuhan_Mobil,
         fotoMobil,
+        status
       );
 
       AwesomeDialog(
@@ -212,7 +230,8 @@ class _AddMobilState extends State<AddMobil> {
   }
 
   Future tambahMobil (String merek, String ID, int tipemesin,
-      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, int Aki,List<Map<String, dynamic>> kebutuhan, String GambarMobil) async{
+      String tipeBB, String pendingin, String transmisi, int kapasitasBB, String ban, int Aki,List<Map<String, dynamic>> kebutuhan, String GambarMobil,
+      String status) async{
     await FirebaseFirestore.instance.collection('Mobil').add({
       'Merek Mobil' : merek,
       'ID Mobil' : ID,
@@ -226,7 +245,8 @@ class _AddMobilState extends State<AddMobil> {
       'Kebutuhan Mobil' : kebutuhan,
       'Gambar Mobil' : GambarMobil,
       'Jenis Aset' : 'Mobil',
-      'Lokasi' : 'Parkiran'
+      'Lokasi' : 'Parkiran',
+      'Status' : status
     });
   }
 
@@ -291,6 +311,49 @@ class _AddMobilState extends State<AddMobil> {
                     textInputAction: TextInputAction.next,
                     controller: idMobilCOntroller),
                 SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<MobilStatus>(
+                      title: Text('Aktif'),
+                      value: MobilStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (MobilStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MobilStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<MobilStatus>(
+                      title: Text('Rusak'),
+                      value: MobilStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (MobilStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MobilStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<MobilStatus>(
+                      title: Text('Hilang'),
+                      value: MobilStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (MobilStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MobilStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(

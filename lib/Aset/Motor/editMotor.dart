@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +44,8 @@ class KebutuhanModelUpdateMotor {
     };
   }
 }
+enum MotorStatus { aktif, rusak, hilang }
+MotorStatus selectedStatus = MotorStatus.aktif;
 
 class _EditMotorState extends State<EditMotor> {
   final merekMotorController = TextEditingController();
@@ -71,6 +72,19 @@ class _EditMotorState extends State<EditMotor> {
       setState(() {
         ImgMotorController.text = pilihMotor.path;
       });
+    }
+  }
+
+  String getStatusMotor(MotorStatus status) {
+    switch (status) {
+      case MotorStatus.aktif:
+        return 'Aktif';
+      case MotorStatus.rusak:
+        return 'Rusak';
+      case MotorStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -170,6 +184,7 @@ class _EditMotorState extends State<EditMotor> {
   Future<void> UpdateMotor(String dokMotor, Map<String, dynamic> DataMotor) async{
     try{
       String GambarMotor;
+      String status = getStatusMotor(selectedStatus);
       List<Map<String, dynamic>> ListKebutuhan_Motor = Kebutuhan_Motor.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan Motor'].toString()));
         return {
@@ -206,7 +221,8 @@ class _EditMotorState extends State<EditMotor> {
           'Jenis Aset' : 'Motor',
           'Waktu Service Motor': waktuKebutuhanMotor.millisecondsSinceEpoch,
           'Hari Service Motor': daysBetween(DateTime.now(), waktuKebutuhanMotor),
-          'Lokasi' : 'Parkiran'
+          'Lokasi' : 'Parkiran',
+          'Status' : status
         };
         await FirebaseFirestore.instance.collection('Motor').doc(dokMotor).update(DataMotorBaru);
       }
@@ -246,12 +262,12 @@ class _EditMotorState extends State<EditMotor> {
       idMotorController.text = data?['ID Motor'] ?? '';
       kapasitasMesinController.text = (data?['Kapasitas Mesin'] ?? '').toString();
       pendinginContorller.text = (data?['Sistem Pendingin'] ?? '').toString();
-      transmisiController.text = data?['Tipe Transmisi' ?? ''];
-      KapasitasBBController.text = (data?['Kapasitas Bahan Bakar' ?? '']).toString();
-      KapasitasMinyakController.text = (data?['Kapasitas Minyak' ?? '']).toString();
-      tipeAkiController.text = (data?['Tipe Aki' ?? '']).toString();
-      banDepanController.text = data?['Ban Depan' ?? ''];
-      banBelakangController.text = data?['Ban Belakang' ?? ''];
+      transmisiController.text = data?['Tipe Transmisi'];
+      KapasitasBBController.text = (data?['Kapasitas Bahan Bakar']).toString();
+      KapasitasMinyakController.text = (data?['Kapasitas Minyak']).toString();
+      tipeAkiController.text = (data?['Tipe Aki']).toString();
+      banDepanController.text = data?['Ban Depan'];
+      banBelakangController.text = data?['Ban Belakang'];
       final UrlMotor = data?['Gambar Motor'] ?? '';
       oldphotoMotor = UrlMotor;
       Kebutuhan_Motor = List<Map<String, dynamic>>.from(data?['Kebutuhan Motor'] ?? []);
@@ -323,6 +339,50 @@ class _EditMotorState extends State<EditMotor> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: idMotorController),
+                const SizedBox(height: 10),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<MotorStatus>(
+                      title: Text('Aktif'),
+                      value: MotorStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (MotorStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MotorStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<MotorStatus>(
+                      title: Text('Rusak'),
+                      value: MotorStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (MotorStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MotorStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<MotorStatus>(
+                      title: Text('Hilang'),
+                      value: MotorStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (MotorStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MotorStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 10),
 
                 Padding(

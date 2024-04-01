@@ -422,25 +422,6 @@ class _MoreDetailMotorState extends State<MoreDetailMotor> {
                                 ),
                               ),
                               const SizedBox(height: 10),
-
-                              Text(
-                                  'Tempo Maintenance',
-                                  style: TextStyles.title.copyWith(
-                                      fontSize: 18,
-                                      color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
-                              SizedBox(height: 5),
-                              Text(
-                                '${widget.data['Masa Servis']} Bulan',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-
                             ],
                           ),
                         ),

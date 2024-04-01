@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -34,13 +35,15 @@ class KebutuhanModelAC {
       this.randomID
       );
 }
+enum ACStatus { aktif, rusak, hilang }
+ACStatus selectedStatus = ACStatus.aktif;
 
 class _AddACState extends State<AddAC> {
+  String selectedRuangan = "";
   final MerekACController = TextEditingController();
   final idACController = TextEditingController();
   final wattController = TextEditingController();
   final PKController = TextEditingController();
-  final ruanganController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
   final isiKebutuhanAC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
@@ -48,6 +51,26 @@ class _AddACState extends State<AddAC> {
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
   List Kebutuhan_AC = [];
+  List<String> Ruangan = [
+    "ADM FAKTURIS",
+    "ADM INKASO",
+    "ADM SALES",
+    "ADM PRODUKSI",
+    "LAB",
+    "APJ",
+    "DIGITAL MARKETING",
+    "Ruangan EKSPOR",
+    "KASIR",
+    "HRD",
+    "KEPALA GUDANG",
+    "MANAGER MARKETING",
+    "MANAGER PRODUKSI",
+    "MANAGER QC-R&D",
+    "MEETING",
+    "STUDIO",
+    "TELE SALES",
+    "MANAGER EKSPORT"
+  ];
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -68,6 +91,19 @@ class _AddACState extends State<AddAC> {
       setState(() {
         gambarAcOutdoorController.text = pilihOutdoor.path;
       });
+    }
+  }
+
+  String getStatusAC(ACStatus status) {
+    switch (status) {
+      case ACStatus.aktif:
+        return 'Aktif';
+      case ACStatus.rusak:
+        return 'Rusak';
+      case ACStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -198,6 +234,7 @@ class _AddACState extends State<AddAC> {
       String fotoIndoor = '';
       String lokasiGambarOutdoor = gambarAcOutdoorController.text;
       String fotoOutdoor = '';
+      String status = getStatusAC(selectedStatus);
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanAC);
 
@@ -224,10 +261,11 @@ class _AddACState extends State<AddAC> {
         idACController.text.trim(),
         int.parse(wattController.text.trim()),
         int.parse(PKController.text.trim()),
-        ruanganController.text.trim(),
+        selectedRuangan,
         ListKebutuhan_AC,
         fotoIndoor,
         fotoOutdoor,
+        status
       );
 
       AwesomeDialog(
@@ -249,17 +287,19 @@ class _AddACState extends State<AddAC> {
     }
   }
 
-  Future tambahAC(String merek, String ID, int watt, int pk, String ruangan,List<Map<String, dynamic>> kebutuhan, String UrlIndoor, String UrlOutdoor) async{
+  Future tambahAC(String merek, String ID, int watt, int pk, String selectedRuangan,List<Map<String, dynamic>> kebutuhan, String UrlIndoor, String UrlOutdoor,
+      String status) async{
     await FirebaseFirestore.instance.collection('Aset').add({
       'Merek AC' : merek,
       'ID AC' : ID,
       'Kapasitas Watt' : watt,
       'Kapasitas PK' : pk,
-      'Lokasi Ruangan' : ruangan,
+      'Ruangan' : selectedRuangan,
       'Kebutuhan AC' : kebutuhan,
       'Foto AC Indoor' : UrlIndoor,
       'Foto AC Outdoor' : UrlOutdoor,
       'Jenis Aset' : 'AC',
+      'Status' : status
     });
   }
 
@@ -327,6 +367,49 @@ class _AddACState extends State<AddAC> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<ACStatus>(
+                      title: Text('Aktif'),
+                      value: ACStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (ACStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? ACStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<ACStatus>(
+                      title: Text('Rusak'),
+                      value: ACStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (ACStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? ACStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<ACStatus>(
+                      title: Text('Hilang'),
+                      value: ACStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (ACStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? ACStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
                     'Kapasitas Watt',
                     style: TextStyles.title
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
@@ -360,12 +443,29 @@ class _AddACState extends State<AddAC> {
                         .copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
-                MyTextField(
-                    textInputType: TextInputType.text,
-                    hint: '',
-                    textInputAction: TextInputAction.next,
-                    controller: ruanganController),
-                SizedBox(height: 10),
+                DropdownSearch<String>(
+                  popupProps: PopupProps.menu(
+                    showSelectedItems: true,
+                  ),
+                  items: Ruangan,
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        hintText: "Pilih Ruangan...",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30)
+                        )
+                    ),
+                  ),
+                  onChanged: (selectedValue){
+                    print(selectedValue);
+                    setState(() {
+                      selectedRuangan = selectedValue ?? "";
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(

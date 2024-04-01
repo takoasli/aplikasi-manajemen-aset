@@ -1,12 +1,12 @@
 // Hitung hari antara 2 tangal
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
 import 'package:excel/excel.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // Hitung perbandingan tanggal berupa hari
 int daysBetween(DateTime from, DateTime to) {
@@ -319,14 +319,22 @@ Future<void> exportExcel(
         statusText += '$status\n';
       }
 
-      sheet.cell(CellIndex.indexByString("H$rowIndex")).value =
+      sheet
+          .cell(CellIndex.indexByString("H$rowIndex"))
+          .value =
           TextCellValue(kebutuhanText);
-      sheet.cell(CellIndex.indexByString("H$rowIndex")).cellStyle =
+      sheet
+          .cell(CellIndex.indexByString("H$rowIndex"))
+          .cellStyle =
           CellStyle(textWrapping: TextWrapping.WrapText);
 
-      sheet.cell(CellIndex.indexByString("I$rowIndex")).value =
+      sheet
+          .cell(CellIndex.indexByString("I$rowIndex"))
+          .value =
           TextCellValue(statusText);
-      sheet.cell(CellIndex.indexByString("I$rowIndex")).cellStyle =
+      sheet
+          .cell(CellIndex.indexByString("I$rowIndex"))
+          .cellStyle =
           CellStyle(textWrapping: TextWrapping.WrapText);
     }
 
@@ -343,63 +351,101 @@ Future<void> exportExcel(
         hargaText += '${convertToRupiah(harga)}\n';
       }
 
-      sheet.cell(CellIndex.indexByString("J$rowIndex")).value =
+      sheet
+          .cell(CellIndex.indexByString("J$rowIndex"))
+          .value =
           TextCellValue(namaBiayaText);
-      sheet.cell(CellIndex.indexByString("J$rowIndex")).cellStyle =
+      sheet
+          .cell(CellIndex.indexByString("J$rowIndex"))
+          .cellStyle =
           CellStyle(textWrapping: TextWrapping.WrapText);
 
-      sheet.cell(CellIndex.indexByString("K$rowIndex")).value =
+      sheet
+          .cell(CellIndex.indexByString("K$rowIndex"))
+          .value =
           TextCellValue(hargaText);
-      sheet.cell(CellIndex.indexByString("K$rowIndex")).cellStyle =
+      sheet
+          .cell(CellIndex.indexByString("K$rowIndex"))
+          .cellStyle =
           CellStyle(textWrapping: TextWrapping.WrapText);
     } else {
-      sheet.cell(CellIndex.indexByString("J$rowIndex")).value =
+      sheet
+          .cell(CellIndex.indexByString("J$rowIndex"))
+          .value =
           TextCellValue('Tidak ada tambahan biaya');
     }
 
-    sheet.cell(CellIndex.indexByString("A$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("A$rowIndex"))
+        .value =
         TextCellValue((nomor).toString());
-    sheet.cell(CellIndex.indexByString("C$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("C$rowIndex"))
+        .value =
         TextCellValue(namaAset);
-    sheet.cell(CellIndex.indexByString("D$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("D$rowIndex"))
+        .value =
         TextCellValue(idAset);
-    sheet.cell(CellIndex.indexByString("B$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("B$rowIndex"))
+        .value =
         TextCellValue(TanggalServis);
-    sheet.cell(CellIndex.indexByString("E$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("E$rowIndex"))
+        .value =
         TextCellValue(jenisAset);
-    sheet.cell(CellIndex.indexByString("F$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("F$rowIndex"))
+        .value =
         TextCellValue(lokasiAset);
-    sheet.cell(CellIndex.indexByString("G$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("G$rowIndex"))
+        .value =
         TextCellValue(keterangan);
-    sheet.cell(CellIndex.indexByString("L$rowIndex")).value =
+    sheet
+        .cell(CellIndex.indexByString("L$rowIndex"))
+        .value =
         TextCellValue(convertToRupiah(total));
 
     nomor++;
     rowIndex++;
   }
 
-  Directory? downloadsDirectory = await getExternalStorageDirectory();
-  if (downloadsDirectory != null) {
-    String filePath = '/storage/emulated/0/Download/${namafile}.xlsx';
+  Directory? appDocDir = await getExternalStorageDirectory();
 
-    final File file = File(filePath);
-    if (await file.exists()) {
-      await file.delete();
+  if (Platform.isAndroid) {
+    final permissionStatus = await Permission.storage.request();
+    if (permissionStatus.isGranted) {
+      if (appDocDir != null) {
+        String filePath = '${appDocDir.path}/${namafile}.xlsx';
+
+        final File file = File(filePath);
+        if (await file.exists()) {
+          await file.delete();
+        }
+
+        await file.writeAsBytes(eksel.encode()!);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Export berhasil. File disimpan di folder Download'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error mengakses direktori unduhan.'),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Permission denied for storage access.'),
+        ),
+      );
     }
-
-    await file.writeAsBytes(eksel.encode()!);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Export berhasil. File disimpan di folder Download'),
-      ),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Error mengakses direktori unduhan.'),
-      ),
-    );
   }
 }
 
