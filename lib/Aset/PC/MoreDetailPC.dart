@@ -148,7 +148,7 @@ class _MoreDetailState extends State<MoreDetail> {
                                       ID_Aset: widget.data['ID PC'],
                                       Nama_Aset: widget.data['Merek PC'],
                                       Jenis_Aset: widget.data['Jenis Aset'],
-                                      lokasiAset: widget.data['Lokasi Ruangan'],
+                                      lokasiAset: widget.data['Ruangan'],
                                     )));
                           },
                           icon:
@@ -297,7 +297,7 @@ class _MoreDetailState extends State<MoreDetail> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '${widget.data['Lokasi Ruangan']}',
+                                '${widget.data['Ruangan']}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   letterSpacing: 1,
@@ -394,24 +394,6 @@ class _MoreDetailState extends State<MoreDetail> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-
-                              Text(
-                                  'Tempo Maintenance',
-                                  style: TextStyles.title.copyWith(
-                                      fontSize: 18,
-                                      color: Warna.darkgrey,
-                                      fontWeight: FontWeight.w500
-                                  )
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                '${widget.data['Masa Servis']} bulan',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-
                             ],
                           ),
                         ),

@@ -5,6 +5,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -43,13 +44,15 @@ class KebutuhanModelUpdateAC {
     };
   }
 }
+enum ACStatus { aktif, rusak, hilang }
+ACStatus selectedStatus = ACStatus.aktif;
 
 class _UpdateACState extends State<UpdateAC> {
+  String selectedRuangan = "";
   final MerekACController = TextEditingController();
   final idACController = TextEditingController();
   final wattController = TextEditingController();
   final PKController = TextEditingController();
-  final ruanganController = TextEditingController();
   final MasaKebutuhanController = TextEditingController();
   final isiKebutuhan_AC = TextEditingController();
   final ImagePicker _gambarACIndoor = ImagePicker();
@@ -57,6 +60,26 @@ class _UpdateACState extends State<UpdateAC> {
   final gambarAcIndoorController = TextEditingController();
   final gambarAcOutdoorController = TextEditingController();
   List Kebutuhan_AC = [];
+  List<String> Ruangan = [
+    "ADM FAKTURIS",
+    "ADM INKASO",
+    "ADM SALES",
+    "ADM PRODUKSI",
+    "LAB",
+    "APJ",
+    "DIGITAL MARKETING",
+    "Ruangan EKSPOR",
+    "KASIR",
+    "HRD",
+    "KEPALA GUDANG",
+    "MANAGER MARKETING",
+    "MANAGER PRODUKSI",
+    "MANAGER QC-R&D",
+    "MEETING",
+    "STUDIO",
+    "TELE SALES",
+    "MANAGER EKSPORT"
+  ];
   String oldphotoIndoor = '';
   String oldphotoOutdoor = '';
   Map <String, dynamic> dataAC = {};
@@ -130,6 +153,19 @@ class _UpdateACState extends State<UpdateAC> {
       fln: flutterLocalNotificationsPlugin,
       id: id,
     );
+  }
+
+  String getStatusAC(ACStatus status) {
+    switch (status) {
+      case ACStatus.aktif:
+        return 'Aktif';
+      case ACStatus.rusak:
+        return 'Rusak';
+      case ACStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
+    }
   }
 
   void tambahKebutuhan_AC(){
@@ -224,7 +260,7 @@ class _UpdateACState extends State<UpdateAC> {
     try{
       String GambarACIndoor;
       String GambarACOutdoor;
-
+      String status = getStatusAC(selectedStatus);
       List<Map<String, dynamic>> ListKebutuhan_AC = Kebutuhan_AC.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan AC'].toString()));
         return {
@@ -254,13 +290,14 @@ class _UpdateACState extends State<UpdateAC> {
           'ID AC': idACController.text,
           'Kapasitas Watt': wattController.text,
           'Kapasitas PK': PKController.text,
-          'Lokasi Ruangan' : ruanganController.text,
+          'Ruangan' : selectedRuangan,
           'Kebutuhan AC' : ListKebutuhan_AC,
           'Foto AC Indoor': GambarACIndoor,
           'Foto AC Outdoor': GambarACOutdoor,
           'Jenis Aset' : 'AC',
           'Waktu Kebutuhan AC' : waktuKebutuhanAC.millisecondsSinceEpoch,
-          'Hari Kebutuhan AC' : daysBetween(DateTime.now(), waktuKebutuhanAC)
+          'Hari Kebutuhan AC' : daysBetween(DateTime.now(), waktuKebutuhanAC),
+          'Status' : status
         };
         await FirebaseFirestore.instance.collection('Aset').doc(dokAC).update(DataACBaru);
       }
@@ -301,7 +338,7 @@ class _UpdateACState extends State<UpdateAC> {
         idACController.text = data?['ID AC'] ?? '';
         wattController.text = (data?['Kapasitas Watt'] ?? '').toString();
         PKController.text = (data?['Kapasitas PK'] ?? '').toString();
-        ruanganController.text = data?['Lokasi Ruangan'] ?? '';
+        selectedRuangan = data?['Ruangan'] ?? '';
         final UrlIndoor = data?['Foto AC Indoor'] ?? '';
         oldphotoIndoor = UrlIndoor;
         final UrlOutdoor = data?['Foto AC Outdoor'] ?? '';
@@ -378,9 +415,50 @@ class _UpdateACState extends State<UpdateAC> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: idACController),
-
                 SizedBox(height: 10),
-
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<ACStatus>(
+                      title: Text('Aktif'),
+                      value: ACStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (ACStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? ACStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<ACStatus>(
+                      title: Text('Rusak'),
+                      value: ACStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (ACStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? ACStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<ACStatus>(
+                      title: Text('Hilang'),
+                      value: ACStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (ACStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? ACStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
@@ -422,13 +500,28 @@ class _UpdateACState extends State<UpdateAC> {
                     ,)
                   ),
 
-                MyTextField(
-                    textInputType: TextInputType.text,
-                    hint: '',
-                    textInputAction: TextInputAction.next,
-                    controller: ruanganController),
-
-                SizedBox(height: 10),
+                DropdownSearch<String>(
+                  popupProps: PopupProps.menu(
+                    showSelectedItems: true,
+                  ),
+                  items: Ruangan,
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        hintText: "Pilih Ruangan...",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30)
+                        )
+                    ),
+                  ),
+                  onChanged: (selectedValue){
+                    print(selectedValue);
+                    setState(() {
+                      selectedRuangan = selectedValue ?? "";
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),

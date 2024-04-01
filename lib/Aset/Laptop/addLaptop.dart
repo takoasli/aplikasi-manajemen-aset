@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:dropdown_search/dropdown_search.dart';
 import '../../komponen/kotakDialog.dart';
 import '../../komponen/style.dart';
 import '../../main.dart';
@@ -34,11 +34,13 @@ class KebutuhanModelLaptop {
       this.randomID
       );
 }
+enum LaptopStatus { aktif, rusak, hilang }
+LaptopStatus selectedStatus = LaptopStatus.aktif;
 
 class _AddLaptopState extends State<AddLaptop> {
+  String selectedRuangan = "";
   final merekLaptopController = TextEditingController();
   final IdLaptopController = TextEditingController();
-  final lokasiRuanganController = TextEditingController();
   final CPUController = TextEditingController();
   final RamController = TextEditingController();
   final VGAController = TextEditingController();
@@ -50,6 +52,27 @@ class _AddLaptopState extends State<AddLaptop> {
   final ImagePicker _gambarLaptop = ImagePicker();
   List Kebutuhan_Laptop = [
   ];
+  List<String> Ruangan = [
+    "ADM FAKTURIS",
+    "ADM INKASO",
+    "ADM SALES",
+    "ADM PRODUKSI",
+    "LAB",
+    "APJ",
+    "DIGITAL MARKETING",
+    "Ruangan EKSPOR",
+    "KASIR",
+    "HRD",
+    "KEPALA GUDANG",
+    "MANAGER MARKETING",
+    "MANAGER PRODUKSI",
+    "MANAGER QC-R&D",
+    "MEETING",
+    "STUDIO",
+    "TELE SALES",
+    "MANAGER EKSPORT"
+  ];
+
 
   void PilihGambarLaptop() async {
     final pilihLaptop =
@@ -79,6 +102,19 @@ class _AddLaptopState extends State<AddLaptop> {
     } catch (e) {
       print('$e');
       return '';
+    }
+  }
+
+  String getStatusLaptop(LaptopStatus status) {
+    switch (status) {
+      case LaptopStatus.aktif:
+        return 'Aktif';
+      case LaptopStatus.rusak:
+        return 'Rusak';
+      case LaptopStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -165,6 +201,7 @@ class _AddLaptopState extends State<AddLaptop> {
     try{
       String lokasiGambarPC = ImglaptopController.text;
       String fotoLaptop = '';
+      String status = getStatusLaptop(selectedStatus);
       List<Map<String, dynamic>> ListKebutuhan_Laptop = Kebutuhan_Laptop.map((kebutuhan) {
         var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanLaptop);
         return {
@@ -182,14 +219,10 @@ class _AddLaptopState extends State<AddLaptop> {
         fotoLaptop = await unggahGambarLaptop(imgLaptop);
       }
 
-      // Kebutuhan_Laptop.forEach((kebutuhan) {
-      //   SetAlarmLaptop(kebutuhan);
-      // });
-
       await tambahLaptop(
         merekLaptopController.text.trim(),
         IdLaptopController.text.trim(),
-        lokasiRuanganController.text.trim(),
+        selectedRuangan,
         CPUController.text.trim(),
         int.parse(RamController.text.trim()),
         int.parse(StorageController.text.trim()),
@@ -197,6 +230,7 @@ class _AddLaptopState extends State<AddLaptop> {
         MonitorController.text.trim(),
         ListKebutuhan_Laptop,
         fotoLaptop,
+        status
       );
 
       AwesomeDialog(
@@ -220,12 +254,13 @@ class _AddLaptopState extends State<AddLaptop> {
     }
   }
 
-  Future tambahLaptop (String merek, String ID, String ruangan,
-      String CPU, int ram, int storage, String vga, String monitor,List<Map<String, dynamic>> kebutuhan, String gambarLaptop) async{
+  Future tambahLaptop (String merek, String ID, String selectedRuangan,
+      String CPU, int ram, int storage, String vga, String monitor,List<Map<String, dynamic>> kebutuhan, String gambarLaptop,
+      String status) async{
     await FirebaseFirestore.instance.collection('Laptop').add({
       'Merek Laptop' : merek,
       'ID Laptop' : ID,
-      'Lokasi Ruangan' : ruangan,
+      'Ruangan' : selectedRuangan,
       'CPU' : CPU,
       'RAM' : ram,
       'Kapasitas Penyimpanan' : storage,
@@ -234,6 +269,8 @@ class _AddLaptopState extends State<AddLaptop> {
       'Kebutuhan Laptop' : kebutuhan,
       'Gambar Laptop' : gambarLaptop,
       'Jenis Aset' : 'Laptop',
+      'Status' : status,
+
     });
   }
 
@@ -299,22 +336,80 @@ class _AddLaptopState extends State<AddLaptop> {
                     textInputAction: TextInputAction.next,
                     controller: IdLaptopController),
                 const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<LaptopStatus>(
+                      title: Text('Aktif'),
+                      value: LaptopStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (LaptopStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? LaptopStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<LaptopStatus>(
+                      title: Text('Rusak'),
+                      value: LaptopStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (LaptopStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? LaptopStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<LaptopStatus>(
+                      title: Text('Hilang'),
+                      value: LaptopStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (LaptopStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? LaptopStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
                   child: Text(
                     'Ruangan',
-                    style: TextStyles.title
-                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                    style: TextStyles.title.copyWith(fontSize: 15, color: Warna.darkgrey),
                   ),
                 ),
                 const SizedBox(height: 10),
 
-                MyTextField(
-                    textInputType: TextInputType.text,
-                    hint: '',
-                    textInputAction: TextInputAction.next,
-                    controller: lokasiRuanganController),
+                DropdownSearch<String>(
+                  popupProps: PopupProps.menu(
+                    showSelectedItems: true,
+                  ),
+                  items: Ruangan,
+                  dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      hintText: "Pilih Ruangan...",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30)
+                      )
+                    ),
+                  ),
+                  onChanged: (selectedValue){
+                    print(selectedValue);
+                    setState(() {
+                      selectedRuangan = selectedValue ?? "";
+                    });
+                  },
+                ),
                 const SizedBox(height: 10),
 
                 Padding(
@@ -396,7 +491,7 @@ class _AddLaptopState extends State<AddLaptop> {
                 const SizedBox(height: 10),
 
                 MyTextField(
-                    textInputType: TextInputType.text,
+                    textInputType: TextInputType.number,
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: MonitorController),

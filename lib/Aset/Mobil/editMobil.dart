@@ -44,6 +44,9 @@ class KebutuhanModelUpdateMobil {
   }
 }
 
+enum MobilStatus { aktif, rusak, hilang }
+MobilStatus selectedStatus = MobilStatus.aktif;
+
 class _EditMobilState extends State<EditMobil> {
   final merekMobilController =TextEditingController();
   final idMobilCOntroller = TextEditingController();
@@ -68,6 +71,19 @@ class _EditMobilState extends State<EditMobil> {
       setState(() {
         imgMobilController.text = pilihMobil.path;
       });
+    }
+  }
+
+  String getStatusMobil(MobilStatus status) {
+    switch (status) {
+      case MobilStatus.aktif:
+        return 'Aktif';
+      case MobilStatus.rusak:
+        return 'Rusak';
+      case MobilStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -196,7 +212,7 @@ class _EditMobilState extends State<EditMobil> {
   Future<void> UpdateMobil(String dokMobil, Map<String, dynamic> DataMobil) async{
     try{
       String GambarMobil;
-
+      String status = getStatusMobil(selectedStatus);
       List<Map<String, dynamic>> ListKebutuhan_Mobil = Kebutuhan_Mobil.map((kebutuhan) {
         var timeKebutuhan = contTimeService(int.parse(kebutuhan['Masa Kebutuhan Mobil'].toString()));
         return {
@@ -232,7 +248,8 @@ class _EditMobilState extends State<EditMobil> {
           'Jenis Aset' : 'Mobil',
           'Waktu Service Mobil': waktuKebutuhanMobil.millisecondsSinceEpoch,
           'Hari Service Mobil': daysBetween(DateTime.now(), waktuKebutuhanMobil),
-          'Lokasi' : 'Parkiran'
+          'Lokasi' : 'Parkiran',
+          'Status' : status
         };
         await FirebaseFirestore.instance.collection('Mobil').doc(dokMobil).update(DataMobilBaru);
       }
@@ -316,6 +333,49 @@ class _EditMobilState extends State<EditMobil> {
                   ),
                 ),
                 SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<MobilStatus>(
+                      title: Text('Aktif'),
+                      value: MobilStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (MobilStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MobilStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<MobilStatus>(
+                      title: Text('Rusak'),
+                      value: MobilStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (MobilStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MobilStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<MobilStatus>(
+                      title: Text('Hilang'),
+                      value: MobilStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (MobilStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MobilStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
 
                 MyTextField(
                     textInputType: TextInputType.text,

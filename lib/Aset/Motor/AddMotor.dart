@@ -34,6 +34,9 @@ class KebutuhanModelMotor {
       );
 }
 
+enum MotorStatus { aktif, rusak, hilang }
+MotorStatus selectedStatus = MotorStatus.aktif;
+
 class _AddMotorState extends State<AddMotor> {
   final ImagePicker _gambarMotor = ImagePicker();
   final merekMotorController = TextEditingController();
@@ -51,6 +54,7 @@ class _AddMotorState extends State<AddMotor> {
   final ImgMotorController = TextEditingController();
   List Kebutuhan_Motor = [];
 
+
   void PilihGambarMotor() async {
     final pilihMotor =
         await _gambarMotor.pickImage(source: ImageSource.gallery);
@@ -58,6 +62,19 @@ class _AddMotorState extends State<AddMotor> {
       setState(() {
         ImgMotorController.text = pilihMotor.path;
       });
+    }
+  }
+
+  String getStatusMotor(MotorStatus status) {
+    switch (status) {
+      case MotorStatus.aktif:
+        return 'Aktif';
+      case MotorStatus.rusak:
+        return 'Rusak';
+      case MotorStatus.hilang:
+        return 'Hilang';
+      default:
+        return '';
     }
   }
 
@@ -158,6 +175,7 @@ class _AddMotorState extends State<AddMotor> {
   void SimpanMotor() async{
     try{
       String lokasiGambarMotor = ImgMotorController.text;
+      String status = getStatusMotor(selectedStatus);
       String fotoMotor = '';
       List<Map<String, dynamic>> ListKebutuhan_Motor = Kebutuhan_Motor.map((kebutuhan) {
         var timeKebutuhan = contTimeService(kebutuhan.masaKebutuhanMotor);
@@ -188,6 +206,7 @@ class _AddMotorState extends State<AddMotor> {
         banBelakangController.text.trim(),
         ListKebutuhan_Motor,
         fotoMotor,
+        status,
       );
 
       AwesomeDialog(
@@ -210,7 +229,8 @@ class _AddMotorState extends State<AddMotor> {
   }
 
   Future tambahMotor (String merek, String id, int kapsMesin, String pendingin,String transmisi, int kapsBB, int kapsMinyak,
-      int aki, String banDpn, String banBlkng,List<Map<String, dynamic>> kebutuhan, String gambarMotor) async{
+      int aki, String banDpn, String banBlkng,List<Map<String, dynamic>> kebutuhan, String gambarMotor,
+      String status) async{
     await FirebaseFirestore.instance.collection('Motor').add({
       'Merek Motor' : merek,
       'ID Motor' : id,
@@ -225,7 +245,8 @@ class _AddMotorState extends State<AddMotor> {
       'Kebutuhan Motor' : kebutuhan,
       'Gambar Motor' : gambarMotor,
       'Jenis Aset' : 'Motor',
-      'Lokasi' : 'Parkiran'
+      'Lokasi' : 'Parkiran',
+      'Status': status,
     });
   }
 
@@ -288,6 +309,49 @@ class _AddMotorState extends State<AddMotor> {
                     hint: '',
                     textInputAction: TextInputAction.next,
                     controller: idMotorController),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Text(
+                    'Status',
+                    style: TextStyles.title
+                        .copyWith(fontSize: 15, color: Warna.darkgrey),
+                  ),
+                ),
+                Column(
+                  children: [
+                    RadioListTile<MotorStatus>(
+                      title: Text('Aktif'),
+                      value: MotorStatus.aktif,
+                      groupValue: selectedStatus,
+                      onChanged: (MotorStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MotorStatus.aktif;
+                        });
+                      },
+                    ),
+                    RadioListTile<MotorStatus>(
+                      title: Text('Rusak'),
+                      value: MotorStatus.rusak,
+                      groupValue: selectedStatus,
+                      onChanged: (MotorStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MotorStatus.rusak;
+                        });
+                      },
+                    ),
+                    RadioListTile<MotorStatus>(
+                      title: Text('Hilang'),
+                      value: MotorStatus.hilang,
+                      groupValue: selectedStatus,
+                      onChanged: (MotorStatus? value){
+                        setState(() {
+                          selectedStatus = value ?? MotorStatus.hilang;
+                        });
+                      },
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 3),
